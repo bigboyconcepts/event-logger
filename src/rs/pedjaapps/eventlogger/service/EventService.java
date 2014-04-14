@@ -18,6 +18,7 @@ import java.util.List;
 
 import rs.pedjaapps.eventlogger.MainApp;
 import rs.pedjaapps.eventlogger.R;
+import rs.pedjaapps.eventlogger.constants.Constants;
 import rs.pedjaapps.eventlogger.constants.EventLevel;
 import rs.pedjaapps.eventlogger.constants.EventType;
 import rs.pedjaapps.eventlogger.model.Event;
@@ -32,7 +33,6 @@ public class EventService extends Service
 {
     private ManualRegisterReceiver manualRegisterReceiver;
     private String lastActiveApp = "";
-    private long checkInterval = 1000l;
     Handler handler;
     private AppLaunchChecker appLaunchChecker = new AppLaunchChecker();
 
@@ -95,7 +95,7 @@ public class EventService extends Service
         HandlerThread thread = new HandlerThread("AppLaunchCheckerThread");
         thread.start();
         handler = new Handler(thread.getLooper());
-        handler.postDelayed(appLaunchChecker, checkInterval);
+        handler.postDelayed(appLaunchChecker, Constants.APP_LAUNCH_CHECK_INTERVAL);
 
         super.onCreate();
     }
@@ -142,7 +142,7 @@ public class EventService extends Service
                     }
                 }
             }
-            handler.postDelayed(appLaunchChecker, checkInterval);
+            handler.postDelayed(appLaunchChecker, Constants.APP_LAUNCH_CHECK_INTERVAL);
         }
     }
 

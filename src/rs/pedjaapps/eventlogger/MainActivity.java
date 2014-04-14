@@ -6,21 +6,17 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.ListView;
 
 import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
-import com.google.android.gms.ads.AdView;
 import com.google.android.gms.ads.InterstitialAd;
 
-import java.util.Objects;
-
 import rs.pedjaapps.eventlogger.adapter.EventAdapter;
+import rs.pedjaapps.eventlogger.constants.Constants;
 import rs.pedjaapps.eventlogger.fragment.EventInfoDialog;
 import rs.pedjaapps.eventlogger.model.Event;
 import rs.pedjaapps.eventlogger.service.EventService;
@@ -98,7 +94,7 @@ public class MainActivity extends AbsActivity implements AdapterView.OnItemClick
                     }
                     try
                     {
-                        Thread.sleep(2000);
+                        Thread.sleep(Constants.LIST_REFRESH_INTERVAL);
                         runOnUiThread(new Runnable()
                         {
                             @Override
