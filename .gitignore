@@ -3,3 +3,8 @@
 /.idea/workspace.xml
 .DS_Store
 /event-logger/build
+*.iml
+*.ipr
+*.iws
+gen
+out
