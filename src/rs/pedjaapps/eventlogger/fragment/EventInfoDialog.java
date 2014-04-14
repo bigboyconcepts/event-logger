@@ -1,13 +1,18 @@
 package rs.pedjaapps.eventlogger.fragment;
 
 
-import android.app.AlertDialog;
 import android.app.Dialog;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.text.Html;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
+import android.view.Window;
 import android.widget.TextView;
+
+import java.text.DateFormat;
+import java.util.Locale;
 
 import rs.pedjaapps.eventlogger.R;
 import rs.pedjaapps.eventlogger.constants.EventLevel;
@@ -41,19 +46,27 @@ public class EventInfoDialog extends DialogFragment
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState)
     {
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        Dialog dialog = new Dialog(getActivity());
+        dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);//make window holding dialog transparent
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        return dialog;
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
+    {
+        DateFormat format = DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.MEDIUM, Locale.getDefault());
         View view = getActivity().getLayoutInflater().inflate(R.layout.layout_event_info, null);
         TextView tvTimestamp = (TextView)view.findViewById(R.id.tvTimestamp);
         TextView tvEventLevelColor = (TextView)view.findViewById(R.id.tvEventLevelColor);
         TextView tvEventLevelText = (TextView)view.findViewById(R.id.tvEventLevelText);
         TextView tvLongDesc = (TextView)view.findViewById(R.id.tvLongDesc);
         TextView tvEventDetails = (TextView)view.findViewById(R.id.tvEventDetails);
-        tvTimestamp.setText(event.getTimestamp().getTime() + "");
+        tvTimestamp.setText(format.format(event.getTimestamp().getTime()));
         tvEventLevelColor.setBackgroundColor(EventLevel.getLevelForInt(event.getLevel()).color());
         tvLongDesc.setText(Html.fromHtml(event.getLong_desc()));
         tvEventDetails.setCompoundDrawablesWithIntrinsicBounds(EventType.getIconForId(event.getType()), 0, 0, 0);
         tvEventLevelText.setText(EventLevel.getTextForInt(event.getLevel()));
-        builder.setView(view);
-        return builder.create();
+        return view;
     }
 }

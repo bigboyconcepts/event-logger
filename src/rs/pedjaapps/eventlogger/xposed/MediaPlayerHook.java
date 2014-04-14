@@ -10,14 +10,14 @@ import de.robv.android.xposed.IXposedHookZygoteInit;
 import de.robv.android.xposed.XC_MethodHook;
 import de.robv.android.xposed.XposedBridge;
 import de.robv.android.xposed.callbacks.XC_LoadPackage;
-import rs.pedjaapps.eventlogger.constants.EventLevel;
-import rs.pedjaapps.eventlogger.constants.EventType;
 import rs.pedjaapps.eventlogger.MainApp;
 import rs.pedjaapps.eventlogger.R;
+import rs.pedjaapps.eventlogger.constants.EventLevel;
+import rs.pedjaapps.eventlogger.constants.EventType;
 import rs.pedjaapps.eventlogger.model.Event;
 import rs.pedjaapps.eventlogger.model.EventDao;
+import rs.pedjaapps.eventlogger.receiver.EventReceiver;
 
-import static de.robv.android.xposed.XposedHelpers.findAndHookMethod;
 import static de.robv.android.xposed.XposedHelpers.findClass;
 
 /**
@@ -75,6 +75,7 @@ public class MediaPlayerHook implements IXposedHookLoadPackage, IXposedHookZygot
                     }
                     EventDao eventDao = MainApp.getInstance().getDaoSession().getEventDao();
                     eventDao.insert(event);
+                    EventReceiver.sendLocalBroadcast(event);
                     XposedBridge.log("before hooked method" + param.method.getName());
                 }
             };

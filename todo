@@ -24,5 +24,7 @@
 ☒ hdmi plugged - xposed(i have no idea how to determine this)
 - nfc toggle - xposed
 ☑ volume changed
+- application installed/removed
+- service start/stop - xposed
 
 - dialog theme on tablet/big screens

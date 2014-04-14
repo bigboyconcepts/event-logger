@@ -135,5 +135,9 @@
     <string name="warning">Warning</string>
     <string name="info">Info</string>
     <string name="ok">OK</string>
+    <string name="xposed_desc">Allows logging of aditional events such as: toggling mobile network, playing pausing audio/video...</string>
+    <string name="restart_event_service_desc">Allowes other packages to restart EventService</string>
+    <string name="restart_event_service_label">RESTART_EVENT_SERVICE</string>
+    <string name="now">now</string>
 
 </resources>

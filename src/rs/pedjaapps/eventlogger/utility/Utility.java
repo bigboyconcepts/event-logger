@@ -169,9 +169,9 @@ public class Utility
         int months = TimeUtility.getMonths(weeks);
         int years = TimeUtility.getYears(days);
 
-        if (seconds < 60)
+        if (minutes <= 0)
         {
-            return seconds + MainApp.getContext().getString(R.string.sec);
+            return MainApp.getContext().getString(R.string.now);
         }
         else if (minutes < 60)
         {

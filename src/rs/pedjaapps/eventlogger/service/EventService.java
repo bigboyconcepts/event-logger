@@ -12,26 +12,27 @@ import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.IBinder;
 import android.telephony.TelephonyManager;
+import android.util.Log;
 
 import java.util.Date;
 import java.util.List;
 
 import rs.pedjaapps.eventlogger.MainApp;
 import rs.pedjaapps.eventlogger.R;
+import rs.pedjaapps.eventlogger.ServiceRestartActivity;
 import rs.pedjaapps.eventlogger.constants.Constants;
 import rs.pedjaapps.eventlogger.constants.EventLevel;
 import rs.pedjaapps.eventlogger.constants.EventType;
 import rs.pedjaapps.eventlogger.model.Event;
 import rs.pedjaapps.eventlogger.model.EventDao;
-import rs.pedjaapps.eventlogger.receiver.AbsEventReceiver;
-import rs.pedjaapps.eventlogger.receiver.ManualRegisterReceiver;
+import rs.pedjaapps.eventlogger.receiver.EventReceiver;
 
 /**
  * Created by pedja on 11.4.14..
  */
 public class EventService extends Service
 {
-    private ManualRegisterReceiver manualRegisterReceiver;
+    private EventReceiver manualRegisterReceiver;
     private String lastActiveApp = "";
     Handler handler;
     private AppLaunchChecker appLaunchChecker = new AppLaunchChecker();
@@ -45,6 +46,7 @@ public class EventService extends Service
     @Override
     public void onCreate()
     {
+        Log.d(Constants.LOG_TAG, "EventService :: onCreate");
         IntentFilter intentFilter = new IntentFilter();
         //screen
         intentFilter.addAction(Intent.ACTION_SCREEN_ON);
@@ -89,7 +91,7 @@ public class EventService extends Service
         intentFilter.addAction(Intent.ACTION_POWER_DISCONNECTED);
         intentFilter.addAction(Intent.ACTION_BATTERY_CHANGED);
 
-        manualRegisterReceiver = new ManualRegisterReceiver();
+        manualRegisterReceiver = new EventReceiver();
         registerReceiver(manualRegisterReceiver, intentFilter);
 
         HandlerThread thread = new HandlerThread("AppLaunchCheckerThread");
@@ -137,7 +139,7 @@ public class EventService extends Service
                             event.setLong_desc(getString(R.string.app_started_desc, appName, pn));
                             EventDao eventDao = MainApp.getInstance().getDaoSession().getEventDao();
                             eventDao.insert(event);
-                            AbsEventReceiver.sendLocalBroadcast(event);
+                            EventReceiver.sendLocalBroadcast(event);
                         }
                     }
                 }
@@ -150,12 +152,22 @@ public class EventService extends Service
     public void onDestroy()
     {
         unregisterReceiver(manualRegisterReceiver);
+        Log.d(Constants.LOG_TAG, "EventService :: onDestroy");
         super.onDestroy();
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId)
     {
+        Log.d(Constants.LOG_TAG, "EventService :: onStartCommand");
         return Service.START_STICKY;
+    }
+
+    @Override
+    public void onTaskRemoved(Intent rootIntent)
+    {
+        Log.d(Constants.LOG_TAG, "EventService :: onTaskRemoved");
+        super.onTaskRemoved(rootIntent);
+        startActivity(new Intent(this, ServiceRestartActivity.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK|Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS));
     }
 }

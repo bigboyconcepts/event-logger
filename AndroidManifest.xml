@@ -32,6 +32,13 @@
 
     <uses-permission android:name="android.permission.GET_TASKS"/>
 
+    <uses-permission android:name="rs.pedjaapps.eventlogger.RESTART_EVENT_SERVICE"/>
+
+    <permission
+        android:name="rs.pedjaapps.eventlogger.RESTART_EVENT_SERVICE"
+        android:description="@string/restart_event_service_desc"
+        android:label="@string/restart_event_service_label"
+        android:protectionLevel="signature" />
 
     <uses-feature
         android:name="android.hardware.telephony"
@@ -61,7 +68,7 @@
             android:value="true"/>
         <meta-data
             android:name="xposeddescription"
-            android:value="TODO description"/>
+            android:value="@string/xposed_desc"/>
         <meta-data
             android:name="xposedminversion"
             android:value="30"/>
@@ -85,7 +92,11 @@
             android:name="com.google.android.gms.ads.AdActivity"
             android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|uiMode|screenSize|smallestScreenSize"/>
 
-        <receiver android:name=".receiver.AutoRegisterReceiver">
+        <activity
+            android:name=".ServiceRestartActivity"
+            android:theme="@style/ThemeTransparent"/>
+
+        <receiver android:name=".receiver.EventReceiver">
             <intent-filter>
                 <action android:name="android.net.wifi.STATE_CHANGE"/>
                 <action android:name="android.net.wifi.WIFI_STATE_CHANGED"/>
@@ -109,8 +120,8 @@
                 <action android:name="android.intent.action.PHONE_STATE" />
             </intent-filter>
         </receiver>
-        <service android:name=".service.EventService"
-                 android:permission="rs.pedjaapps.eventlogger.RestartService"
+        <service android:name="rs.pedjaapps.eventlogger.service.EventService"
+                 android:permission="rs.pedjaapps.eventlogger.RESTART_EVENT_SERVICE"
                  android:exported="true"/>
     </application>
 

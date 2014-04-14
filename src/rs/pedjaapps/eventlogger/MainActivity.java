@@ -66,6 +66,14 @@ public class MainActivity extends AbsActivity implements AdapterView.OnItemClick
             }
         });
         mMsgListView.setClipToPadding(true);
+        mMsgListView.post(new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                smoothScrollToEnd(false, 0);
+            }
+        });
 
         mEventListAdapter = new EventAdapter(this, getDaoSession().getEventDao().loadAll());
         mMsgListView.setAdapter(mEventListAdapter);
@@ -134,7 +142,6 @@ public class MainActivity extends AbsActivity implements AdapterView.OnItemClick
                 adView.setVisibility(View.VISIBLE);
             }
         });*/
-        smoothScrollToEnd(true, 0);
 
         //test interstitial ad
         // Create the interstitial.
