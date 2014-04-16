@@ -164,7 +164,6 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/DaoGenerator/DaoGenerator.iml" filepath="$PROJECT_DIR$/DaoGenerator/DaoGenerator.iml" />
-      <module fileurl="file://$PROJECT_DIR$/Event Logger Helper/Event Logger Helper.iml" filepath="$PROJECT_DIR$/Event Logger Helper/Event Logger Helper.iml" />
       <module fileurl="file://$PROJECT_DIR$/libs/appcompat/appcompat.iml" filepath="$PROJECT_DIR$/libs/appcompat/appcompat.iml" />
       <module fileurl="file://$PROJECT_DIR$/event-logger.iml" filepath="$PROJECT_DIR$/event-logger.iml" />
       <module fileurl="file://$PROJECT_DIR$/libs/google-play-services_lib/google-play-services_lib.iml" filepath="$PROJECT_DIR$/libs/google-play-services_lib/google-play-services_lib.iml" />

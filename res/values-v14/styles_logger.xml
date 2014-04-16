@@ -19,7 +19,7 @@
 
 <resources>
 
-    <style name="Theme.Logger" parent="@style/Theme.AppCompat.Light">
+    <style name="Theme.Logger" parent="@style/AppTheme">
         <item name="android:actionBarItemBackground">@drawable/selectable_background_logger</item>
         <item name="android:popupMenuStyle">@style/PopupMenu.Logger</item>
         <item name="android:dropDownListViewStyle">@style/DropDownListView.Logger</item>

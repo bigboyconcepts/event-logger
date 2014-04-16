@@ -52,9 +52,9 @@
     <string name="device_shutdown">Device Shutting down...</string>
     <string name="shutdown_desc">Device shutdown process has started.</string>
     <string name="time_changed">Time changed</string>
-    <string name="time_changed_desc">User has changed device time settings.</string>
+    <string name="time_changed_desc"><![CDATA[User has changed device time settings.<br>This event will also happen from time to time if "Automatic date & time" option is enabled]]></string>
     <string name="date_changed">Date changed</string>
-    <string name="date_changed_desc">User has changed device date settings.</string>
+    <string name="date_changed_desc"><![CDATA[User has changed device date settings.<br>This event will also happen from time to time if "Automatic date & time" option is enabled]]></string>
     <string name="timezone_changed">Timezone changed</string>
     <string name="timezone_changed_desc">User has changed device timezone: %s</string>
     <string name="airplane_mode_toggled" formatted="false"><![CDATA[Airplane Mode Toggled: <font color="%s">[%s]</font>]]></string>
@@ -106,17 +106,17 @@
     <string name="screen_on_desc">Screen has been turned on.</string>
     <string name="screen_unlocked">Screen Unlocked</string>
     <string name="screen_unlocked_desc">User has unlocked the device.</string>
-    <string name="headset_plugged">Headset Plugged-In [%s]</string>
-    <string name="headset_unplugged">Headset Unplugged [%s]</string>
-    <string name="headset_status_changed">Headset Status Changed [UNKNOWN]</string>
-    <string name="headset_plugged_desc" formatted="false"><![CDATA[Headset Plugged-In.<br>
+    <string name="headset_plugged">Headphones Plugged-In [%s]</string>
+    <string name="headset_unplugged">Headphones Unplugged [%s]</string>
+    <string name="headset_status_changed">Headphones Status Changed [UNKNOWN]</string>
+    <string name="headset_plugged_desc" formatted="false"><![CDATA[Headphones Plugged-In.<br>
                 •Name: %s<br>
                 •Has Mic.: %s<br>]]></string>
-    <string name="headset_unplugged_desc" formatted="false"><![CDATA[Headset Unplugged.<br>
+    <string name="headset_unplugged_desc" formatted="false"><![CDATA[Headphones Unplugged.<br>
                 •Name: %s<br>
                 •Has Mic.: %s<br>]]></string>
     <string name="headset_unknown_desc" formatted="false"><![CDATA[
-    Headset Status Changed<br>There was no information whether headset was plugged-in or unplugged or any other info about headset.
+    Headphones Status Changed<br>There was no information whether headset was plugged-in or unplugged or any other info about headset.
     ]]></string>
     <string name="yes">Yes</string>
     <string name="no">No</string>
@@ -139,5 +139,6 @@
     <string name="restart_event_service_desc">Allowes other packages to restart EventService</string>
     <string name="restart_event_service_label">RESTART_EVENT_SERVICE</string>
     <string name="now">now</string>
+    <string name="no_events">There are no events at this moment!\nGo do something with your phone and come back later.</string>
 
 </resources>

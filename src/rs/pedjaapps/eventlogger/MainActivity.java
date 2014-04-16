@@ -4,16 +4,28 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.res.Configuration;
+import android.graphics.Point;
+import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
+import android.view.Display;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.AdapterView;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.InterstitialAd;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import rs.pedjaapps.eventlogger.adapter.EventAdapter;
 import rs.pedjaapps.eventlogger.constants.Constants;
@@ -33,7 +45,7 @@ public class MainActivity extends AbsActivity implements AdapterView.OnItemClick
     // then a scroll shortcut is invoked to move the list near the end before scrolling.
     protected static final int MAX_ITEMS_TO_INVOKE_SCROLL_SHORTCUT = 20;
 
-    protected EventListView mMsgListView;
+    protected EventListView mEventListView;
     protected EventAdapter mEventListAdapter;
     protected int mLastSmoothScrollPosition;
     final Object refreshLock = new Object();
@@ -44,17 +56,23 @@ public class MainActivity extends AbsActivity implements AdapterView.OnItemClick
     public static final String EXTRA_EVENT = "extra_event";
 
     InterstitialAd interstitial;
+    TextView tvNoEvents;
+    ProgressBar pbLoading;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
+        setupActivityStyle();
         setContentView(R.layout.activity_main);
 
+        tvNoEvents = (TextView) findViewById(R.id.tvNoEvents);
+        pbLoading = (ProgressBar) findViewById(R.id.pbLoading);
+
         startService(new Intent(this, EventService.class));
-        mMsgListView = (EventListView) findViewById(R.id.lvEvents);
-        mMsgListView.setOnSizeChangedListener(new EventListView.OnSizeChangedListener()
+        mEventListView = (EventListView) findViewById(R.id.lvEvents);
+        mEventListView.setOnSizeChangedListener(new EventListView.OnSizeChangedListener()
         {
             public void onSizeChanged(int width, int height, int oldWidth, int oldHeight)
             {
@@ -65,19 +83,11 @@ public class MainActivity extends AbsActivity implements AdapterView.OnItemClick
                 smoothScrollToEnd(false, height - oldHeight);
             }
         });
-        mMsgListView.setClipToPadding(true);
-        mMsgListView.post(new Runnable()
-        {
-            @Override
-            public void run()
-            {
-                smoothScrollToEnd(false, 0);
-            }
-        });
+        mEventListView.setClipToPadding(true);
 
-        mEventListAdapter = new EventAdapter(this, getDaoSession().getEventDao().loadAll());
-        mMsgListView.setAdapter(mEventListAdapter);
-        mMsgListView.setOnItemClickListener(this);
+        mEventListAdapter = new EventAdapter(this, new ArrayList<Event>());
+        mEventListView.setAdapter(mEventListAdapter);
+        mEventListView.setOnItemClickListener(this);
 
         Thread thread = new Thread(new Runnable()
         {
@@ -157,7 +167,42 @@ public class MainActivity extends AbsActivity implements AdapterView.OnItemClick
                 displayInterstitial();
             }
         });
+        new ATLoadEvents().execute();
+    }
 
+    private void setupActivityStyle()
+    {
+        if (getResources().getBoolean(R.bool.isTablet))
+        {
+            requestWindowFeature(Window.FEATURE_ACTION_BAR);
+            getWindow().setFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND, WindowManager.LayoutParams.FLAG_DIM_BEHIND);
+            WindowManager.LayoutParams params = getWindow().getAttributes();
+            params.alpha = 1.0f;
+            params.dimAmount = 0.5f;
+            getWindow().setAttributes(params);
+
+            // This sets the window size, while working around the IllegalStateException thrown by ActionBarView
+            WindowManager manager = getWindowManager();
+            Display display = manager.getDefaultDisplay();
+            int sWidth, sHeight, aWidth, aHeight;
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR2)
+            {
+                Point size = new Point();
+                display.getSize(size);
+                sWidth = size.x;
+                sHeight = size.y;
+            }
+            else
+            {
+                sWidth = display.getWidth();
+                sHeight = display.getHeight();
+            }
+            boolean landscape = getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE;
+            aWidth = landscape ? sWidth / 2 : (sWidth - sWidth / 5);
+            aHeight = landscape ? (sHeight - sHeight / 5) : sHeight / 2;
+
+            getWindow().setLayout(aWidth, aHeight);
+        }
     }
 
     public void displayInterstitial()
@@ -183,7 +228,7 @@ public class MainActivity extends AbsActivity implements AdapterView.OnItemClick
     protected void onPause()
     {
         super.onPause();
-        if(!isFinishing())autorefreshList = false;
+        if (!isFinishing()) autorefreshList = false;
     }
 
     @Override
@@ -240,7 +285,7 @@ public class MainActivity extends AbsActivity implements AdapterView.OnItemClick
      */
     protected void smoothScrollToEnd(boolean force, int listSizeChange)
     {
-        int lastItemVisible = mMsgListView.getLastVisiblePosition();
+        int lastItemVisible = mEventListView.getLastVisiblePosition();
         int lastItemInList = mEventListAdapter.getCount() - 1;
         if (lastItemVisible < 0 || lastItemInList < 0)
         {
@@ -248,7 +293,7 @@ public class MainActivity extends AbsActivity implements AdapterView.OnItemClick
         }
 
         View lastChildVisible =
-                mMsgListView.getChildAt(lastItemVisible - mMsgListView.getFirstVisiblePosition());
+                mEventListView.getChildAt(lastItemVisible - mEventListView.getFirstVisiblePosition());
         int lastVisibleItemBottom = 0;
         int lastVisibleItemHeight = 0;
         if (lastChildVisible != null)
@@ -270,12 +315,12 @@ public class MainActivity extends AbsActivity implements AdapterView.OnItemClick
         // list. This happens when the keyboard is up and the last item is an mms with an
         // attachment thumbnail, such as picture. In this situation, we want to scroll the list so
         // the bottom of the thumbnail is visible and the top of the item is scroll off the screen.
-        int listHeight = mMsgListView.getHeight();
+        int listHeight = mEventListView.getHeight();
         boolean lastItemTooTall = lastVisibleItemHeight > listHeight;
         boolean willScroll = force ||
                 ((listSizeChange != 0 || lastItemInList != mLastSmoothScrollPosition) &&
                         lastVisibleItemBottom + listSizeChange <=
-                                listHeight - mMsgListView.getPaddingBottom());
+                                listHeight - mEventListView.getPaddingBottom());
         if (willScroll || (lastItemTooTall && lastItemInList == lastItemVisible))
         {
             if (Math.abs(listSizeChange) > SMOOTH_SCROLL_THRESHOLD)
@@ -290,17 +335,17 @@ public class MainActivity extends AbsActivity implements AdapterView.OnItemClick
                     // we need to scroll that item so that its top is negative or above the top of
                     // the list. That way, the bottom of the last item will be exposed above the
                     // keyboard.
-                    mMsgListView.setSelectionFromTop(lastItemInList,
+                    mEventListView.setSelectionFromTop(lastItemInList,
                             listHeight - lastVisibleItemHeight);
                 }
                 else
                 {
-                    mMsgListView.setSelection(lastItemInList);
+                    mEventListView.setSelection(lastItemInList);
                 }
             }
             else if (lastItemInList - lastItemVisible > MAX_ITEMS_TO_INVOKE_SCROLL_SHORTCUT)
             {
-                mMsgListView.setSelection(lastItemInList);
+                mEventListView.setSelection(lastItemInList);
             }
             else
             {
@@ -311,12 +356,12 @@ public class MainActivity extends AbsActivity implements AdapterView.OnItemClick
                     // the list. That way, the bottom of the last item will be exposed above the
                     // keyboard. We should use smoothScrollToPositionFromTop here, but it doesn't
                     // seem to work -- the list ends up scrolling to a random position.
-                    mMsgListView.setSelectionFromTop(lastItemInList,
+                    mEventListView.setSelectionFromTop(lastItemInList,
                             listHeight - lastVisibleItemHeight);
                 }
                 else
                 {
-                    mMsgListView.smoothScrollToPosition(lastItemInList);
+                    mEventListView.smoothScrollToPosition(lastItemInList);
                 }
                 mLastSmoothScrollPosition = lastItemInList;
             }
@@ -328,5 +373,50 @@ public class MainActivity extends AbsActivity implements AdapterView.OnItemClick
     {
         EventInfoDialog dialog = EventInfoDialog.newInstance(mEventListAdapter.getItem(i));
         dialog.show(getSupportFragmentManager(), "event_details");
+    }
+
+    public class ATLoadEvents extends AsyncTask<String, Void, List<Event>>
+    {
+        @Override
+        protected void onPreExecute()
+        {
+            super.onPreExecute();
+            pbLoading.setVisibility(View.VISIBLE);
+            tvNoEvents.setVisibility(View.GONE);
+        }
+
+        @Override
+        protected List<Event> doInBackground(String... params)
+        {
+            List<Event> events = getDaoSession().getEventDao().loadAll();//TODO load with filter
+
+            return events;
+        }
+
+        @Override
+        protected void onPostExecute(List<Event> events)
+        {
+            pbLoading.setVisibility(View.GONE);
+            if (events == null || events.isEmpty())
+            {
+                tvNoEvents.setVisibility(View.GONE);
+            }
+            else
+            {
+                for (Event event : events)
+                {
+                    mEventListAdapter.add(event);
+                }
+                mEventListAdapter.notifyDataSetChanged();
+                mEventListView.post(new Runnable()
+                {
+                    @Override
+                    public void run()
+                    {
+                        mEventListView.setSelection(mEventListAdapter.getCount() - 1);
+                    }
+                });
+            }
+        }
     }
 }
