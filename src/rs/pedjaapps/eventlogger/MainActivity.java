@@ -408,6 +408,7 @@ public class MainActivity extends AbsActivity implements AdapterView.OnItemClick
                     mEventListAdapter.add(event);
                 }
                 mEventListAdapter.notifyDataSetChanged();
+                mEventListView.setSelection(mEventListAdapter.getCount() - 1);
                 mEventListView.post(new Runnable()
                 {
                     @Override

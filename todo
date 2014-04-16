@@ -26,3 +26,12 @@
 ☑ volume changed
 - application installed/removed
 - service start/stop - xposed
+
+bugs
+- sometimes events are added to the list without them actually happening(Headphone plugged, volume level changed, orientation changed)
+- list sometimes doesn't scroll to bottom when app is started
+- filter doesn't work yet
+- settings menu is there but it doesn't do anything at the moment
+- help item is there but it does nothing yet
+- media play/pause works only on limited number of players
+- when app is killed by the system due to low memory (on android 4.4) it doesn't get restarted - only happens on 4.4+
