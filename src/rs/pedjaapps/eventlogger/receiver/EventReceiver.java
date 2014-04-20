@@ -36,10 +36,15 @@ public class EventReceiver extends BroadcastReceiver
 {
     public static void sendLocalBroadcast(Event event)
     {
+        sendLocalBroadcast(event, MainApp.getContext());
+    }
+
+    public static void sendLocalBroadcast(Event event, Context context)
+    {
         Intent intent = new Intent();
         intent.setAction(MainActivity.ACTION_ADD_EVENT);
         intent.putExtra(MainActivity.EXTRA_EVENT, event);
-        LocalBroadcastManager.getInstance(MainApp.getContext()).sendBroadcast(intent);
+        LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
     }
 
     @Override

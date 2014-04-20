@@ -35,3 +35,6 @@ bugs
 - help item is there but it does nothing yet
 - media play/pause works only on limited number of players
 - when app is killed by the system due to low memory (on android 4.4) it doesn't get restarted - only happens on 4.4+
+
+todo
+-filter events

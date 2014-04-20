@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+          xmlns:tools="http://schemas.android.com/tools"
           package="rs.pedjaapps.eventlogger"
-          android:versionCode="1"
+          android:versionCode="20140418"
           android:versionName="1.0.0"
           android:installLocation="internalOnly">
 
@@ -38,7 +39,7 @@
         android:name="rs.pedjaapps.eventlogger.RESTART_EVENT_SERVICE"
         android:description="@string/restart_event_service_desc"
         android:label="@string/restart_event_service_label"
-        android:protectionLevel="signature" />
+        android:protectionLevel="signature"/>
 
     <uses-feature
         android:name="android.hardware.telephony"
@@ -115,14 +116,23 @@
                 <action android:name="android.intent.action.DATE_CHANGED"/>
                 <action android:name="android.intent.action.AIRPLANE_MODE"/>
                 <action android:name="android.intent.action.WALLPAPER_CHANGED"/>
-                <action android:name="android.location.PROVIDERS_CHANGED" />
-                <action android:name="android.media.VOLUME_CHANGED_ACTION" />
-                <action android:name="android.intent.action.PHONE_STATE" />
+                <action android:name="android.location.PROVIDERS_CHANGED"/>
+                <action android:name="android.media.VOLUME_CHANGED_ACTION"/>
+                <action android:name="android.intent.action.PHONE_STATE"/>
             </intent-filter>
         </receiver>
-        <service android:name="rs.pedjaapps.eventlogger.service.EventService"
-                 android:permission="rs.pedjaapps.eventlogger.RESTART_EVENT_SERVICE"
-                 android:exported="true"/>
+        <service
+            android:name="rs.pedjaapps.eventlogger.service.EventService"
+            android:permission="rs.pedjaapps.eventlogger.RESTART_EVENT_SERVICE"
+            android:exported="true"/>
+        <receiver
+            android:name=".receiver.InsertEventReceiver"
+            android:exported="true"
+            tools:ignore="ExportedReceiver">
+            <intent-filter>
+                <action android:name="rs.pedjaapps.eventlogger.INSERT_EVENT"/>
+            </intent-filter>
+        </receiver>
     </application>
 
 </manifest>

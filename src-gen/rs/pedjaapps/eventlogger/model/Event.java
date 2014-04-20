@@ -106,6 +106,7 @@ public class Event implements Parcelable {
         dest.writeString(this.short_desc);
         dest.writeString(this.long_desc);
         dest.writeInt(this.type);
+        dest.writeInt(this.level);
     }
 
     private Event(Parcel in)
@@ -116,6 +117,7 @@ public class Event implements Parcelable {
         this.short_desc = in.readString();
         this.long_desc = in.readString();
         this.type = in.readInt();
+        this.level = in.readInt();
     }
 
     public static Creator<Event> CREATOR = new Creator<Event>()
@@ -130,6 +132,19 @@ public class Event implements Parcelable {
             return new Event[size];
         }
     };
+
+    @Override
+    public String toString()
+    {
+        return "Event{" +
+                "id=" + id +
+                ", timestamp=" + timestamp +
+                ", short_desc='" + short_desc + '\'' +
+                ", long_desc='" + long_desc + '\'' +
+                ", type=" + type +
+                ", level=" + level +
+                '}';
+    }
 
     // KEEP METHODS END
 

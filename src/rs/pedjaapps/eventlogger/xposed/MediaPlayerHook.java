@@ -1,5 +1,7 @@
 package rs.pedjaapps.eventlogger.xposed;
 
+import android.content.Context;
+
 import java.lang.reflect.Method;
 import java.util.Date;
 import java.util.HashSet;
@@ -12,13 +14,20 @@ import de.robv.android.xposed.XposedBridge;
 import de.robv.android.xposed.callbacks.XC_LoadPackage;
 import rs.pedjaapps.eventlogger.MainApp;
 import rs.pedjaapps.eventlogger.R;
+import rs.pedjaapps.eventlogger.constants.Constants;
 import rs.pedjaapps.eventlogger.constants.EventLevel;
 import rs.pedjaapps.eventlogger.constants.EventType;
 import rs.pedjaapps.eventlogger.model.Event;
 import rs.pedjaapps.eventlogger.model.EventDao;
 import rs.pedjaapps.eventlogger.receiver.EventReceiver;
+import rs.pedjaapps.eventlogger.receiver.InsertEventReceiver;
 
+import static de.robv.android.xposed.XposedHelpers.callMethod;
 import static de.robv.android.xposed.XposedHelpers.findClass;
+import android.app.AndroidAppHelper;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.os.Bundle;
 
 /**
  * Created by pedja on 12.4.14..
@@ -30,8 +39,23 @@ public class MediaPlayerHook implements IXposedHookLoadPackage, IXposedHookZygot
     public void handleLoadPackage(XC_LoadPackage.LoadPackageParam lpparam) throws Throwable
     {
         //do nothing for now
+        /*if(lpparam.packageName.equals(Constants.PACKAGE_NAME))
+        {
+            XposedBridge.log(lpparam.packageName);
+            final Class<?> mClass = findClass(Constants.PACKAGE_NAME + ".MainApp", lpparam.classLoader);
+            XposedBridge.hookAllMethods(mClass, "onCreate", new XC_MethodHook()
+            {
+                @Override
+                protected void afterHookedMethod(MethodHookParam param) throws Throwable
+                {
+                    XposedBridge.log(param.method.getName());
+                    // save the launcher instance and the context
+                    Constants.context = (Context) callMethod(param.thisObject, "getApplicationContext");
+                    XposedBridge.log("Context: " + Constants.context);
+                }
+            });
+        }*/
     }
-
 
     @Override
     public void initZygote(StartupParam startupParam) throws Throwable
@@ -39,7 +63,7 @@ public class MediaPlayerHook implements IXposedHookLoadPackage, IXposedHookZygot
         hookMediaPlayer("android.media.MediaPlayer");
     }
 
-    private void hookMediaPlayer(String context)
+    private void hookMediaPlayer(final String context)
     {
         try
         {
@@ -54,29 +78,38 @@ public class MediaPlayerHook implements IXposedHookLoadPackage, IXposedHookZygot
                 @Override
                 protected void afterHookedMethod(MethodHookParam param) throws Throwable
                 {
+                    Context cappContext = AndroidAppHelper.currentApplication().getApplicationContext();
+                    Context context = cappContext.createPackageContext(Constants.PACKAGE_NAME, Context.CONTEXT_IGNORE_SECURITY);
+                    XposedBridge.log("Context: " + context);
                     Event event = new Event();
                     event.setTimestamp(new Date());
                     event.setLevel(EventLevel.getIntForLevel(EventLevel.info));
                     event.setType(EventType.getIntForType(EventType.media));
                     if(param.method.getName().equals("start"))
                     {
-                        event.setShort_desc(MainApp.getContext().getString(R.string.media_start_short));
-                        event.setLong_desc(MainApp.getContext().getString(R.string.media_start_long));
+                        event.setShort_desc(context.getString(R.string.media_start_short));
+                        event.setLong_desc(context.getString(R.string.media_start_long));
                     }
                     else if(param.method.getName().equals("pause"))
                     {
-                        event.setShort_desc(MainApp.getContext().getString(R.string.media_pause_short));
-                        event.setLong_desc(MainApp.getContext().getString(R.string.media_pause_long));
+                        event.setShort_desc(context.getString(R.string.media_pause_short));
+                        event.setLong_desc(context.getString(R.string.media_pause_long));
                     }
                     else if(param.method.getName().equals("stop"))
                     {
-                        event.setShort_desc(MainApp.getContext().getString(R.string.media_stop_short));
-                        event.setLong_desc(MainApp.getContext().getString(R.string.media_stop_long));
+                        event.setShort_desc(context.getString(R.string.media_stop_short));
+                        event.setLong_desc(context.getString(R.string.media_stop_long));
                     }
-                    EventDao eventDao = MainApp.getInstance().getDaoSession().getEventDao();
-                    eventDao.insert(event);
-                    EventReceiver.sendLocalBroadcast(event);
-                    XposedBridge.log("before hooked method" + param.method.getName());
+                    XposedBridge.log(event.toString());
+                    //EventDao eventDao = MainApp.getInstance().getDaoSession(context).getEventDao();
+                    //eventDao.insert(event);
+                    //EventReceiver.sendLocalBroadcast(event, context);
+                    Intent intent = new Intent();
+                    intent.setAction(InsertEventReceiver.ACTION_INSERT_EVENT);
+                    Bundle extras = new Bundle();
+                    extras.putParcelable(InsertEventReceiver.EXTRA_EVENT, event);
+                    intent.putExtras(extras);
+                    context.sendBroadcast(intent);
                 }
             };
 

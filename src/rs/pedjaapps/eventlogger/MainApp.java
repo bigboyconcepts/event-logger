@@ -59,9 +59,14 @@ public class MainApp extends Application
 
     public DaoSession getDaoSession()
     {
+        return getDaoSession(this);
+    }
+
+    public DaoSession getDaoSession(Context context)
+    {
         if (daoSession == null)
         {
-            DaoMaster.DevOpenHelper helper = new DaoMaster.DevOpenHelper(this, Constants.DB_NAME, null);
+            DaoMaster.DevOpenHelper helper = new DaoMaster.DevOpenHelper(context, Constants.DB_NAME, null);
             SQLiteDatabase db = helper.getWritableDatabase();
             DaoMaster daoMaster = new DaoMaster(db);
             daoSession = daoMaster.newSession();
