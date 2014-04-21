@@ -26,6 +26,10 @@
 ☑ volume changed
 - application installed/removed
 - service start/stop - xposed
+- app fc-ed
+- application accesed gps/network location
+- app opened data connection
+
 
 bugs
 - sometimes events are added to the list without them actually happening(Headphone plugged, volume level changed, orientation changed)
@@ -37,4 +41,7 @@ bugs
 - when app is killed by the system due to low memory (on android 4.4) it doesn't get restarted - only happens on 4.4+
 
 todo
--filter events
+- filter events to show
+- filter events to log
+- save add to cvs
+- concurrency database

@@ -22,6 +22,7 @@ import android.widget.TextView;
 
 import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
 import com.google.android.gms.ads.InterstitialAd;
 
 import java.util.ArrayList;
@@ -29,9 +30,11 @@ import java.util.List;
 
 import rs.pedjaapps.eventlogger.adapter.EventAdapter;
 import rs.pedjaapps.eventlogger.constants.Constants;
+import rs.pedjaapps.eventlogger.fragment.EventFilterDialog;
 import rs.pedjaapps.eventlogger.fragment.EventInfoDialog;
 import rs.pedjaapps.eventlogger.model.Event;
 import rs.pedjaapps.eventlogger.service.EventService;
+import rs.pedjaapps.eventlogger.utility.SettingsManager;
 import rs.pedjaapps.eventlogger.view.EventListView;
 
 public class MainActivity extends AbsActivity implements AdapterView.OnItemClickListener
@@ -53,12 +56,13 @@ public class MainActivity extends AbsActivity implements AdapterView.OnItemClick
     boolean doRefresh = true;
 
     public static final String ACTION_ADD_EVENT = "action_add_event";
+    public static final String ACTION_REMOVE_ADS = "action_remove_ads";
     public static final String EXTRA_EVENT = "extra_event";
 
     InterstitialAd interstitial;
     TextView tvNoEvents;
     ProgressBar pbLoading;
-
+    AdView adView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -134,16 +138,17 @@ public class MainActivity extends AbsActivity implements AdapterView.OnItemClick
 
         IntentFilter filter = new IntentFilter();
         filter.addAction(ACTION_ADD_EVENT);
+        filter.addAction(ACTION_REMOVE_ADS);
         LocalBroadcastManager.getInstance(this).registerReceiver(localReceiver, filter);
 
-        //final AdView adView = (AdView)findViewById(R.id.adView);
+        //adView = (AdView)findViewById(R.id.adView);
         AdRequest adRequest = new AdRequest.Builder()
                 .addTestDevice(AdRequest.DEVICE_ID_EMULATOR)
                 .addTestDevice("5750ECFACEA6FCE685DE7A97D8C59A5F")
                 .addTestDevice("05FBCDCAC44495595ACE7DC1AEC5C208")
                 .build();
-        /*adView.loadAd(adRequest);
-        adView.setAdListener(new AdListener()
+        //if(!SettingsManager.adsRemoved())adView.loadAd(adRequest);
+        /*adView.setAdListener(new AdListener()
         {
             @Override
             public void onAdLoaded()
@@ -157,7 +162,7 @@ public class MainActivity extends AbsActivity implements AdapterView.OnItemClick
         // Create the interstitial.
         interstitial = new InterstitialAd(this);
         interstitial.setAdUnitId("ca-app-pub-6294976772687752/1839387229");
-        interstitial.loadAd(adRequest);
+        if(!SettingsManager.adsRemoved() && SettingsManager.canDisplayAdds())interstitial.loadAd(adRequest);
         interstitial.setAdListener(new AdListener()
         {
             @Override
@@ -210,6 +215,7 @@ public class MainActivity extends AbsActivity implements AdapterView.OnItemClick
         if (interstitial.isLoaded())
         {
             interstitial.show();
+            SettingsManager.setAdShownTs();
         }
     }
 
@@ -243,11 +249,22 @@ public class MainActivity extends AbsActivity implements AdapterView.OnItemClick
         @Override
         public void onReceive(Context context, Intent intent)
         {
-            Event event = intent.getParcelableExtra(EXTRA_EVENT);
-            if (event == null) return;
-            mEventListAdapter.add(event);
-            mEventListAdapter.notifyDataSetChanged();
-            smoothScrollToEnd(true, 0);
+            if(ACTION_ADD_EVENT.equals(intent.getAction()))
+            {
+                Event event = intent.getParcelableExtra(EXTRA_EVENT);
+                if (event == null) return;
+                mEventListAdapter.add(event);
+                mEventListAdapter.notifyDataSetChanged();
+                smoothScrollToEnd(true, 0);
+            }
+            if(ACTION_REMOVE_ADS.equals(intent.getAction()))
+            {
+                if (adView != null)
+                {
+                    adView.destroy();
+                    adView.setVisibility(View.GONE);
+                }
+            }
         }
     };
 
@@ -266,8 +283,11 @@ public class MainActivity extends AbsActivity implements AdapterView.OnItemClick
             case R.id.action_about:
                 break;
             case R.id.action_settings:
+                startActivity(new Intent(this, SettingsActivity.class));
                 break;
             case R.id.action_filter:
+                EventFilterDialog dialog = EventFilterDialog.newInstance();
+                dialog.show(getSupportFragmentManager(), "event_filter");
                 break;
         }
         return super.onOptionsItemSelected(item);

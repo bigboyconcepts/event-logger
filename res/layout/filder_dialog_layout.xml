@@ -1,13 +1,308 @@
 <?xml version="1.0" encoding="utf-8"?>
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
 
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:orientation="vertical"
-              android:layout_width="match_parent"
-              android:layout_height="match_parent">
-
-    <CheckBox
+    <LinearLayout
+        android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/cbTimeFilter"/>
+        android:layout_height="wrap_content">
 
-</LinearLayout>
+        <CheckBox
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/cbTimeFilter"
+            android:text="@string/filter_by_time"
+            android:singleLine="true"/>
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:src="@android:color/darker_gray"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/llTimeFilter"
+            android:layout_marginLeft="40dp"
+            android:layout_marginRight="40dp"
+            android:orientation="vertical"
+            android:paddingTop="5dp"
+            android:paddingBottom="5dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/from"/>
+
+            <EditText
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:minEms="5"
+                android:inputType="datetime"
+                android:id="@+id/edTimeFrom"
+                android:focusable="false"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/to"
+                android:layout_marginTop="5dp"/>
+
+            <EditText
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:minEms="5"
+                android:inputType="datetime"
+                android:id="@+id/edTimeTo"
+                android:focusable="false"/>
+
+        </LinearLayout>
+
+        <CheckBox
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/cbTypeFilter"
+            android:text="@string/filter_by_type"
+            android:singleLine="true"/>
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:src="@android:color/darker_gray"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/llTypeFilter"
+            android:layout_marginLeft="40dp"
+            android:layout_marginRight="40dp"
+            android:orientation="vertical">
+
+            <CheckBox
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:singleLine="true"
+                android:text="@string/wifi"
+                android:drawableLeft="@drawable/ic_action_wifi"
+                android:id="@+id/cbWifi"/>
+
+            <CheckBox
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:singleLine="true"
+                android:text="@string/bluetooth"
+                android:drawableLeft="@drawable/ic_action_bluetooth"
+                android:id="@+id/cbBluetooth"/>
+
+            <CheckBox
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:singleLine="true"
+                android:text="@string/gps"
+                android:drawableLeft="@drawable/ic_action_gps"
+                android:id="@+id/cbGps"/>
+
+            <CheckBox
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:singleLine="true"
+                android:text="@string/media"
+                android:drawableLeft="@drawable/ic_action_media"
+                android:id="@+id/cbMedia"/>
+
+            <!--
+            <CheckBox
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:singleLine="true"
+                android:text="@string/nfc"
+                android:drawableLeft="@drawable/ic_action_nfc"
+                android:id="@+id/cbNfc"/>
+            -->
+
+            <CheckBox
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:singleLine="true"
+                android:text="@string/usb"
+                android:drawableLeft="@drawable/ic_action_usb"
+                android:id="@+id/cbUsb"/>
+
+            <CheckBox
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:singleLine="true"
+                android:text="@string/orientation"
+                android:drawableLeft="@drawable/ic_action_orientation"
+                android:id="@+id/cbOrientation"/>
+
+            <CheckBox
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:singleLine="true"
+                android:text="@string/locale"
+                android:drawableLeft="@drawable/ic_action_locale"
+                android:id="@+id/cbLocale"/>
+
+            <CheckBox
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:singleLine="true"
+                android:text="@string/screen"
+                android:drawableLeft="@drawable/ic_action_screen"
+                android:id="@+id/cbScreen"/>
+
+            <CheckBox
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:singleLine="true"
+                android:text="@string/sms"
+                android:drawableLeft="@drawable/ic_action_sms"
+                android:id="@+id/cbSms"/>
+
+            <CheckBox
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:singleLine="true"
+                android:text="@string/applications"
+                android:drawableLeft="@drawable/ic_action_app"
+                android:id="@+id/cbApp"/>
+
+            <CheckBox
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:singleLine="true"
+                android:text="@string/call"
+                android:drawableLeft="@drawable/ic_action_call"
+                android:id="@+id/cbCall"/>
+
+            <CheckBox
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:singleLine="true"
+                android:text="@string/heaphones"
+                android:drawableLeft="@drawable/ic_action_headset"
+                android:id="@+id/cbHeadphones"/>
+
+            <!--
+            <CheckBox
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:singleLine="true"
+                android:text="@string/storage"
+                android:drawableLeft="@drawable/ic_action_ums"
+                android:id="@+id/cbStorage"/>
+            -->
+
+            <CheckBox
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:singleLine="true"
+                android:text="@string/boot"
+                android:drawableLeft="@drawable/ic_action_power"
+                android:id="@+id/cbBoot"/>
+
+            <CheckBox
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:singleLine="true"
+                android:text="@string/time"
+                android:drawableLeft="@drawable/ic_action_timestamp"
+                android:id="@+id/cbTime"/>
+
+            <CheckBox
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:singleLine="true"
+                android:text="@string/date"
+                android:drawableLeft="@drawable/ic_action_date"
+                android:id="@+id/cbDate"/>
+
+            <CheckBox
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:singleLine="true"
+                android:text="@string/airplane"
+                android:drawableLeft="@drawable/ic_action_airplane"
+                android:id="@+id/cbAirplane"/>
+
+            <CheckBox
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:singleLine="true"
+                android:text="@string/battery"
+                android:drawableLeft="@drawable/ic_action_battery"
+                android:id="@+id/cbBattery"/>
+
+            <CheckBox
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:singleLine="true"
+                android:text="@string/wallpaper"
+                android:drawableLeft="@drawable/ic_action_wallpaper"
+                android:id="@+id/cbWallpaper"/>
+
+            <CheckBox
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:singleLine="true"
+                android:text="@string/volume"
+                android:drawableLeft="@drawable/ic_action_volume"
+                android:id="@+id/cbVolume"/>
+
+        </LinearLayout>
+
+        <CheckBox
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/cbLevelFilter"
+            android:text="@string/filter_by_level"
+            android:singleLine="true"/>
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:src="@android:color/darker_gray"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/llLevelFilter"
+            android:layout_marginLeft="30dp"
+            android:layout_marginRight="30dp"
+            android:orientation="vertical">
+
+            <CheckBox
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:singleLine="true"
+                android:text="@string/error"
+                android:textColor="@color/red"/>
+
+            <CheckBox
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:singleLine="true"
+                android:text="@string/warning"
+                android:textColor="@color/yellow"/>
+
+            <CheckBox
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:singleLine="true"
+                android:text="@string/info"
+                android:textColor="@color/green"/>
+
+            <CheckBox
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:singleLine="true"
+                android:text="@string/ok"
+                android:textColor="@color/cyan"/>
+
+        </LinearLayout>
+
+    </LinearLayout>
+</ScrollView>

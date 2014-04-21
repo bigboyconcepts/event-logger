@@ -10,4 +10,8 @@ public class Constants
     public static final long LIST_REFRESH_INTERVAL = 60000l;//ms
     public static final long APP_LAUNCH_CHECK_INTERVAL = 1000l;
     public static final String PACKAGE_NAME = "rs.pedjaapps.eventlogger";
+    public static final String UNLOCK_ADS_KEY_HASH = "84037fa835a3c13fa6d3f98b0dacb0c7";//md5sum of "r3m0v3_@ds"
+    public static final long ONE_DAY_MS = 1000 * 60 * 60 * 24;
+    public static final long ONE_HOUR_MS = 1000 * 60 * 60;
+
 }

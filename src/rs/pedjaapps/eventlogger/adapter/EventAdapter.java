@@ -52,6 +52,7 @@ public class EventAdapter extends ArrayAdapter<Event>
         holder.tvTimestamp.setText(Utility.getTime(event.getTimestamp().getTime()));
         holder.ivType.setImageResource(EventType.getIconForId(event.getType()));
 
+
         return convertView;
     }
 

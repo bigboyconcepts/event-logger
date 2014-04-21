@@ -140,5 +140,37 @@
     <string name="restart_event_service_label">RESTART_EVENT_SERVICE</string>
     <string name="now">now</string>
     <string name="no_events">There are no events at this moment!\nGo do something with your phone and come back later.</string>
+    <string name="remove_ads">Remove Ads</string>
+    <string name="enter_unlock_key">Enter Unlock Key</string>
+    <string name="ads_removed">Ads are removed.</string>
+    <string name="ads_not_removed">Ads are showing.</string>
+    <string name="wrong_key">Wrong Unlock Key</string>
+    <string name="unlock_disabled">Remove ads disabled due to 3 failed attempts!</string>
+    <string name="filter_by_type">FILTER BY TYPE</string>
+    <string name="filter_by_time">FILTER BY TIME</string>
+    <string name="filter_by_level">FILTER BY LEVEL</string>
+    <string name="filter_now">FILTER NOW</string>
+    <string name="from">from:</string>
+    <string name="to">to:</string>
+    <string name="wifi">WiFi</string>
+    <string name="bluetooth">Bluetooth</string>
+    <string name="gps">GPS</string>
+    <string name="nfc">NFC</string>
+    <string name="usb">USB/Power</string>
+    <string name="orientation">Orientation</string>
+    <string name="locale">Locale</string>
+    <string name="screen">Screen</string>
+    <string name="sms">SMS</string>
+    <string name="applications">Applications</string>
+    <string name="call">Call</string>
+    <string name="heaphones">Headphones</string>
+    <string name="storage">Storage</string>
+    <string name="boot">Boot/Shutdown</string>
+    <string name="time">Time</string>
+    <string name="date">Date</string>
+    <string name="airplane">Airplane Mode</string>
+    <string name="battery">Battery</string>
+    <string name="wallpaper">Wallpaper</string>
+    <string name="volume">Volume</string>
 
 </resources>
