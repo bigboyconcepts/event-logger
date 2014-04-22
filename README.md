@@ -9,6 +9,7 @@
 ### Event Logger will keep track of the following events:
 
 ☑ WiFi Enabled/Disabled
+
 ☑ WiFi Connected/Disconnected
 ☑ Bluetooth Enabled/Disabled
 ☑ GPS Enabled/Disabled
