@@ -19,6 +19,7 @@ import java.util.Locale;
 
 import rs.pedjaapps.eventlogger.R;
 import rs.pedjaapps.eventlogger.constants.Constants;
+import rs.pedjaapps.eventlogger.utility.SettingsManager;
 
 /**
  * Created by pedja on 13.4.14..
@@ -61,9 +62,9 @@ public class EventFilterDialog extends DialogFragment implements CompoundButton.
         cbTypeFilter.setOnCheckedChangeListener(this);
         CheckBox cbLevelFilter = (CheckBox)view.findViewById(R.id.cbLevelFilter);
         cbLevelFilter.setOnCheckedChangeListener(this);
-        cbTimeFilter.setChecked(false);
-        cbTypeFilter.setChecked(false);
-        cbLevelFilter.setChecked(false);
+        cbTimeFilter.setChecked(SettingsManager.isTimeFilterEnabled());
+        cbTypeFilter.setChecked(SettingsManager.isTypeFilterEnabled());
+        cbLevelFilter.setChecked(SettingsManager.isLevelFilterEnabled());
         llTimeFilter.setVisibility(cbTimeFilter.isChecked() ? View.VISIBLE : View.GONE);
         llTypeFilter.setVisibility(cbTypeFilter.isChecked() ? View.VISIBLE : View.GONE);
         llLevelFilter.setVisibility(cbLevelFilter.isChecked() ? View.VISIBLE : View.GONE);
@@ -75,10 +76,24 @@ public class EventFilterDialog extends DialogFragment implements CompoundButton.
         edTimeFrom.setOnClickListener(this);
         edTimeTo.setOnClickListener(this);
         Date yesterday = new Date(new Date().getTime() - Constants.ONE_DAY_MS);
-        edTimeFrom.setText(format.format(yesterday));
-        edTimeTo.setText(format.format(new Date()));
+        edTimeFrom.setText(format.format(SettingsManager.getFilterTimeFrom(yesterday.getTime())));
+        edTimeTo.setText(format.format(SettingsManager.getFilterTimeTo(new Date().getTime())));
         //TIME FILTER END
 
+        //LEVEL FILTER
+        CheckBox cbError = (CheckBox)view.findViewById(R.id.cbError);
+        CheckBox cbWarning = (CheckBox)view.findViewById(R.id.cbWarning);
+        CheckBox cbInfo = (CheckBox)view.findViewById(R.id.cbInfo);
+        CheckBox cbOk = (CheckBox)view.findViewById(R.id.cbOk);
+        cbError.setOnCheckedChangeListener(this);
+        cbWarning.setOnCheckedChangeListener(this);
+        cbInfo.setOnCheckedChangeListener(this);
+        cbOk.setOnCheckedChangeListener(this);
+        cbError.setChecked(SettingsManager.isFilterLevelErrorEnabled());
+        cbWarning.setChecked(SettingsManager.isFilterLevelWarningEnabled());
+        cbInfo.setChecked(SettingsManager.isFilterLevelInfoEnabled());
+        cbOk.setChecked(SettingsManager.isFilterLevelOkEnabled());
+        //LEVEL FILTER END
 
         builder.setView(view);
         builder.setPositiveButton(R.string.filter_now, new DialogInterface.OnClickListener()
@@ -106,6 +121,18 @@ public class EventFilterDialog extends DialogFragment implements CompoundButton.
             case R.id.cbLevelFilter:
                 llLevelFilter.setVisibility(checked ? View.VISIBLE : View.GONE);
                 break;
+            case R.id.cbError:
+                SettingsManager.setFilterLevelError(checked);
+                break;
+            case R.id.cbWarning:
+                SettingsManager.setFilterLevelWarning(checked);
+                break;
+            case R.id.cbInfo:
+                SettingsManager.setFilterLevelInfo(checked);
+                break;
+            case R.id.cbOk:
+                SettingsManager.setFilterLevelOk(checked);
+                break;
         }
     }
 
@@ -131,6 +158,7 @@ public class EventFilterDialog extends DialogFragment implements CompoundButton.
                     public void onDateSet(Date date)
                     {
                         edTimeFrom.setText(format.format(date));
+                        SettingsManager.setTimeFilterFrom(date.getTime());
                     }
                 });
                 dialog.show(getChildFragmentManager(), "date_time_picker");
@@ -151,6 +179,7 @@ public class EventFilterDialog extends DialogFragment implements CompoundButton.
                     public void onDateSet(Date date)
                     {
                         edTimeTo.setText(format.format(date));
+                        SettingsManager.setTimeFilterTo(date.getTime());
                     }
                 });
                 dialog.show(getChildFragmentManager(), "date_time_picker");

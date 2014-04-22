@@ -279,28 +279,32 @@
                 android:layout_height="wrap_content"
                 android:singleLine="true"
                 android:text="@string/error"
-                android:textColor="@color/red"/>
+                android:textColor="@color/red"
+                android:id="@+id/cbError"/>
 
             <CheckBox
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:singleLine="true"
                 android:text="@string/warning"
-                android:textColor="@color/yellow"/>
+                android:textColor="@color/yellow"
+                android:id="@+id/cbWarning"/>
 
             <CheckBox
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:singleLine="true"
                 android:text="@string/info"
-                android:textColor="@color/green"/>
+                android:textColor="@color/green"
+                android:id="@+id/cbInfo"/>
 
             <CheckBox
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:singleLine="true"
                 android:text="@string/ok"
-                android:textColor="@color/cyan"/>
+                android:textColor="@color/cyan"
+                android:id="@+id/cbOk"/>
 
         </LinearLayout>
 

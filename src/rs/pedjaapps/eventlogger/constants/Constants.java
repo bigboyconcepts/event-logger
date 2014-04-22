@@ -13,5 +13,5 @@ public class Constants
     public static final String UNLOCK_ADS_KEY_HASH = "84037fa835a3c13fa6d3f98b0dacb0c7";//md5sum of "r3m0v3_@ds"
     public static final long ONE_DAY_MS = 1000 * 60 * 60 * 24;
     public static final long ONE_HOUR_MS = 1000 * 60 * 60;
-
+    public static final String PREFS_FILTER = "preferences_filter";
 }
