@@ -45,3 +45,5 @@ todo
 - filter events to log
 - save add to cvs
 - concurrency database
+- lock app
+-

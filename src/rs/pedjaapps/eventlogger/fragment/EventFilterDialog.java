@@ -6,28 +6,19 @@ import android.app.Dialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
-import android.text.Html;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
-import android.view.Window;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.LinearLayout;
-import android.widget.TextView;
 
 import java.text.DateFormat;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
 import rs.pedjaapps.eventlogger.R;
 import rs.pedjaapps.eventlogger.constants.Constants;
-import rs.pedjaapps.eventlogger.constants.EventLevel;
-import rs.pedjaapps.eventlogger.constants.EventType;
-import rs.pedjaapps.eventlogger.model.Event;
 
 /**
  * Created by pedja on 13.4.14..
@@ -134,9 +125,35 @@ public class EventFilterDialog extends DialogFragment implements CompoundButton.
                     date = new Date();
                 }
                 DateTimePickerDialog dialog = DateTimePickerDialog.newInstance(date);
+                dialog.setDateSetListener(new DateTimePickerDialog.DateSetListener()
+                {
+                    @Override
+                    public void onDateSet(Date date)
+                    {
+                        edTimeFrom.setText(format.format(date));
+                    }
+                });
                 dialog.show(getChildFragmentManager(), "date_time_picker");
                 break;
             case R.id.edTimeTo:
+                try
+                {
+                    date = format.parse(edTimeTo.getText().toString());
+                }
+                catch (ParseException e)
+                {
+                    date = new Date();
+                }
+                dialog = DateTimePickerDialog.newInstance(date);
+                dialog.setDateSetListener(new DateTimePickerDialog.DateSetListener()
+                {
+                    @Override
+                    public void onDateSet(Date date)
+                    {
+                        edTimeTo.setText(format.format(date));
+                    }
+                });
+                dialog.show(getChildFragmentManager(), "date_time_picker");
                 break;
         }
     }
