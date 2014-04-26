@@ -272,4 +272,13 @@ public class Utility
         return new String( hexChars );
     }
 
+    public static boolean arrayContainsString(String[] array, String value)
+    {
+        for(String s : array)
+        {
+            if(value.equals(s))return true;
+        }
+        return false;
+    }
+
 }

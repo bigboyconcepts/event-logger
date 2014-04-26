@@ -169,5 +169,16 @@ public enum EventType
         }
     }
 
+    public static EventType fromString(String type)
+    {
+        for (EventType t : EventType.values())
+        {
+            if(t.toString().equals(type))
+            {
+                return t;
+            }
+        }
+        return null;
+    }
 
 }

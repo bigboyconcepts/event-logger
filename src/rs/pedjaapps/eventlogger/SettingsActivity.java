@@ -1,10 +1,13 @@
 package rs.pedjaapps.eventlogger;
 
 import android.content.Intent;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.preference.EditTextPreference;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
+import android.preference.PreferenceScreen;
 import android.support.v4.content.LocalBroadcastManager;
 
 import rs.pedjaapps.eventlogger.constants.Constants;
@@ -16,6 +19,8 @@ import rs.pedjaapps.eventlogger.utility.Utility;
  */
 public class SettingsActivity extends PreferenceActivity
 {
+    long aboutFirstClickTs = 0;
+    int aboutClickCount = 0;
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
@@ -24,6 +29,10 @@ public class SettingsActivity extends PreferenceActivity
         final EditTextPreference etpRemoveAds = (EditTextPreference) findPreference("remove_ads_unlock_key");
         if(etpRemoveAds != null)
         {
+            if(!SettingsManager.showRemoveAds())
+            {
+                getPreferenceScreen().removePreference(etpRemoveAds);
+            }
             refreshRemoveAds(etpRemoveAds);
             etpRemoveAds.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener()
             {
@@ -49,6 +58,46 @@ public class SettingsActivity extends PreferenceActivity
                     }
                     refreshRemoveAds(etpRemoveAds);
                     return false;
+                }
+            });
+        }
+
+        PreferenceScreen about = (PreferenceScreen) findPreference("prefs_about");
+        if(about != null)
+        {
+            String version = "";
+            try
+            {
+                PackageInfo pInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
+                version = pInfo.versionName;
+            }
+            catch (PackageManager.NameNotFoundException e)
+            {
+                e.printStackTrace();
+                //should never happen
+            }
+            about.setTitle(getString(R.string.app_name) + " " + version);
+            about.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener()
+            {
+                @Override
+                public boolean onPreferenceClick(Preference preference)
+                {
+                    if(SettingsManager.showRemoveAds())
+                    {
+                        return true;
+                    }
+                    if(aboutClickCount == 0)
+                    {
+                        aboutFirstClickTs = System.currentTimeMillis();
+                    }
+                    aboutClickCount++;
+                    long ts = System.currentTimeMillis();
+                    if(aboutClickCount == 5 && (aboutFirstClickTs - ts) <= 5000)
+                    {
+                        getPreferenceScreen().addPreference(etpRemoveAds);
+                        SettingsManager.setShowRemoveAds(true);
+                    }
+                    return true;
                 }
             });
         }

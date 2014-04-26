@@ -14,12 +14,16 @@ import android.widget.LinearLayout;
 
 import java.text.DateFormat;
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 
+import rs.pedjaapps.eventlogger.MainActivity;
 import rs.pedjaapps.eventlogger.R;
 import rs.pedjaapps.eventlogger.constants.Constants;
 import rs.pedjaapps.eventlogger.utility.SettingsManager;
+import rs.pedjaapps.eventlogger.utility.Utility;
 
 /**
  * Created by pedja on 13.4.14..
@@ -32,6 +36,10 @@ public class EventFilterDialog extends DialogFragment implements CompoundButton.
 
     EditText edTimeFrom;
     EditText edTimeTo;
+
+    String[] filterTypes;
+
+    CheckBox cbTypeAll;
 
     public static EventFilterDialog newInstance()
     {
@@ -58,6 +66,8 @@ public class EventFilterDialog extends DialogFragment implements CompoundButton.
 
         CheckBox cbTimeFilter = (CheckBox)view.findViewById(R.id.cbTimeFilter);
         cbTimeFilter.setOnCheckedChangeListener(this);
+        cbTypeAll = (CheckBox)view.findViewById(R.id.cbTypeAll);
+        cbTypeAll.setOnCheckedChangeListener(this);
         CheckBox cbTypeFilter = (CheckBox)view.findViewById(R.id.cbTypeFilter);
         cbTypeFilter.setOnCheckedChangeListener(this);
         CheckBox cbLevelFilter = (CheckBox)view.findViewById(R.id.cbLevelFilter);
@@ -67,6 +77,7 @@ public class EventFilterDialog extends DialogFragment implements CompoundButton.
         cbLevelFilter.setChecked(SettingsManager.isLevelFilterEnabled());
         llTimeFilter.setVisibility(cbTimeFilter.isChecked() ? View.VISIBLE : View.GONE);
         llTypeFilter.setVisibility(cbTypeFilter.isChecked() ? View.VISIBLE : View.GONE);
+        cbTypeAll.setVisibility(cbTypeFilter.isChecked() ? View.VISIBLE : View.GONE);
         llLevelFilter.setVisibility(cbLevelFilter.isChecked() ? View.VISIBLE : View.GONE);
         //GENERAL END
 
@@ -95,13 +106,46 @@ public class EventFilterDialog extends DialogFragment implements CompoundButton.
         cbOk.setChecked(SettingsManager.isFilterLevelOkEnabled());
         //LEVEL FILTER END
 
+        //TYPE FILTER
+        filterTypes = SettingsManager.getFilterTypes();
+        int checkedCount = 0;
+        for(int i = 0 ; i < llTypeFilter.getChildCount(); i++)
+        {
+            final CheckBox cb = (CheckBox) llTypeFilter.getChildAt(i);
+            if (cb != null)
+            {
+                cb.setChecked(Utility.arrayContainsString(filterTypes, cb.getTag().toString()));
+                /*cb.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener()
+                {
+                    @Override
+                    public void onCheckedChanged(CompoundButton compoundButton, boolean checked)
+                    {
+                        SettingsManager.setBooleanPref(cb.getTag().toString(), checked);
+                    }
+                });*/
+                if(cb.isChecked())checkedCount++;
+            }
+        }
+        cbTypeAll.setChecked(checkedCount == llTypeFilter.getChildCount());
+        //TYPE FILTER END
+
         builder.setView(view);
         builder.setPositiveButton(R.string.filter_now, new DialogInterface.OnClickListener()
         {
             @Override
-            public void onClick(DialogInterface dialogInterface, int i)
+            public void onClick(DialogInterface dialogInterface, int which)
             {
-                //TODO filter now
+                List<String> filterTypes = new ArrayList<String>();
+                for(int i = 0 ; i < llTypeFilter.getChildCount(); i++)
+                {
+                    final CheckBox cb = (CheckBox) llTypeFilter.getChildAt(i);
+                    if(cb != null && cb.isChecked())
+                    {
+                        filterTypes.add(cb.getTag().toString());
+                    }
+                }
+                SettingsManager.setFilterTypes(filterTypes.toArray(new String[filterTypes.size()]));
+                ((MainActivity)getActivity()).refreshList();
             }
         });
         return builder.create();
@@ -114,12 +158,16 @@ public class EventFilterDialog extends DialogFragment implements CompoundButton.
         {
             case R.id.cbTimeFilter:
                 llTimeFilter.setVisibility(checked ? View.VISIBLE : View.GONE);
+                SettingsManager.setTimeFilterEnabled(checked);
                 break;
             case R.id.cbTypeFilter:
                 llTypeFilter.setVisibility(checked ? View.VISIBLE : View.GONE);
+                cbTypeAll.setVisibility(checked ? View.VISIBLE : View.GONE);
+                SettingsManager.setTypeFilterEnabled(checked);
                 break;
             case R.id.cbLevelFilter:
                 llLevelFilter.setVisibility(checked ? View.VISIBLE : View.GONE);
+                SettingsManager.setLevelFilterEnabled(checked);
                 break;
             case R.id.cbError:
                 SettingsManager.setFilterLevelError(checked);
@@ -132,6 +180,16 @@ public class EventFilterDialog extends DialogFragment implements CompoundButton.
                 break;
             case R.id.cbOk:
                 SettingsManager.setFilterLevelOk(checked);
+                break;
+            case R.id.cbTypeAll:
+                for(int i = 0 ; i < llTypeFilter.getChildCount(); i++)
+                {
+                    CheckBox cb = (CheckBox) llTypeFilter.getChildAt(i);
+                    if(cb != null)
+                    {
+                        cb.setChecked(checked);
+                    }
+                }
                 break;
         }
     }

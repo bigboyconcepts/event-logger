@@ -26,13 +26,19 @@ import com.google.android.gms.ads.AdView;
 import com.google.android.gms.ads.InterstitialAd;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
+import de.greenrobot.dao.query.QueryBuilder;
+import de.greenrobot.dao.query.WhereCondition;
 import rs.pedjaapps.eventlogger.adapter.EventAdapter;
 import rs.pedjaapps.eventlogger.constants.Constants;
+import rs.pedjaapps.eventlogger.constants.EventLevel;
+import rs.pedjaapps.eventlogger.constants.EventType;
 import rs.pedjaapps.eventlogger.fragment.EventFilterDialog;
 import rs.pedjaapps.eventlogger.fragment.EventInfoDialog;
 import rs.pedjaapps.eventlogger.model.Event;
+import rs.pedjaapps.eventlogger.model.EventDao;
 import rs.pedjaapps.eventlogger.service.EventService;
 import rs.pedjaapps.eventlogger.utility.SettingsManager;
 import rs.pedjaapps.eventlogger.view.EventListView;
@@ -141,14 +147,14 @@ public class MainActivity extends AbsActivity implements AdapterView.OnItemClick
         filter.addAction(ACTION_REMOVE_ADS);
         LocalBroadcastManager.getInstance(this).registerReceiver(localReceiver, filter);
 
-        //adView = (AdView)findViewById(R.id.adView);
+        adView = (AdView)findViewById(R.id.adView);
         AdRequest adRequest = new AdRequest.Builder()
                 .addTestDevice(AdRequest.DEVICE_ID_EMULATOR)
                 .addTestDevice("5750ECFACEA6FCE685DE7A97D8C59A5F")
                 .addTestDevice("05FBCDCAC44495595ACE7DC1AEC5C208")
                 .build();
-        //if(!SettingsManager.adsRemoved())adView.loadAd(adRequest);
-        /*adView.setAdListener(new AdListener()
+        if(!SettingsManager.adsRemoved())adView.loadAd(adRequest);
+        adView.setAdListener(new AdListener()
         {
             @Override
             public void onAdLoaded()
@@ -156,11 +162,11 @@ public class MainActivity extends AbsActivity implements AdapterView.OnItemClick
                 super.onAdLoaded();
                 adView.setVisibility(View.VISIBLE);
             }
-        });*/
+        });
 
         //test interstitial ad
         // Create the interstitial.
-        interstitial = new InterstitialAd(this);
+        /*interstitial = new InterstitialAd(this);
         interstitial.setAdUnitId("ca-app-pub-6294976772687752/1839387229");
         if(!SettingsManager.adsRemoved() && SettingsManager.canDisplayAdds())interstitial.loadAd(adRequest);
         interstitial.setAdListener(new AdListener()
@@ -171,7 +177,7 @@ public class MainActivity extends AbsActivity implements AdapterView.OnItemClick
                 super.onAdLoaded();
                 displayInterstitial();
             }
-        });
+        });*/
         new ATLoadEvents().execute();
     }
 
@@ -252,10 +258,11 @@ public class MainActivity extends AbsActivity implements AdapterView.OnItemClick
             if(ACTION_ADD_EVENT.equals(intent.getAction()))
             {
                 Event event = intent.getParcelableExtra(EXTRA_EVENT);
-                if (event == null) return;
+                if (event == null || !eventMatchesFilter(event)) return;
                 mEventListAdapter.add(event);
                 mEventListAdapter.notifyDataSetChanged();
                 smoothScrollToEnd(true, 0);
+                tvNoEvents.setVisibility(mEventListAdapter.getCount() == 0 ? View.VISIBLE : View.GONE);
             }
             if(ACTION_REMOVE_ADS.equals(intent.getAction()))
             {
@@ -267,6 +274,35 @@ public class MainActivity extends AbsActivity implements AdapterView.OnItemClick
             }
         }
     };
+
+    private boolean eventMatchesFilter(Event event)
+    {
+        if(SettingsManager.isTimeFilterEnabled())
+        {
+            if(event.getTimestamp().before(SettingsManager.getFilterTimeFrom(0))) return false;
+            if(event.getTimestamp().after(SettingsManager.getFilterTimeTo(new Date().getTime()))) return false;
+        }
+        if(SettingsManager.isTypeFilterEnabled())
+        {
+            List<Integer> enabledTypes = new ArrayList<Integer>();
+            String[] filerTypes = SettingsManager.getFilterTypes();
+            for(String s : filerTypes)
+            {
+                enabledTypes.add(EventType.getIntForType(EventType.fromString(s)));
+            }
+            if(!enabledTypes.contains(event.getType())) return false;
+        }
+        if(SettingsManager.isLevelFilterEnabled())
+        {
+            List<Integer> enabledLevels = new ArrayList<Integer>();
+            if(SettingsManager.isFilterLevelErrorEnabled())enabledLevels.add(EventLevel.getIntForLevel(EventLevel.error));
+            if(SettingsManager.isFilterLevelWarningEnabled())enabledLevels.add(EventLevel.getIntForLevel(EventLevel.warning));
+            if(SettingsManager.isFilterLevelInfoEnabled())enabledLevels.add(EventLevel.getIntForLevel(EventLevel.info));
+            if(SettingsManager.isFilterLevelOkEnabled())enabledLevels.add(EventLevel.getIntForLevel(EventLevel.ok));
+            if(!enabledLevels.contains(event.getLevel())) return false;
+        }
+        return true;
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu)
@@ -280,8 +316,8 @@ public class MainActivity extends AbsActivity implements AdapterView.OnItemClick
     {
         switch (item.getItemId())
         {
-            case R.id.action_about:
-                break;
+            /*case R.id.action_about:
+                break;*/
             case R.id.action_settings:
                 startActivity(new Intent(this, SettingsActivity.class));
                 break;
@@ -395,6 +431,11 @@ public class MainActivity extends AbsActivity implements AdapterView.OnItemClick
         dialog.show(getSupportFragmentManager(), "event_details");
     }
 
+    public void refreshList()
+    {
+        new ATLoadEvents().execute();
+    }
+
     public class ATLoadEvents extends AsyncTask<String, Void, List<Event>>
     {
         @Override
@@ -408,18 +449,72 @@ public class MainActivity extends AbsActivity implements AdapterView.OnItemClick
         @Override
         protected List<Event> doInBackground(String... params)
         {
-            List<Event> events = getDaoSession().getEventDao().loadAll();//TODO load with filter
+            QueryBuilder<Event> queryBuilder = getDaoSession().getEventDao().queryBuilder();
+            if(SettingsManager.isTimeFilterEnabled())
+            {
+                queryBuilder.where(EventDao.Properties.Timestamp.between(SettingsManager.getFilterTimeFrom(0), SettingsManager.getFilterTimeTo(new Date().getTime())));
+            }
+            if(SettingsManager.isTypeFilterEnabled())
+            {
+                List<Integer> enabledTypes = new ArrayList<Integer>();
+                String[] filerTypes = SettingsManager.getFilterTypes();
+                for(String s : filerTypes)
+                {
+                    enabledTypes.add(EventType.getIntForType(EventType.fromString(s)));
+                }
+                if(enabledTypes.size() == 1)
+                {
+                    queryBuilder.where(EventDao.Properties.Type.eq(enabledTypes.get(0)));
+                }
+                else if(enabledTypes.size() > 1)
+                {
+                    WhereCondition cond1 = EventDao.Properties.Type.eq(enabledTypes.get(0));
+                    WhereCondition cond2 = EventDao.Properties.Type.eq(enabledTypes.get(1));
+                    List<WhereCondition> orConditions = new ArrayList<WhereCondition>();
+                    for(int i = 2; i < enabledTypes.size(); i++)
+                    {
+                        orConditions.add(EventDao.Properties.Type.eq(enabledTypes.get(i)));
+                    }
 
-            return events;
+                    queryBuilder.where(queryBuilder.or(cond1, cond2, orConditions.toArray(new WhereCondition[orConditions.size()])));
+                }
+            }
+            if(SettingsManager.isLevelFilterEnabled())
+            {
+                List<Integer> enabledLevels = new ArrayList<Integer>();
+                if(SettingsManager.isFilterLevelErrorEnabled())enabledLevels.add(EventLevel.getIntForLevel(EventLevel.error));
+                if(SettingsManager.isFilterLevelWarningEnabled())enabledLevels.add(EventLevel.getIntForLevel(EventLevel.warning));
+                if(SettingsManager.isFilterLevelInfoEnabled())enabledLevels.add(EventLevel.getIntForLevel(EventLevel.info));
+                if(SettingsManager.isFilterLevelOkEnabled())enabledLevels.add(EventLevel.getIntForLevel(EventLevel.ok));
+                if(enabledLevels.size() == 1)
+                {
+                    queryBuilder.where(EventDao.Properties.Level.eq(enabledLevels.get(0)));
+                }
+                else if(enabledLevels.size() > 1)
+                {
+                    WhereCondition cond1 = EventDao.Properties.Level.eq(enabledLevels.get(0));
+                    WhereCondition cond2 = EventDao.Properties.Level.eq(enabledLevels.get(1));
+                    List<WhereCondition> orConditions = new ArrayList<WhereCondition>();
+                    for(int i = 2; i < enabledLevels.size(); i++)
+                    {
+                        orConditions.add(EventDao.Properties.Level.eq(enabledLevels.get(i)));
+                    }
+
+                    queryBuilder.where(queryBuilder.or(cond1, cond2, orConditions.toArray(new WhereCondition[orConditions.size()])));
+                }
+            }
+
+            return queryBuilder.list();
         }
 
         @Override
         protected void onPostExecute(List<Event> events)
         {
             pbLoading.setVisibility(View.GONE);
+            mEventListAdapter.clear();
             if (events == null || events.isEmpty())
             {
-                tvNoEvents.setVisibility(View.GONE);
+                tvNoEvents.setVisibility(View.VISIBLE);
             }
             else
             {

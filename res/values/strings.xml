@@ -139,7 +139,7 @@
     <string name="restart_event_service_desc">Allowes other packages to restart EventService</string>
     <string name="restart_event_service_label">RESTART_EVENT_SERVICE</string>
     <string name="now">now</string>
-    <string name="no_events">There are no events at this moment!\nGo do something with your phone and come back later.</string>
+    <string name="no_events">There are no events at this moment!\nTry changing filter or go do something with your phone and come back later.</string>
     <string name="remove_ads">Remove Ads</string>
     <string name="enter_unlock_key">Enter Unlock Key</string>
     <string name="ads_removed">Ads are removed.</string>
@@ -172,5 +172,7 @@
     <string name="battery">Battery</string>
     <string name="wallpaper">Wallpaper</string>
     <string name="volume">Volume</string>
+    <string name="copyright">Copyright © Predrag Čokulov</string>
+    <string name="all">All</string>
 
 </resources>

@@ -5,4 +5,7 @@
         android:title="@string/remove_ads"
         android:dialogTitle="@string/enter_unlock_key"
         android:inputType="textPassword"/>
+    <PreferenceScreen
+        android:key="prefs_about"
+        android:summary="@string/copyright"/>
 </PreferenceScreen>

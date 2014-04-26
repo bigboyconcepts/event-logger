@@ -60,12 +60,26 @@
 
         </LinearLayout>
 
-        <CheckBox
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/cbTypeFilter"
-            android:text="@string/filter_by_type"
-            android:singleLine="true"/>
+            android:layout_height="wrap_content">
+
+            <CheckBox
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:id="@+id/cbTypeFilter"
+                android:text="@string/filter_by_type"
+                android:singleLine="true"
+                android:layout_weight="1"/>
+
+            <CheckBox
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/cbTypeAll"
+                android:text="@string/all"
+                android:singleLine="true"/>
+
+        </LinearLayout>
 
         <ImageView
             android:layout_width="match_parent"
@@ -86,7 +100,9 @@
                 android:singleLine="true"
                 android:text="@string/wifi"
                 android:drawableLeft="@drawable/ic_action_wifi"
-                android:id="@+id/cbWifi"/>
+                android:id="@+id/cbWifi"
+                android:checked="true"
+                android:tag="wifi"/>
 
             <CheckBox
                 android:layout_width="wrap_content"
@@ -94,7 +110,9 @@
                 android:singleLine="true"
                 android:text="@string/bluetooth"
                 android:drawableLeft="@drawable/ic_action_bluetooth"
-                android:id="@+id/cbBluetooth"/>
+                android:id="@+id/cbBluetooth"
+                android:checked="true"
+                android:tag="bluetooth"/>
 
             <CheckBox
                 android:layout_width="wrap_content"
@@ -102,7 +120,9 @@
                 android:singleLine="true"
                 android:text="@string/gps"
                 android:drawableLeft="@drawable/ic_action_gps"
-                android:id="@+id/cbGps"/>
+                android:id="@+id/cbGps"
+                android:checked="true"
+                android:tag="gps"/>
 
             <CheckBox
                 android:layout_width="wrap_content"
@@ -110,7 +130,9 @@
                 android:singleLine="true"
                 android:text="@string/media"
                 android:drawableLeft="@drawable/ic_action_media"
-                android:id="@+id/cbMedia"/>
+                android:id="@+id/cbMedia"
+                android:checked="true"
+                android:tag="media"/>
 
             <!--
             <CheckBox
@@ -119,7 +141,8 @@
                 android:singleLine="true"
                 android:text="@string/nfc"
                 android:drawableLeft="@drawable/ic_action_nfc"
-                android:id="@+id/cbNfc"/>
+                android:id="@+id/cbNfc"
+                android:checked="true"/>
             -->
 
             <CheckBox
@@ -128,7 +151,9 @@
                 android:singleLine="true"
                 android:text="@string/usb"
                 android:drawableLeft="@drawable/ic_action_usb"
-                android:id="@+id/cbUsb"/>
+                android:id="@+id/cbUsb"
+                android:checked="true"
+                android:tag="usb"/>
 
             <CheckBox
                 android:layout_width="wrap_content"
@@ -136,7 +161,9 @@
                 android:singleLine="true"
                 android:text="@string/orientation"
                 android:drawableLeft="@drawable/ic_action_orientation"
-                android:id="@+id/cbOrientation"/>
+                android:id="@+id/cbOrientation"
+                android:checked="true"
+                android:tag="orientation"/>
 
             <CheckBox
                 android:layout_width="wrap_content"
@@ -144,7 +171,9 @@
                 android:singleLine="true"
                 android:text="@string/locale"
                 android:drawableLeft="@drawable/ic_action_locale"
-                android:id="@+id/cbLocale"/>
+                android:id="@+id/cbLocale"
+                android:checked="true"
+                android:tag="locale"/>
 
             <CheckBox
                 android:layout_width="wrap_content"
@@ -152,7 +181,9 @@
                 android:singleLine="true"
                 android:text="@string/screen"
                 android:drawableLeft="@drawable/ic_action_screen"
-                android:id="@+id/cbScreen"/>
+                android:id="@+id/cbScreen"
+                android:checked="true"
+                android:tag="screen"/>
 
             <CheckBox
                 android:layout_width="wrap_content"
@@ -160,7 +191,9 @@
                 android:singleLine="true"
                 android:text="@string/sms"
                 android:drawableLeft="@drawable/ic_action_sms"
-                android:id="@+id/cbSms"/>
+                android:id="@+id/cbSms"
+                android:checked="true"
+                android:tag="sms"/>
 
             <CheckBox
                 android:layout_width="wrap_content"
@@ -168,7 +201,9 @@
                 android:singleLine="true"
                 android:text="@string/applications"
                 android:drawableLeft="@drawable/ic_action_app"
-                android:id="@+id/cbApp"/>
+                android:id="@+id/cbApp"
+                android:checked="true"
+                android:tag="app"/>
 
             <CheckBox
                 android:layout_width="wrap_content"
@@ -176,7 +211,9 @@
                 android:singleLine="true"
                 android:text="@string/call"
                 android:drawableLeft="@drawable/ic_action_call"
-                android:id="@+id/cbCall"/>
+                android:id="@+id/cbCall"
+                android:checked="true"
+                android:tag="call"/>
 
             <CheckBox
                 android:layout_width="wrap_content"
@@ -184,7 +221,9 @@
                 android:singleLine="true"
                 android:text="@string/heaphones"
                 android:drawableLeft="@drawable/ic_action_headset"
-                android:id="@+id/cbHeadphones"/>
+                android:id="@+id/cbHeadphones"
+                android:checked="true"
+                android:tag="headset"/>
 
             <!--
             <CheckBox
@@ -193,7 +232,8 @@
                 android:singleLine="true"
                 android:text="@string/storage"
                 android:drawableLeft="@drawable/ic_action_ums"
-                android:id="@+id/cbStorage"/>
+                android:id="@+id/cbStorage"
+                android:checked="true"/>
             -->
 
             <CheckBox
@@ -202,7 +242,9 @@
                 android:singleLine="true"
                 android:text="@string/boot"
                 android:drawableLeft="@drawable/ic_action_power"
-                android:id="@+id/cbBoot"/>
+                android:id="@+id/cbBoot"
+                android:checked="true"
+                android:tag="boot"/>
 
             <CheckBox
                 android:layout_width="wrap_content"
@@ -210,7 +252,9 @@
                 android:singleLine="true"
                 android:text="@string/time"
                 android:drawableLeft="@drawable/ic_action_timestamp"
-                android:id="@+id/cbTime"/>
+                android:id="@+id/cbTime"
+                android:checked="true"
+                android:tag="time"/>
 
             <CheckBox
                 android:layout_width="wrap_content"
@@ -218,7 +262,9 @@
                 android:singleLine="true"
                 android:text="@string/date"
                 android:drawableLeft="@drawable/ic_action_date"
-                android:id="@+id/cbDate"/>
+                android:id="@+id/cbDate"
+                android:checked="true"
+                android:tag="date"/>
 
             <CheckBox
                 android:layout_width="wrap_content"
@@ -226,7 +272,9 @@
                 android:singleLine="true"
                 android:text="@string/airplane"
                 android:drawableLeft="@drawable/ic_action_airplane"
-                android:id="@+id/cbAirplane"/>
+                android:id="@+id/cbAirplane"
+                android:checked="true"
+                android:tag="airplane"/>
 
             <CheckBox
                 android:layout_width="wrap_content"
@@ -234,7 +282,9 @@
                 android:singleLine="true"
                 android:text="@string/battery"
                 android:drawableLeft="@drawable/ic_action_battery"
-                android:id="@+id/cbBattery"/>
+                android:id="@+id/cbBattery"
+                android:checked="true"
+                android:tag="battery"/>
 
             <CheckBox
                 android:layout_width="wrap_content"
@@ -242,7 +292,9 @@
                 android:singleLine="true"
                 android:text="@string/wallpaper"
                 android:drawableLeft="@drawable/ic_action_wallpaper"
-                android:id="@+id/cbWallpaper"/>
+                android:id="@+id/cbWallpaper"
+                android:checked="true"
+                android:tag="wallpaper"/>
 
             <CheckBox
                 android:layout_width="wrap_content"
@@ -250,7 +302,9 @@
                 android:singleLine="true"
                 android:text="@string/volume"
                 android:drawableLeft="@drawable/ic_action_volume"
-                android:id="@+id/cbVolume"/>
+                android:id="@+id/cbVolume"
+                android:checked="true"
+                android:tag="volume"/>
 
         </LinearLayout>
 

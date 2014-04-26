@@ -21,7 +21,7 @@ public class SettingsManager
     {
         remove_ads, remove_ads_disabled, unlock_attempts_left, filter_date, add_shown_ts, time_filter_enabled,
         type_filter_enabled, level_filter_enabled, filter_time_from, filter_time_to, filter_level_error,
-        filter_level_warning, filter_level_info, filter_level_ok
+        filter_level_warning, filter_level_info, filter_level_ok, show_remove_ads, filter_types
     }
 
     public static void setAdsRemoved()
@@ -156,6 +156,72 @@ public class SettingsManager
     {
         SharedPreferences.Editor editor = prefsFilter.edit();
         editor.putBoolean(Key.filter_level_ok.toString(), enabled);
+        editor.apply();
+    }
+
+    public static boolean showRemoveAds()
+    {
+        return prefsDefault.getBoolean(Key.show_remove_ads.toString(), false);
+    }
+
+    public static void setShowRemoveAds(boolean show)
+    {
+        SharedPreferences.Editor editor = prefsDefault.edit();
+        editor.putBoolean(Key.show_remove_ads.toString(), show);
+        editor.apply();
+    }
+
+    /*public static boolean getBooleanPref(String key, boolean defValue)
+    {
+        return prefsDefault.getBoolean(key, defValue);
+    }
+
+    public static void setBooleanPref(String key, boolean value)
+    {
+        SharedPreferences.Editor editor = prefsDefault.edit();
+        editor.putBoolean(key, value);
+        editor.apply();
+    }*/
+
+    public static void setTimeFilterEnabled(boolean value)
+    {
+        SharedPreferences.Editor editor = prefsFilter.edit();
+        editor.putBoolean(Key.time_filter_enabled.toString(), value);
+        editor.apply();
+    }
+
+    public static void setLevelFilterEnabled(boolean value)
+    {
+        SharedPreferences.Editor editor = prefsFilter.edit();
+        editor.putBoolean(Key.level_filter_enabled.toString(), value);
+        editor.apply();
+    }
+
+    public static void setTypeFilterEnabled(boolean value)
+    {
+        SharedPreferences.Editor editor = prefsFilter.edit();
+        editor.putBoolean(Key.type_filter_enabled.toString(), value);
+        editor.apply();
+    }
+
+    public static String[] getFilterTypes()
+    {
+        return prefsFilter.getString(Key.filter_types.toString(), "").split(",");
+    }
+
+    public static void setFilterTypes(String... types)
+    {
+        if (types == null || types.length == 0) return;
+        StringBuilder value = new StringBuilder("");
+        int offset = 0;
+        for(String type : types)
+        {
+            if(offset != 0) value.append(",");
+            value.append(type);
+            offset++;
+        }
+        SharedPreferences.Editor editor = prefsFilter.edit();
+        editor.putString(Key.filter_types.toString(), value.toString());
         editor.apply();
     }
 }
