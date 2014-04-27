@@ -338,6 +338,19 @@ public class MainActivity extends AbsActivity implements AdapterView.OnItemClick
                 new ATExportDB().execute();
                 break;
             case R.id.action_share:
+                try
+                {
+                    Intent sendIntent = new Intent();
+                    sendIntent.setAction(Intent.ACTION_SEND);
+                    sendIntent.putExtra(Intent.EXTRA_TEXT, Utility.readFileToString(Constants.EXPORT_FILE));
+                    sendIntent.setType("text/plain");
+                    startActivity(Intent.createChooser(sendIntent, getResources().getText(R.string.send_to)));
+                }
+                catch (IOException e)
+                {
+                    e.printStackTrace();
+                    Utility.showMessageAlertDialog(this, getString(R.string.share_failed, e.getMessage()), null, null);
+                }
                 break;
         }
         return super.onOptionsItemSelected(item);

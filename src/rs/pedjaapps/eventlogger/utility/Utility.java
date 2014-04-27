@@ -10,6 +10,8 @@ import android.widget.Toast;
 import com.crashlytics.android.Crashlytics;
 
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -279,6 +281,19 @@ public class Utility
             if(value.equals(s))return true;
         }
         return false;
+    }
+
+    public static String readFileToString(File file) throws IOException
+    {
+        InputStream is = new FileInputStream(file);
+        BufferedReader br = new BufferedReader(new InputStreamReader(is));
+        String read;
+        StringBuilder sb = new StringBuilder();
+        while ((read = br.readLine()) != null)
+        {
+            sb.append(read);
+        }
+        return sb.toString();
     }
 
 }
