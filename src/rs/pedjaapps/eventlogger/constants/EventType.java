@@ -170,6 +170,60 @@ public enum EventType
         }
     }
 
+    public static EventType getEventTypeForId(int id)
+    {
+        switch (id)
+        {
+            case 0:
+                return wifi;
+            case 1:
+                return bluetooth;
+            case 2:
+                return nfc;
+            case 3:
+                return gps;
+            case 4:
+                return mobile;
+            case 5:
+                return media;
+            case 6:
+                return usb;
+            case 7:
+                return orientation;
+            case 8:
+                return locale;
+            case 9:
+                return screen;
+            case 10:
+                return sms;
+            case 11:
+                return app;
+            case 12:
+                return call;
+            case 13:
+                return headset;
+            case 14:
+                return storage;
+            case 15:
+                return usb;
+            case 16:
+                return time;
+            case 17:
+                return airplane;
+            case 18:
+                return battery;
+            case 19:
+                return wallpaper;
+            case 20:
+                return volume;
+            case 21:
+                return date;
+            default:
+                return null;
+        }
+    }
+
+
     public static EventType fromString(String type)
     {
         for (EventType t : EventType.values())

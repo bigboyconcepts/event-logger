@@ -1,5 +1,9 @@
 package rs.pedjaapps.eventlogger.constants;
 
+import android.os.Environment;
+
+import java.io.File;
+
 /**
  * Created by pedja on 12.4.14..
  */
@@ -14,4 +18,8 @@ public class Constants
     public static final long ONE_DAY_MS = 1000 * 60 * 60 * 24;
     public static final long ONE_HOUR_MS = 1000 * 60 * 60;
     public static final String PREFS_FILTER = "preferences_filter";
+    public static final String EXTERNAL_APP_FOLDER = Environment.getExternalStorageDirectory().getAbsolutePath()
+            + File.separator + "Event Logger" + File.separator;
+    public static final String EXPORT_FILENAME = "Event Logger.csv";
+    public static final File EXPORT_FILE = new File(EXTERNAL_APP_FOLDER, EXPORT_FILENAME);
 }

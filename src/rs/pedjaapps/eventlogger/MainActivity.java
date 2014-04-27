@@ -1,5 +1,6 @@
 package rs.pedjaapps.eventlogger;
 
+import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -10,6 +11,7 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
+import android.text.Html;
 import android.view.Display;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -25,10 +27,16 @@ import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 import com.google.android.gms.ads.InterstitialAd;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
+import au.com.bytecode.opencsv.CSVWriter;
 import de.greenrobot.dao.query.QueryBuilder;
 import de.greenrobot.dao.query.WhereCondition;
 import rs.pedjaapps.eventlogger.adapter.EventAdapter;
@@ -41,6 +49,7 @@ import rs.pedjaapps.eventlogger.model.Event;
 import rs.pedjaapps.eventlogger.model.EventDao;
 import rs.pedjaapps.eventlogger.service.EventService;
 import rs.pedjaapps.eventlogger.utility.SettingsManager;
+import rs.pedjaapps.eventlogger.utility.Utility;
 import rs.pedjaapps.eventlogger.view.EventListView;
 
 public class MainActivity extends AbsActivity implements AdapterView.OnItemClickListener
@@ -316,14 +325,19 @@ public class MainActivity extends AbsActivity implements AdapterView.OnItemClick
     {
         switch (item.getItemId())
         {
-            /*case R.id.action_about:
-                break;*/
+            case R.id.action_about:
+                break;
             case R.id.action_settings:
                 startActivity(new Intent(this, SettingsActivity.class));
                 break;
             case R.id.action_filter:
                 EventFilterDialog dialog = EventFilterDialog.newInstance();
                 dialog.show(getSupportFragmentManager(), "event_filter");
+                break;
+            case R.id.action_export:
+                new ATExportDB().execute();
+                break;
+            case R.id.action_share:
                 break;
         }
         return super.onOptionsItemSelected(item);
@@ -533,6 +547,101 @@ public class MainActivity extends AbsActivity implements AdapterView.OnItemClick
                     }
                 });
             }
+        }
+    }
+
+    private class ATExportDB extends AsyncTask<String, Integer, Boolean>
+    {
+        ProgressDialog progressDialog;
+        String failMessage;
+        @Override
+        protected void onPreExecute()
+        {
+            progressDialog = new ProgressDialog(MainActivity.this);
+            progressDialog.setMessage(getString(R.string.please_wait));
+            progressDialog.setCancelable(false);
+            progressDialog.setIndeterminate(false);
+            progressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+            progressDialog.show();
+        }
+
+        @Override
+        protected Boolean doInBackground(String... strings)
+        {
+            File dir = new File(Constants.EXTERNAL_APP_FOLDER);
+            File file = Constants.EXPORT_FILE;
+            dir.mkdirs();
+            CSVWriter csvWrite = null;
+            try
+            {
+                DateFormat format = DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.MEDIUM, Locale.getDefault());
+
+                csvWrite = new CSVWriter(new FileWriter(file));
+
+                //ormlite core method
+                EventDao eventDao = MainApp.getInstance().getDaoSession().getEventDao();
+                List<Event> events = eventDao.loadAll();
+
+                // this is the Column of the table and same for Header of CSV file
+                String header[] ={EventDao.Properties.Id.columnName, EventDao.Properties.Timestamp.columnName,
+                        EventDao.Properties.Short_desc.columnName, EventDao.Properties.Long_desc.columnName,
+                        EventDao.Properties.Type.columnName, EventDao.Properties.Level.columnName};
+                csvWrite.writeNext(header);
+                publishProgress(-1, events.size());
+
+                if(events.size() > 1)
+                {
+                    int offset = 0;
+                    for(Event event : events)
+                    {
+                        String value[] ={event.getId() + "", format.format(event.getTimestamp()), event.getShort_desc(),
+                                event.getLong_desc(), EventType.getEventTypeForId(event.getType()).toString(),
+                                EventLevel.getLevelForInt(event.getLevel()).toString()};
+                        csvWrite.writeNext(value);
+                        publishProgress(offset);
+                        offset++;
+                    }
+                }
+                return true;
+            }
+            catch (IOException e)
+            {
+                e.printStackTrace();
+                failMessage = e.getMessage();
+                return false;
+            }
+            finally
+            {
+                try
+                {
+                    if(csvWrite != null)csvWrite.close();
+                }
+                catch (IOException ignored){}
+            }
+        }
+
+        @Override
+        protected void onProgressUpdate(Integer... values)
+        {
+            if(values == null || values.length == 0)
+            {
+                return;
+            }
+            if(values[0] == -1)
+            {
+                progressDialog.setMax(values[1]);
+            }
+            else
+            {
+                progressDialog.setProgress(values[0]);
+            }
+        }
+
+        @Override
+        protected void onPostExecute(Boolean aBoolean)
+        {
+            Utility.showMessageAlertDialog(MainActivity.this, aBoolean ? getString(R.string.export_success, Constants.EXPORT_FILE.getAbsolutePath()) : getString(R.string.export_failed, failMessage), null, null);
+            progressDialog.dismiss();
         }
     }
 }
