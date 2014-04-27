@@ -41,9 +41,6 @@ bugs
 - when app is killed by the system due to low memory (on android 4.4) it doesn't get restarted - only happens on 4.4+
 
 todo
-- filter events to show
-- filter events to log
-- save add to cvs
 - concurrency database
 - lock app
 -
