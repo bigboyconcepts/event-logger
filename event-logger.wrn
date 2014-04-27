@@ -1,0 +1,25 @@
+(res/drawable-xhdpi/ic_launcher.png) found an alternate icon with better size:impact=1
+(AndroidManifest.xml) targetSdkVersion: 19 is higher than 10:required minimal OS version=10.2:impact=1
+(AndroidManifest.xml) uses-permission: GET_TASKS:impact=1
+(AndroidManifest.xml) uses-permission: BLUETOOTH_ADMIN:impact=1
+(<unknown source>:280) class: com.crashlytics.android.v uses intent action android.intent.action.ACTION_POWER_DISCONNECTED:impact=1
+(<unknown source>:271) class: com.crashlytics.android.v uses intent action android.intent.action.ACTION_POWER_CONNECTED:impact=1
+(<unknown source>) class: com.google.android.gms.internal.cv$a uses intent action android.intent.action.USER_PRESENT:impact=1
+(<unknown source>) class: com.google.android.gms.internal.cv uses intent action android.intent.action.USER_PRESENT:impact=1
+(rs/pedjaapps/eventlogger/receiver/EventReceiver.java:552) class: rs.pedjaapps.eventlogger.receiver.EventReceiver uses intent action android.intent.action.USER_PRESENT:impact=1
+(rs/pedjaapps/eventlogger/receiver/EventReceiver.java:401) class: rs.pedjaapps.eventlogger.receiver.EventReceiver uses intent action android.intent.action.ACTION_POWER_DISCONNECTED:impact=1
+(rs/pedjaapps/eventlogger/receiver/EventReceiver.java:389) class: rs.pedjaapps.eventlogger.receiver.EventReceiver uses intent action android.intent.action.ACTION_POWER_CONNECTED:impact=1
+(rs/pedjaapps/eventlogger/receiver/EventReceiver.java:377) class: rs.pedjaapps.eventlogger.receiver.EventReceiver uses intent action android.intent.action.ACTION_SHUTDOWN:impact=1
+(rs/pedjaapps/eventlogger/receiver/EventReceiver.java:204) class: rs.pedjaapps.eventlogger.receiver.EventReceiver uses intent action android.intent.action.BOOT_COMPLETED:impact=1
+(rs/pedjaapps/eventlogger/service/EventService.java:91) class: rs.pedjaapps.eventlogger.service.EventService uses intent action android.intent.action.ACTION_POWER_DISCONNECTED:impact=1
+(rs/pedjaapps/eventlogger/service/EventService.java:90) class: rs.pedjaapps.eventlogger.service.EventService uses intent action android.intent.action.ACTION_POWER_CONNECTED:impact=1
+(rs/pedjaapps/eventlogger/service/EventService.java:68) class: rs.pedjaapps.eventlogger.service.EventService uses intent action android.intent.action.PACKAGE_RESTARTED:impact=1
+(rs/pedjaapps/eventlogger/service/EventService.java:67) class: rs.pedjaapps.eventlogger.service.EventService uses intent action android.intent.action.PACKAGE_REPLACED:impact=1
+(rs/pedjaapps/eventlogger/service/EventService.java:66) class: rs.pedjaapps.eventlogger.service.EventService uses intent action android.intent.action.PACKAGE_REMOVED:impact=1
+(rs/pedjaapps/eventlogger/service/EventService.java:65) class: rs.pedjaapps.eventlogger.service.EventService uses intent action android.intent.action.PACKAGE_DATA_CLEARED:impact=1
+(rs/pedjaapps/eventlogger/service/EventService.java:64) class: rs.pedjaapps.eventlogger.service.EventService uses intent action android.intent.action.PACKAGE_CHANGED:impact=1
+(rs/pedjaapps/eventlogger/service/EventService.java:63) class: rs.pedjaapps.eventlogger.service.EventService uses intent action android.intent.action.PACKAGE_ADDED:impact=1
+(rs/pedjaapps/eventlogger/service/EventService.java:58) class: rs.pedjaapps.eventlogger.service.EventService uses intent action android.intent.action.ACTION_SHUTDOWN:impact=1
+(rs/pedjaapps/eventlogger/service/EventService.java:54) class: rs.pedjaapps.eventlogger.service.EventService uses intent action android.intent.action.USER_PRESENT:impact=1
+Summary: [5]=0; [4]=0; [3]=0; [2]=0; [1]=23;
+Impact Legend: [5]=Severe; [4]=High /context; [3]=Medium /context; [2]=Medium-low /context; [1]=Minor;

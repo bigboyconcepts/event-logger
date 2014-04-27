@@ -118,6 +118,7 @@ public enum EventType
 
     public static int getIntForType(EventType type)
     {
+        if(type == null) return -1;
         switch (type)
         {
             case wifi:
