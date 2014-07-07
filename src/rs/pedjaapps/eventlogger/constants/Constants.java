@@ -19,7 +19,7 @@ public class Constants
     public static final long ONE_HOUR_MS = 1000 * 60 * 60;
     public static final String PREFS_FILTER = "preferences_filter";
     public static final String EXTERNAL_APP_FOLDER = Environment.getExternalStorageDirectory().getAbsolutePath()
-            + File.separator + "Event Logger" + File.separator;
-    public static final String EXPORT_FILENAME = "Event Logger.csv";
+            + File.separator + "event_logger" + File.separator;
+    public static final String EXPORT_FILENAME = "event_logger.csv";
     public static final File EXPORT_FILE = new File(EXTERNAL_APP_FOLDER, EXPORT_FILENAME);
 }

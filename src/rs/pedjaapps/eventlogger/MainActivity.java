@@ -11,7 +11,6 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
-import android.text.Html;
 import android.view.Display;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -591,7 +590,6 @@ public class MainActivity extends AbsActivity implements AdapterView.OnItemClick
 
                 csvWrite = new CSVWriter(new FileWriter(file));
 
-                //ormlite core method
                 EventDao eventDao = MainApp.getInstance().getDaoSession().getEventDao();
                 List<Event> events = eventDao.loadAll();
 
