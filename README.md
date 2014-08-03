@@ -1,6 +1,6 @@
 # event-logger  
-![Image 1](https://dl.dropboxusercontent.com/u/21407545/%5BDONT_DELETE%5D/device-2014-04-18-224223_nexus4_portrait.png "Image 1")
-![Image 2](https://dl.dropboxusercontent.com/u/21407545/%5BDONT_DELETE%5D/device-2014-04-18-224223_nexus4_angle1.png "Image 2")
+![Image 1](https://raw.githubusercontent.com/pedja1/event-logger/master/_market/device-2014-04-18-224223_nexus4_angle1.png "Image 1")
+![Image 2](https://raw.githubusercontent.com/pedja1/event-logger/master/_market/device-2014-04-18-224223_nexus4_angle1.png "Image 2")
 
 
 ## Easily keep track of what your phone is doing.
