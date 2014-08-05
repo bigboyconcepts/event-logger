@@ -36,7 +36,7 @@ public class MainApp extends Application
     public void onCreate()
     {
         super.onCreate();
-        //Crashlytics.start(this);
+        Crashlytics.start(this);
         context = this.getApplicationContext();
         mainApp = this;
 
