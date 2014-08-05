@@ -11,6 +11,13 @@
 			android:title="@string/time_display"
 			android:defaultValue="passed"/>
 
+        <ListPreference
+            android:entries="@array/displayLimit"
+            android:entryValues="@array/displayLimit"
+            android:key="items_display_limit"
+            android:title="@string/display_limit"
+            android:defaultValue="200"/>
+
 	</PreferenceCategory>
 
 	<PreferenceCategory

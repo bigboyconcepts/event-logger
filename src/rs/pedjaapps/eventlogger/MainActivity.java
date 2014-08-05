@@ -483,7 +483,6 @@ public class MainActivity extends AbsActivity implements AdapterView.OnItemClick
         protected List<Event> doInBackground(String... params)
         {
             QueryBuilder<Event> queryBuilder = getDaoSession().getEventDao().queryBuilder();
-			queryBuilder.limit(100);
             if(SettingsManager.isTimeFilterEnabled())
             {
                 queryBuilder.where(EventDao.Properties.Timestamp.between(SettingsManager.getFilterTimeFrom(0), SettingsManager.getFilterTimeTo(new Date().getTime())));
@@ -536,6 +535,14 @@ public class MainActivity extends AbsActivity implements AdapterView.OnItemClick
 
                     queryBuilder.where(queryBuilder.or(cond1, cond2, orConditions.toArray(new WhereCondition[orConditions.size()])));
                 }
+            }
+            int limit = Utility.parseInt(SettingsManager.getItemsDisplayLimit(), -1);
+            if(limit != -1)
+            {
+                long count = queryBuilder.count();
+                queryBuilder.offset((int) (count - limit) - 1);
+                queryBuilder.limit(limit);
+                //queryBuilder.orderAsc(EventDao.Properties.Id);
             }
 
             return queryBuilder.list();

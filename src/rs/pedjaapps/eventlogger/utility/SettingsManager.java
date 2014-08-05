@@ -21,7 +21,8 @@ public class SettingsManager
     {
         remove_ads, remove_ads_disabled, unlock_attempts_left, filter_date, add_shown_ts, time_filter_enabled,
         type_filter_enabled, level_filter_enabled, filter_time_from, filter_time_to, filter_level_error,
-        filter_level_warning, filter_level_info, filter_level_ok, show_remove_ads, filter_types, time_display
+        filter_level_warning, filter_level_info, filter_level_ok, show_remove_ads, filter_types, time_display,
+        items_display_limit
     }
 
     public static void setAdsRemoved()
@@ -224,16 +225,14 @@ public class SettingsManager
         editor.putString(Key.filter_types.toString(), value.toString());
         editor.apply();
     }
-	
-	public static void setTimeDisplay(String value)
-    {
-        SharedPreferences.Editor editor = prefsDefault.edit();
-        editor.putString(Key.time_display.toString(), value);
-        editor.apply();
-    }
 
     public static String getTimeDisplay()
     {
         return prefsDefault.getString(Key.time_display.toString(), "passed");
+    }
+
+    public static String getItemsDisplayLimit()
+    {
+        return prefsDefault.getString(Key.items_display_limit.toString(), "200");
     }
 }

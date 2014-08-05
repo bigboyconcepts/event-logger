@@ -7,16 +7,17 @@ import android.os.Bundle;
 import android.preference.EditTextPreference;
 import android.preference.ListPreference;
 import android.preference.Preference;
+import android.preference.Preference.OnPreferenceChangeListener;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceScreen;
 import android.support.v4.content.LocalBroadcastManager;
+
 import java.util.Arrays;
 import java.util.List;
-import rs.pedjaapps.eventlogger.R;
+
 import rs.pedjaapps.eventlogger.constants.Constants;
 import rs.pedjaapps.eventlogger.utility.SettingsManager;
 import rs.pedjaapps.eventlogger.utility.Utility;
-import android.preference.Preference.OnPreferenceChangeListener;
 /**
  * Created by pedja on 20.4.14..
  */
@@ -24,6 +25,7 @@ public class SettingsActivity extends PreferenceActivity
 {
     long aboutFirstClickTs = 0;
     int aboutClickCount = 0;
+
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
@@ -104,6 +106,7 @@ public class SettingsActivity extends PreferenceActivity
                 }
             });
         }
+
 		final ListPreference timeDisplay = (ListPreference) findPreference("time_display");
 		final List<String> timeDisplayEntries = Arrays.asList(getResources().getStringArray(R.array.timeDisplayEntries));
 		final List<String> timeDisplayValues = Arrays.asList(getResources().getStringArray(R.array.timeDisplayValues));
@@ -118,10 +121,27 @@ public class SettingsActivity extends PreferenceActivity
 					Intent intent = new Intent();
 					intent.setAction(MainActivity.ACTION_REFRESH_ALL);
 					LocalBroadcastManager.getInstance(SettingsActivity.this).sendBroadcast(intent);
-					Utility.showToast(SettingsActivity.this, R.string.ads_removed);
 					return true;
 				}
 		});
+
+
+        final long eventCount = MainApp.getInstance().getDaoSession().getEventDao().queryBuilder().count();
+        final ListPreference displaylimit = (ListPreference) findPreference("items_display_limit");
+        final List<String> displayLimit = Arrays.asList(getResources().getStringArray(R.array.displayLimit));
+        displaylimit.setSummary(displayLimit.get(displayLimit.indexOf(SettingsManager.getItemsDisplayLimit())) + "/" + eventCount);
+        displaylimit.setOnPreferenceChangeListener(new OnPreferenceChangeListener()
+        {
+            @Override
+            public boolean onPreferenceChange(Preference p1, Object p2)
+            {
+                displaylimit.setSummary(displayLimit.get(displayLimit.indexOf(p2.toString())) + "/" + eventCount);
+                Intent intent = new Intent();
+                intent.setAction(MainActivity.ACTION_REFRESH_ALL);
+                LocalBroadcastManager.getInstance(SettingsActivity.this).sendBroadcast(intent);
+                return true;
+            }
+        });
     }
 
     private void refreshRemoveAds(EditTextPreference etpRemoveAds)

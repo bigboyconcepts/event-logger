@@ -8,4 +8,18 @@
 		<item>Passed Time</item>
 		<item>Full Time</item>
 	</string-array>
+    <string-array name="displayLimit">
+        <item>100</item>
+        <item>200</item>
+        <item>500</item>
+        <item>1000</item>
+        <item>2000</item>
+        <item>3000</item>
+        <item>5000</item>
+        <item>10000</item>
+        <item>50000</item>
+        <item>100000</item>
+        <item>1000000</item>
+        <item>All</item>
+    </string-array>
 </resources>
