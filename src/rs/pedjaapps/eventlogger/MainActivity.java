@@ -78,6 +78,8 @@ public class MainActivity extends AbsActivity implements AdapterView.OnItemClick
     ProgressBar pbLoading;
     AdView adView;
 
+	public static final String ACTION_REFRESH_ALL = "action_refresh_all";
+
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
@@ -153,6 +155,7 @@ public class MainActivity extends AbsActivity implements AdapterView.OnItemClick
         IntentFilter filter = new IntentFilter();
         filter.addAction(ACTION_ADD_EVENT);
         filter.addAction(ACTION_REMOVE_ADS);
+		filter.addAction(ACTION_REFRESH_ALL);
         LocalBroadcastManager.getInstance(this).registerReceiver(localReceiver, filter);
 
         adView = (AdView)findViewById(R.id.adView);
@@ -279,6 +282,10 @@ public class MainActivity extends AbsActivity implements AdapterView.OnItemClick
                     adView.destroy();
                     adView.setVisibility(View.GONE);
                 }
+            }
+			if(ACTION_REFRESH_ALL.equals(intent.getAction()))
+            {
+                refreshList();
             }
         }
     };
@@ -476,6 +483,7 @@ public class MainActivity extends AbsActivity implements AdapterView.OnItemClick
         protected List<Event> doInBackground(String... params)
         {
             QueryBuilder<Event> queryBuilder = getDaoSession().getEventDao().queryBuilder();
+			queryBuilder.limit(100);
             if(SettingsManager.isTimeFilterEnabled())
             {
                 queryBuilder.where(EventDao.Properties.Timestamp.between(SettingsManager.getFilterTimeFrom(0), SettingsManager.getFilterTimeTo(new Date().getTime())));

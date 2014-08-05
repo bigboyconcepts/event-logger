@@ -1,11 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
-    <EditTextPreference
-        android:key="remove_ads_unlock_key"
-        android:title="@string/remove_ads"
-        android:dialogTitle="@string/enter_unlock_key"
-        android:inputType="textPassword"/>
-    <PreferenceScreen
-        android:key="prefs_about"
-        android:summary="@string/copyright"/>
+
+	<PreferenceCategory
+		android:title="@string/options">
+
+		<ListPreference
+			android:entries="@array/timeDisplayEntries"
+			android:entryValues="@array/timeDisplayValues"
+			android:key="time_display"
+			android:title="@string/time_display"
+			android:defaultValue="passed"/>
+
+	</PreferenceCategory>
+
+	<PreferenceCategory
+		android:title="@string/action_about">
+
+		<EditTextPreference
+			android:key="remove_ads_unlock_key"
+			android:title="@string/remove_ads"
+			android:dialogTitle="@string/enter_unlock_key"
+			android:inputType="textPassword"/>
+
+		<PreferenceScreen
+			android:key="prefs_about"
+			android:summary="@string/copyright"/>
+
+	</PreferenceCategory>
 </PreferenceScreen>

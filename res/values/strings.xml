@@ -185,5 +185,7 @@
     ]]></string>
     <string name="send_to">Send To</string>
     <string name="share_failed"><![CDATA[Share Failed!<br>Cause:<br><b>%s</b>]]></string>
-
+	<string name="time_display">Display Event Time As</string>
+	<string name="options">Options</string>
+	
 </resources>

@@ -5,15 +5,18 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.preference.EditTextPreference;
+import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceScreen;
 import android.support.v4.content.LocalBroadcastManager;
-
+import java.util.Arrays;
+import java.util.List;
+import rs.pedjaapps.eventlogger.R;
 import rs.pedjaapps.eventlogger.constants.Constants;
 import rs.pedjaapps.eventlogger.utility.SettingsManager;
 import rs.pedjaapps.eventlogger.utility.Utility;
-
+import android.preference.Preference.OnPreferenceChangeListener;
 /**
  * Created by pedja on 20.4.14..
  */
@@ -101,6 +104,24 @@ public class SettingsActivity extends PreferenceActivity
                 }
             });
         }
+		final ListPreference timeDisplay = (ListPreference) findPreference("time_display");
+		final List<String> timeDisplayEntries = Arrays.asList(getResources().getStringArray(R.array.timeDisplayEntries));
+		final List<String> timeDisplayValues = Arrays.asList(getResources().getStringArray(R.array.timeDisplayValues));
+		timeDisplay.setSummary(timeDisplayEntries.get(timeDisplayValues.indexOf(SettingsManager.getTimeDisplay())));
+		timeDisplay.setOnPreferenceChangeListener(new OnPreferenceChangeListener()
+		{
+
+				@Override
+				public boolean onPreferenceChange(Preference p1, Object p2)
+				{
+					timeDisplay.setSummary(timeDisplayEntries.get(timeDisplayValues.indexOf(p2.toString())));
+					Intent intent = new Intent();
+					intent.setAction(MainActivity.ACTION_REFRESH_ALL);
+					LocalBroadcastManager.getInstance(SettingsActivity.this).sendBroadcast(intent);
+					Utility.showToast(SettingsActivity.this, R.string.ads_removed);
+					return true;
+				}
+		});
     }
 
     private void refreshRemoveAds(EditTextPreference etpRemoveAds)
@@ -121,4 +142,5 @@ public class SettingsActivity extends PreferenceActivity
             etpRemoveAds.setSummary(R.string.ads_not_removed);
         }
     }
+	
 }

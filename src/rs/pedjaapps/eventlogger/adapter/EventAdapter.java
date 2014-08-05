@@ -8,19 +8,23 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
+import java.text.DateFormat;
 import java.util.List;
-
+import java.util.Locale;
+import rs.pedjaapps.eventlogger.R;
 import rs.pedjaapps.eventlogger.constants.EventLevel;
 import rs.pedjaapps.eventlogger.constants.EventType;
-import rs.pedjaapps.eventlogger.R;
-import rs.pedjaapps.eventlogger.utility.Utility;
 import rs.pedjaapps.eventlogger.model.Event;
+import rs.pedjaapps.eventlogger.utility.SettingsManager;
+import rs.pedjaapps.eventlogger.utility.Utility;
 
 /**
  * Created by pedja on 12.4.14..
  */
 public class EventAdapter extends ArrayAdapter<Event>
 {
+	DateFormat format = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT, Locale.getDefault());
+	
     public EventAdapter(Context context, List<Event> events)
     {
         super(context, 0, events);
@@ -49,7 +53,15 @@ public class EventAdapter extends ArrayAdapter<Event>
 
         holder.tvDescription.setText(Html.fromHtml(event.getShort_desc()));
         holder.tvColorStamp.setBackgroundColor(EventLevel.getLevelForInt(event.getLevel()).color());
-        holder.tvTimestamp.setText(Utility.getTime(event.getTimestamp().getTime()));
+        
+		if("passed".equals(SettingsManager.getTimeDisplay()))
+		{
+			holder.tvTimestamp.setText(Utility.getTime(event.getTimestamp().getTime()));
+		}
+		else
+		{
+			holder.tvTimestamp.setText(format.format(event.getTimestamp()));
+		}
         holder.ivType.setImageResource(EventType.getIconForId(event.getType()));
 
 

@@ -18,6 +18,7 @@ import rs.pedjaapps.eventlogger.R;
 import rs.pedjaapps.eventlogger.constants.EventLevel;
 import rs.pedjaapps.eventlogger.constants.EventType;
 import rs.pedjaapps.eventlogger.model.Event;
+import android.app.AlertDialog;
 
 /**
  * Created by pedja on 13.4.14..
@@ -46,16 +47,9 @@ public class EventInfoDialog extends DialogFragment
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState)
     {
-        Dialog dialog = new Dialog(getActivity());
-        dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);//make window holding dialog transparent
-        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-        return dialog;
-    }
-
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
-    {
-        DateFormat format = DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.MEDIUM, Locale.getDefault());
+		AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        //builder.setTitle("bla");
+		DateFormat format = DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.MEDIUM, Locale.getDefault());
         View view = getActivity().getLayoutInflater().inflate(R.layout.layout_event_info, null);
         TextView tvTimestamp = (TextView)view.findViewById(R.id.tvTimestamp);
         TextView tvEventLevelColor = (TextView)view.findViewById(R.id.tvEventLevelColor);
@@ -67,6 +61,10 @@ public class EventInfoDialog extends DialogFragment
         tvLongDesc.setText(Html.fromHtml(event.getLong_desc()));
         tvEventDetails.setCompoundDrawablesWithIntrinsicBounds(EventType.getIconForId(event.getType()), 0, 0, 0);
         tvEventLevelText.setText(EventLevel.getTextForInt(event.getLevel()));
-        return view;
+        builder.setView(view);
+		AlertDialog dialog = builder.create();
+		
+        return dialog;
     }
+
 }
