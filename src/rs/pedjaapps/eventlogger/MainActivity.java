@@ -72,6 +72,7 @@ public class MainActivity extends AbsActivity implements AdapterView.OnItemClick
     public static final String ACTION_ADD_EVENT = "action_add_event";
     public static final String ACTION_REMOVE_ADS = "action_remove_ads";
     public static final String EXTRA_EVENT = "extra_event";
+    public static final String ACTION_SHOW_DETAILS = "show_details";
 
     InterstitialAd interstitial;
     TextView tvNoEvents;
@@ -190,6 +191,21 @@ public class MainActivity extends AbsActivity implements AdapterView.OnItemClick
             }
         });*/
         new ATLoadEvents().execute();
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent)
+    {
+        super.onNewIntent(intent);
+        if(intent != null && ACTION_SHOW_DETAILS.equals(intent.getAction()))
+        {
+            Event event = intent.getParcelableExtra(EXTRA_EVENT);
+            if(event != null)
+            {
+                EventInfoDialog info = EventInfoDialog.newInstance(event);
+                info.show(getSupportFragmentManager(), "event_details");
+            }
+        }
     }
 
     private void setupActivityStyle()

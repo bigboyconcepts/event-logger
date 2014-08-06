@@ -10,10 +10,10 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
 import android.widget.RemoteViews;
-import android.widget.Toast;
 
 import rs.pedjaapps.eventlogger.MainActivity;
 import rs.pedjaapps.eventlogger.R;
+import rs.pedjaapps.eventlogger.model.Event;
 
 /**
  * Created by pedja on 7.7.14. 11.08.
@@ -53,8 +53,14 @@ public class EventsWidgetProvider extends AppWidgetProvider
         int appWidgetId = intent.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, AppWidgetManager.INVALID_APPWIDGET_ID);
         if (intent.getAction().equals(INTENT_ACTION_EVENT_DETAILS))
         {
-            int viewIndex = intent.getIntExtra(EXTRA_ITEM, 0);
-            Toast.makeText(context, "Touched view " + viewIndex, Toast.LENGTH_SHORT).show();
+            Event event = intent.getParcelableExtra(EXTRA_ITEM);
+            if(event != null)
+            {
+                context.startActivity(new Intent(context, MainActivity.class)
+                        .setAction(MainActivity.ACTION_SHOW_DETAILS)
+                        .putExtra(MainActivity.EXTRA_EVENT, event)
+                        /*.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)*/);
+            }
         }
         else if(intent.getAction().equals(INTENT_ACTION_REFRESH_WIDGET))
         {
