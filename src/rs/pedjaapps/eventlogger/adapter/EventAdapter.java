@@ -8,9 +8,15 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.nostra13.universalimageloader.core.DisplayImageOptions;
+import com.nostra13.universalimageloader.core.ImageLoader;
+
 import java.text.DateFormat;
 import java.util.List;
 import java.util.Locale;
+
+import rs.pedjaapps.eventlogger.MainApp;
 import rs.pedjaapps.eventlogger.R;
 import rs.pedjaapps.eventlogger.constants.EventLevel;
 import rs.pedjaapps.eventlogger.constants.EventType;
@@ -62,8 +68,25 @@ public class EventAdapter extends ArrayAdapter<Event>
 		{
 			holder.tvTimestamp.setText(format.format(event.getTimestamp()));
 		}
-        holder.ivType.setImageResource(EventType.getIconForId(event.getType()));
-
+        byte[] icon = event.getIcon();
+        if(icon == null || icon.length == 0)
+        {
+            holder.ivType.setImageResource(EventType.getIconForId(event.getType()));
+        }
+        else
+        {
+            /*Bitmap bmp = BitmapFactory.decodeByteArray(icon, 0, icon.length);//FIXME async decoding icon
+            if(bmp != null)
+            {
+                holder.ivType.setImageBitmap(bmp);
+            }
+            else
+            {
+                holder.ivType.setImageResource(EventType.getIconForId(event.getType()));
+            }*/
+            DisplayImageOptions dio = new DisplayImageOptions.Builder().cloneFrom(MainApp.getInstance().getDefaultDisplayImageOptions()).extraForDownloader(icon).build();
+            ImageLoader.getInstance().displayImage("db://" + event.getId(), holder.ivType, dio);
+        }
 
         return convertView;
     }

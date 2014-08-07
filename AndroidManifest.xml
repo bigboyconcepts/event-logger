@@ -125,6 +125,13 @@
                 <action android:name="android.location.PROVIDERS_CHANGED"/>
                 <action android:name="android.media.VOLUME_CHANGED_ACTION"/>
                 <action android:name="android.intent.action.PHONE_STATE"/>
+                <action android:name="android.intent.action.PACKAGE_ADDED"/>
+                <action android:name="android.intent.action.PACKAGE_REPLACED"/>
+                <action android:name="android.intent.action.PACKAGE_REMOVED"/>
+                <action android:name="android.intent.action.PACKAGE_RESTARTED"/>
+                <action android:name="android.intent.action.PACKAGE_DATA_CLEARED"/>
+                <action android:name="android.intent.action.PACKAGE_CHANGED"/>
+                <data android:scheme="package"/>
             </intent-filter>
         </receiver>
         <service

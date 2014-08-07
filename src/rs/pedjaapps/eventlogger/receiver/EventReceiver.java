@@ -16,6 +16,7 @@ import android.provider.Telephony;
 import android.support.v4.content.LocalBroadcastManager;
 import android.telephony.SmsMessage;
 import android.telephony.TelephonyManager;
+import android.util.Log;
 
 import java.util.Date;
 import java.util.Locale;
@@ -23,11 +24,13 @@ import java.util.Locale;
 import rs.pedjaapps.eventlogger.MainActivity;
 import rs.pedjaapps.eventlogger.MainApp;
 import rs.pedjaapps.eventlogger.R;
+import rs.pedjaapps.eventlogger.constants.Constants;
 import rs.pedjaapps.eventlogger.constants.EventLevel;
 import rs.pedjaapps.eventlogger.constants.EventType;
 import rs.pedjaapps.eventlogger.model.Event;
 import rs.pedjaapps.eventlogger.model.EventDao;
 import rs.pedjaapps.eventlogger.service.EventService;
+import rs.pedjaapps.eventlogger.utility.Utility;
 
 /**
  * Created by pedja on 11.4.14..
@@ -54,9 +57,16 @@ public class EventReceiver extends BroadcastReceiver
         {
             return;
         }
-        //TODO only if battery save isn't enabled
         context.startService(new Intent(context, EventService.class));
         Bundle extras = intent.getExtras();
+        if(extras != null)
+        {
+            extras.isEmpty();// has effect of unparcelling Bundle
+            for (String s : extras.keySet())
+            {
+                Log.d(Constants.LOG_TAG, "Bundle extras map key: " + s);
+            }
+        }
         if(intent.getAction().equals(WifiManager.NETWORK_STATE_CHANGED_ACTION))
         {
             /*networkinfo(NetworkInfo), bssid(string), linkProperties(LinkProperties)*/
@@ -619,6 +629,87 @@ public class EventReceiver extends BroadcastReceiver
             event.setType(EventType.getIntForType(EventType.media));
             event.setShort_desc(context.getString(R.string.scanner_finished));
             event.setLong_desc(context.getString(R.string.scanner_finished_desc));
+            EventDao eventDao = MainApp.getInstance().getDaoSession().getEventDao();
+            eventDao.insert(event);
+            sendLocalBroadcast(event);
+        }
+        if(intent.getAction().equals(Intent.ACTION_PACKAGE_REMOVED))
+        {
+            boolean replacing = intent.getBooleanExtra(Intent.EXTRA_REPLACING, false);
+            String pn = intent.getData().toString().split(":")[1];
+            if(!replacing)
+            {
+                Event event = new Event();
+                event.setTimestamp(new Date());
+                event.setLevel(EventLevel.getIntForLevel(EventLevel.warning));
+                event.setType(EventType.getIntForType(EventType.app));
+                event.setShort_desc(context.getString(R.string.app_removed));
+                event.setLong_desc(context.getString(R.string.app_removed_desc, pn));
+                EventDao eventDao = MainApp.getInstance().getDaoSession().getEventDao();
+                eventDao.insert(event);
+                sendLocalBroadcast(event);
+            }
+        }
+        if(intent.getAction().equals(Intent.ACTION_PACKAGE_ADDED))
+        {
+            boolean replacing = intent.getBooleanExtra(Intent.EXTRA_REPLACING, false);
+            String pn = intent.getData().toString().split(":")[1];
+            if(!replacing)
+            {
+                String appName = Utility.getNameForPackage(context, pn);
+                Event event = new Event();
+                event.setTimestamp(new Date());
+                event.setLevel(EventLevel.getIntForLevel(EventLevel.warning));
+                event.setType(EventType.getIntForType(EventType.app));
+                event.setShort_desc(context.getString(R.string.app_installed, appName));
+                event.setLong_desc(context.getString(R.string.app_installed_desc, appName, pn));
+                event.setIcon(Utility.getApplicationIcon(context, pn));
+                EventDao eventDao = MainApp.getInstance().getDaoSession().getEventDao();
+                eventDao.insert(event);
+                sendLocalBroadcast(event);
+            }
+        }
+        if(intent.getAction().equals(Intent.ACTION_PACKAGE_DATA_CLEARED))
+        {
+            String pn = intent.getData().toString().split(":")[1];
+            String appName = Utility.getNameForPackage(context, pn);
+            Event event = new Event();
+            event.setTimestamp(new Date());
+            event.setLevel(EventLevel.getIntForLevel(EventLevel.warning));
+            event.setType(EventType.getIntForType(EventType.app));
+            event.setShort_desc(context.getString(R.string.app_data_cleared, appName));
+            event.setLong_desc(context.getString(R.string.app_data_cleared_desc, appName, pn));
+            event.setIcon(Utility.getApplicationIcon(context, pn));
+            EventDao eventDao = MainApp.getInstance().getDaoSession().getEventDao();
+            eventDao.insert(event);
+            sendLocalBroadcast(event);
+        }
+        if(intent.getAction().equals(Intent.ACTION_PACKAGE_RESTARTED))
+        {
+            String pn = intent.getData().toString().split(":")[1];
+            String appName = Utility.getNameForPackage(context, pn);
+            Event event = new Event();
+            event.setTimestamp(new Date());
+            event.setLevel(EventLevel.getIntForLevel(EventLevel.warning));
+            event.setType(EventType.getIntForType(EventType.app));
+            event.setShort_desc(context.getString(R.string.app_killed, appName));
+            event.setLong_desc(context.getString(R.string.app_killed_desc, appName, pn));
+            event.setIcon(Utility.getApplicationIcon(context, pn));
+            EventDao eventDao = MainApp.getInstance().getDaoSession().getEventDao();
+            eventDao.insert(event);
+            sendLocalBroadcast(event);
+        }
+        if(intent.getAction().equals(Intent.ACTION_PACKAGE_REPLACED))
+        {
+            String pn = intent.getData().toString().split(":")[1];
+            String appName = Utility.getNameForPackage(context, pn);
+            Event event = new Event();
+            event.setTimestamp(new Date());
+            event.setLevel(EventLevel.getIntForLevel(EventLevel.warning));
+            event.setType(EventType.getIntForType(EventType.app));
+            event.setShort_desc(context.getString(R.string.app_reinstalled, appName));
+            event.setLong_desc(context.getString(R.string.app_reinstalled_desc, appName, pn));
+            event.setIcon(Utility.getApplicationIcon(context, pn));
             EventDao eventDao = MainApp.getInstance().getDaoSession().getEventDao();
             eventDao.insert(event);
             sendLocalBroadcast(event);

@@ -188,5 +188,24 @@
 	<string name="time_display">Display Event Time As</string>
 	<string name="options">Options</string>
     <string name="display_limit">Max Number of Events to Display</string>
+    <string name="app_removed">Application Removed</string>
+    <string name="app_removed_desc" formatted="false"><![CDATA[Application has been uninstalled from device.<br>
+                •Package Name: %s<br>]]></string>
+    <string name="app_installed">Application Installed: [%s]</string>
+    <string name="app_installed_desc" formatted="false"><![CDATA[Application has been uninstalled from device.<br>
+                •Application Name: %s<br>
+                •Package Name: %s<br>]]></string>
+    <string name="app_data_cleared">Application Data Cleared: [%s]</string>
+    <string name="app_data_cleared_desc" formatted="false"><![CDATA[Application Data has been cleared.<br>
+                •Application Name: %s<br>
+                •Package Name: %s<br>]]></string>
+    <string name="app_killed">Application Killed: [%s]</string>
+    <string name="app_killed_desc" formatted="false"><![CDATA[Application has been killed to free memory, or for some other reason.<br>
+                •Application Name: %s<br>
+                •Package Name: %s<br>]]></string>
+    <string name="app_reinstalled">Application Replaced: [%s]</string>
+    <string name="app_reinstalled_desc" formatted="false"><![CDATA[Application has been re-installed.<br>
+                •Application Name: %s<br>
+                •Package Name: %s<br>]]></string>
 
 </resources>

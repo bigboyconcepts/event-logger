@@ -4,12 +4,17 @@ import android.app.Activity;
 import android.app.Application;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Bitmap;
 
 import com.crashlytics.android.Crashlytics;
+import com.nostra13.universalimageloader.core.DisplayImageOptions;
+import com.nostra13.universalimageloader.core.ImageLoader;
+import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 
 import rs.pedjaapps.eventlogger.constants.Constants;
 import rs.pedjaapps.eventlogger.model.DaoMaster;
 import rs.pedjaapps.eventlogger.model.DaoSession;
+import rs.pedjaapps.eventlogger.utility.SqliteImageLoader;
 
 /**
  * Created by pedja on 10/8/13.
@@ -22,6 +27,8 @@ public class MainApp extends Application
     private Activity foregroundActivity = null;
 
     private DaoSession daoSession;
+
+    private DisplayImageOptions defaultDisplayImageOptions;
 
     public synchronized static MainApp getInstance()
     {
@@ -55,6 +62,21 @@ public class MainApp extends Application
                     .penaltyDeath()
                     .build());
         }*/
+        defaultDisplayImageOptions = new DisplayImageOptions.Builder()
+                .cacheInMemory(true)
+                .bitmapConfig(Bitmap.Config.RGB_565)
+                .showImageOnLoading(R.drawable.ic_action_app)
+                .showImageOnFail(R.drawable.ic_action_app)
+                .showImageForEmptyUri(R.drawable.ic_action_app)
+                .build();
+
+        ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(this)
+                .memoryCacheSizePercentage(13) // default
+                .writeDebugLogs()
+                .imageDownloader(new SqliteImageLoader(this))
+                .defaultDisplayImageOptions(defaultDisplayImageOptions)
+                .build();
+        ImageLoader.getInstance().init(config);
     }
 
     public DaoSession getDaoSession()
@@ -87,5 +109,10 @@ public class MainApp extends Application
     public void setForegroundActivity(Activity foregroundActivity)
     {
         this.foregroundActivity = foregroundActivity;
+    }
+
+    public DisplayImageOptions getDefaultDisplayImageOptions()
+    {
+        return defaultDisplayImageOptions;
     }
 }

@@ -15,25 +15,22 @@
  */
 package rs.pedjaapps.eventlogger_daogen;
 
-import de.greenrobot.daogenerator.DaoGenerator;
 import de.greenrobot.daogenerator.Entity;
-import de.greenrobot.daogenerator.Property;
 import de.greenrobot.daogenerator.Schema;
-import de.greenrobot.daogenerator.ToMany;
 
 public class LoggerDaoGenerator
 {
 
     public static void main(String[] args) throws Exception
     {
-        Schema schema = new Schema(2, "rs.pedjaapps.eventlogger.model");
+        Schema schema = new Schema(3, "rs.pedjaapps.eventlogger.model");
 
-        addQuestions(schema);
+        addEvents(schema);
 
         new de.greenrobot.daogenerator.DaoGenerator().generateAll(schema, "src-gen");
     }
 
-    private static void addQuestions(Schema schema)
+    private static void addEvents(Schema schema)
     {
         Entity event = schema.addEntity("Event");
         event.setHasKeepSections(true);
@@ -44,6 +41,7 @@ public class LoggerDaoGenerator
         event.addStringProperty("long_desc");
         event.addIntProperty("type").notNull();
         event.addIntProperty("level").notNull();
+        event.addByteArrayProperty("icon");
 
         /*Entity question = schema.addEntity("Question");
         question.addLongProperty("question_id").primaryKey();

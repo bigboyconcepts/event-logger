@@ -8,7 +8,7 @@ import rs.pedjaapps.eventlogger.R;
 public enum EventType
 {
     wifi, bluetooth, nfc, gps, mobile, media, usb, orientation, locale, screen, sms, app, call, headset,
-    storage, boot, time, airplane, battery, wallpaper, volume, date;
+    storage, boot, time, airplane, battery, wallpaper, volume, date, pckg;
 
     public static int getIconForType(EventType type)
     {
@@ -58,6 +58,8 @@ public enum EventType
                 return R.drawable.ic_action_volume;
             case date:
                 return R.drawable.ic_action_date;
+            case pckg:
+                return R.drawable.ic_action_app;
             default:
                 return R.drawable.ic_action_info;
         }
@@ -111,6 +113,8 @@ public enum EventType
                 return R.drawable.ic_action_volume;
             case 21:
                 return R.drawable.ic_action_date;
+            case 22:
+                return R.drawable.ic_action_app;
             default:
                 return R.drawable.ic_action_info;
         }
@@ -165,6 +169,8 @@ public enum EventType
                 return 20;
             case date:
                 return 21;
+            case pckg:
+                return 22;
             default:
                 return -1;
         }
@@ -218,6 +224,8 @@ public enum EventType
                 return volume;
             case 21:
                 return date;
+            case 22:
+                return pckg;
             default:
                 return null;
         }

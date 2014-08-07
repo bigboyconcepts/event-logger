@@ -3,6 +3,11 @@ package rs.pedjaapps.eventlogger.utility;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.text.Html;
 import android.util.Log;
 import android.widget.Toast;
@@ -10,6 +15,7 @@ import android.widget.Toast;
 import com.crashlytics.android.Crashlytics;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -21,9 +27,9 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Date;
 
-import rs.pedjaapps.eventlogger.constants.Constants;
 import rs.pedjaapps.eventlogger.MainApp;
 import rs.pedjaapps.eventlogger.R;
+import rs.pedjaapps.eventlogger.constants.Constants;
 
 /**
  * Created by pedja on 10/9/13.
@@ -296,4 +302,36 @@ public class Utility
         return sb.toString();
     }
 
+    public static String getNameForPackage(Context context, String pn)
+    {
+        PackageManager pm = context.getPackageManager();
+        String appName;
+        try
+        {
+            ApplicationInfo ai = pm.getApplicationInfo(pn, 0);
+            appName = (String) pm.getApplicationLabel(ai);
+        }
+        catch (Exception e)
+        {
+            appName = "[" + context.getString(R.string.unknown).toUpperCase() + "]";
+        }
+        return appName;
+    }
+
+    public static byte[] getApplicationIcon(Context context, String pn)
+    {
+        try
+        {
+            Drawable icon = context.getPackageManager().getApplicationIcon(pn);
+            Bitmap bitmap = ((BitmapDrawable)icon).getBitmap();
+            ByteArrayOutputStream stream = new ByteArrayOutputStream();
+            bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
+            return stream.toByteArray();
+        }
+        catch (PackageManager.NameNotFoundException e)
+        {
+            e.printStackTrace();
+        }
+        return new byte[0];
+    }
 }

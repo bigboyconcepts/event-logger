@@ -29,6 +29,7 @@ public class EventDao extends AbstractDao<Event, Long> {
         public final static Property Long_desc = new Property(3, String.class, "long_desc", false, "LONG_DESC");
         public final static Property Type = new Property(4, int.class, "type", false, "TYPE");
         public final static Property Level = new Property(5, int.class, "level", false, "LEVEL");
+        public final static Property Icon = new Property(6, byte[].class, "icon", false, "ICON");
     };
 
 
@@ -49,7 +50,8 @@ public class EventDao extends AbstractDao<Event, Long> {
                 "'SHORT_DESC' TEXT," + // 2: short_desc
                 "'LONG_DESC' TEXT," + // 3: long_desc
                 "'TYPE' INTEGER NOT NULL ," + // 4: type
-                "'LEVEL' INTEGER NOT NULL );"); // 5: level
+                "'LEVEL' INTEGER NOT NULL ," + // 5: level
+                "'ICON' BLOB);"); // 6: icon
     }
 
     /** Drops the underlying database table. */
@@ -80,6 +82,11 @@ public class EventDao extends AbstractDao<Event, Long> {
         }
         stmt.bindLong(5, entity.getType());
         stmt.bindLong(6, entity.getLevel());
+ 
+        byte[] icon = entity.getIcon();
+        if (icon != null) {
+            stmt.bindBlob(7, icon);
+        }
     }
 
     /** @inheritdoc */
@@ -97,7 +104,8 @@ public class EventDao extends AbstractDao<Event, Long> {
             cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2), // short_desc
             cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3), // long_desc
             cursor.getInt(offset + 4), // type
-            cursor.getInt(offset + 5) // level
+            cursor.getInt(offset + 5), // level
+            cursor.isNull(offset + 6) ? null : cursor.getBlob(offset + 6) // icon
         );
         return entity;
     }
@@ -111,6 +119,7 @@ public class EventDao extends AbstractDao<Event, Long> {
         entity.setLong_desc(cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3));
         entity.setType(cursor.getInt(offset + 4));
         entity.setLevel(cursor.getInt(offset + 5));
+        entity.setIcon(cursor.isNull(offset + 6) ? null : cursor.getBlob(offset + 6));
      }
     
     /** @inheritdoc */

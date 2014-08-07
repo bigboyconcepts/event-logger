@@ -19,6 +19,7 @@ public class Event implements Parcelable {
     private String long_desc;
     private int type;
     private int level;
+    private byte[] icon;
 
     // KEEP FIELDS - put your custom fields here
     // KEEP FIELDS END
@@ -30,13 +31,14 @@ public class Event implements Parcelable {
         this.id = id;
     }
 
-    public Event(Long id, java.util.Date timestamp, String short_desc, String long_desc, int type, int level) {
+    public Event(Long id, java.util.Date timestamp, String short_desc, String long_desc, int type, int level, byte[] icon) {
         this.id = id;
         this.timestamp = timestamp;
         this.short_desc = short_desc;
         this.long_desc = long_desc;
         this.type = type;
         this.level = level;
+        this.icon = icon;
     }
 
     public Long getId() {
@@ -87,6 +89,14 @@ public class Event implements Parcelable {
 
     public void setLevel(int level) {
         this.level = level;
+    }
+
+    public byte[] getIcon() {
+        return icon;
+    }
+
+    public void setIcon(byte[] icon) {
+        this.icon = icon;
     }
 
     // KEEP METHODS - put your custom methods here
@@ -145,7 +155,6 @@ public class Event implements Parcelable {
                 ", level=" + level +
                 '}';
     }
-
     // KEEP METHODS END
 
 }

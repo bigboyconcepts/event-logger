@@ -6,8 +6,6 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.pm.ApplicationInfo;
-import android.content.pm.PackageManager;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.IBinder;
@@ -26,6 +24,7 @@ import rs.pedjaapps.eventlogger.constants.EventType;
 import rs.pedjaapps.eventlogger.model.Event;
 import rs.pedjaapps.eventlogger.model.EventDao;
 import rs.pedjaapps.eventlogger.receiver.EventReceiver;
+import rs.pedjaapps.eventlogger.utility.Utility;
 
 /**
  * Created by pedja on 11.4.14..
@@ -60,12 +59,12 @@ public class EventService extends Service
         intentFilter.addAction(Intent.ACTION_HEADSET_PLUG);
 
         //package
-        intentFilter.addAction(Intent.ACTION_PACKAGE_ADDED);
+        /*intentFilter.addAction(Intent.ACTION_PACKAGE_ADDED);
         intentFilter.addAction(Intent.ACTION_PACKAGE_CHANGED);
         intentFilter.addAction(Intent.ACTION_PACKAGE_DATA_CLEARED);
         intentFilter.addAction(Intent.ACTION_PACKAGE_REMOVED);
         intentFilter.addAction(Intent.ACTION_PACKAGE_REPLACED);
-        intentFilter.addAction(Intent.ACTION_PACKAGE_RESTARTED);
+        intentFilter.addAction(Intent.ACTION_PACKAGE_RESTARTED);*/
 
         //configuration
         intentFilter.addAction(Intent.ACTION_LOCALE_CHANGED);
@@ -120,23 +119,15 @@ public class EventService extends Service
                         if(pn != null && !lastActiveApp.equals(pn))
                         {
                             lastActiveApp = pn;
-                            PackageManager pm = getPackageManager();
-                            String appName;
-                            try
-                            {
-                                ApplicationInfo ai = pm.getApplicationInfo(pn, 0);
-                                appName = (String) pm.getApplicationLabel(ai);
-                            }
-                            catch (Exception e)
-                            {
-                                appName = "[" + getString(R.string.unknown).toUpperCase() + "]";
-                            }
+                            String appName = Utility.getNameForPackage(EventService.this, pn);
+
                             Event event = new Event();
                             event.setTimestamp(new Date());
                             event.setLevel(EventLevel.getIntForLevel(EventLevel.info));
                             event.setType(EventType.getIntForType(EventType.app));
                             event.setShort_desc(getString(R.string.app_started, appName));
                             event.setLong_desc(getString(R.string.app_started_desc, appName, pn));
+                            event.setIcon(Utility.getApplicationIcon(EventService.this, pn));
                             EventDao eventDao = MainApp.getInstance().getDaoSession().getEventDao();
                             eventDao.insert(event);
                             EventReceiver.sendLocalBroadcast(event);

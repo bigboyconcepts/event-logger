@@ -1,14 +1,15 @@
 package rs.pedjaapps.eventlogger.fragment;
 
 
+import android.app.AlertDialog;
 import android.app.Dialog;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.text.Html;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
-import android.view.Window;
 import android.widget.TextView;
 
 import java.text.DateFormat;
@@ -18,7 +19,6 @@ import rs.pedjaapps.eventlogger.R;
 import rs.pedjaapps.eventlogger.constants.EventLevel;
 import rs.pedjaapps.eventlogger.constants.EventType;
 import rs.pedjaapps.eventlogger.model.Event;
-import android.app.AlertDialog;
 
 /**
  * Created by pedja on 13.4.14..
@@ -59,12 +59,31 @@ public class EventInfoDialog extends DialogFragment
         tvTimestamp.setText(format.format(event.getTimestamp().getTime()));
         tvEventLevelColor.setBackgroundColor(EventLevel.getLevelForInt(event.getLevel()).color());
         tvLongDesc.setText(Html.fromHtml(event.getLong_desc()));
-        tvEventDetails.setCompoundDrawablesWithIntrinsicBounds(EventType.getIconForId(event.getType()), 0, 0, 0);
+        byte[] icon = event.getIcon();
+        if(icon == null || icon.length == 0)
+        {
+            tvEventDetails.setCompoundDrawablesWithIntrinsicBounds(EventType.getIconForId(event.getType()), 0, 0, 0);
+        }
+        else
+        {
+            Bitmap bmp = BitmapFactory.decodeByteArray(icon, 0, icon.length);//DO this
+            if(bmp != null)
+            {
+                BitmapDrawable drawable = new BitmapDrawable(getResources(), bmp);
+                drawable.setBounds(0, 0, getResources().getDimensionPixelOffset(R.dimen.dp32), getResources().getDimensionPixelOffset(R.dimen.dp32));
+                //FIXME drawable looses aspect ratio
+                tvEventDetails.setCompoundDrawables(drawable, null, null, null);
+            }
+            else
+            {
+                tvEventDetails.setCompoundDrawablesWithIntrinsicBounds(EventType.getIconForId(event.getType()), 0, 0, 0);
+            }
+        }
+
         tvEventLevelText.setText(EventLevel.getTextForInt(event.getLevel()));
         builder.setView(view);
-		AlertDialog dialog = builder.create();
-		
-        return dialog;
+
+        return builder.create();
     }
 
 }
