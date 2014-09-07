@@ -25,6 +25,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.text.DecimalFormat;
 import java.util.Date;
 
 import rs.pedjaapps.eventlogger.MainApp;
@@ -333,5 +334,39 @@ public class Utility
             e.printStackTrace();
         }
         return new byte[0];
+    }
+
+    public static String byteToHumanReadableSize(long size)
+    {
+        String hrSize = "0.00B";
+        double k = size / 1024.0;
+        double m = size / 1048576.0;
+        double g = size / 1073741824.0;
+        double t = size / 1099511627776.0;
+
+        DecimalFormat dec = new DecimalFormat("0.00");
+
+        if (t > 1)
+        {
+            hrSize = dec.format(t).concat("TB");
+        }
+        else if (g > 1)
+        {
+            hrSize = dec.format(g).concat("GB");
+        }
+        else if (m > 1)
+        {
+            hrSize = dec.format(m).concat("MB");
+        }
+        else if (k > 1)
+        {
+            hrSize = dec.format(k).concat("KB");
+        }
+        else if (size > 1)
+        {
+            hrSize = dec.format(size).concat("B");
+        }
+        return hrSize;
+
     }
 }

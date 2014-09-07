@@ -207,5 +207,8 @@
     <string name="app_reinstalled_desc" formatted="false"><![CDATA[Application has been re-installed.<br>
                 •Application Name: %s<br>
                 •Package Name: %s<br>]]></string>
+    <string name="clear_db">Clear Database</string>
+    <string name="db_size">Database Size:</string>
+    <string name="clear_db_warning">All logs will be deleted.\nMake sure to export logs first if you want to save them.\nClear Database Now?</string>
 
 </resources>

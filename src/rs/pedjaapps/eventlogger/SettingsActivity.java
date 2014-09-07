@@ -1,8 +1,12 @@
 package rs.pedjaapps.eventlogger;
 
+import android.app.AlertDialog;
+import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.EditTextPreference;
 import android.preference.ListPreference;
@@ -11,7 +15,9 @@ import android.preference.Preference.OnPreferenceChangeListener;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceScreen;
 import android.support.v4.content.LocalBroadcastManager;
+import android.widget.ProgressBar;
 
+import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 
@@ -25,6 +31,8 @@ public class SettingsActivity extends PreferenceActivity
 {
     long aboutFirstClickTs = 0;
     int aboutClickCount = 0;
+    ListPreference displaylimit;
+    PreferenceScreen clearDb;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -127,7 +135,7 @@ public class SettingsActivity extends PreferenceActivity
 
 
         final long eventCount = MainApp.getInstance().getDaoSession().getEventDao().queryBuilder().count();
-        final ListPreference displaylimit = (ListPreference) findPreference("items_display_limit");
+        displaylimit = (ListPreference) findPreference("items_display_limit");
         final List<String> displayLimit = Arrays.asList(getResources().getStringArray(R.array.displayLimit));
         displaylimit.setSummary(displayLimit.get(displayLimit.indexOf(SettingsManager.getItemsDisplayLimit())) + "/" + eventCount);
         displaylimit.setOnPreferenceChangeListener(new OnPreferenceChangeListener()
@@ -142,6 +150,45 @@ public class SettingsActivity extends PreferenceActivity
                 return true;
             }
         });
+
+        clearDb = (PreferenceScreen) findPreference("prefs_clear_db");
+        if(clearDb != null)
+        {
+            setClearDbSummary();
+            clearDb.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener()
+            {
+                @Override
+                public boolean onPreferenceClick(Preference preference)
+                {
+                    clearDbDialog();
+                    return true;
+                }
+            });
+        }
+    }
+
+    private void setClearDbSummary()
+    {
+        if(clearDb == null)return;
+        long dbSizeBytes = new File(MainApp.getInstance().getDaoSession().getDatabase().getPath()).length();
+        clearDb.setSummary(getString(R.string.db_size) + " " + Utility.byteToHumanReadableSize(dbSizeBytes));
+    }
+
+    private void clearDbDialog()
+    {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle(R.string.clear_db);
+        builder.setMessage(R.string.clear_db_warning);
+        builder.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener()
+        {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i)
+            {
+                new ATClearDb().execute();
+            }
+        });
+        builder.setNegativeButton(R.string.no, null);
+        builder.show();
     }
 
     private void refreshRemoveAds(EditTextPreference etpRemoveAds)
@@ -162,5 +209,51 @@ public class SettingsActivity extends PreferenceActivity
             etpRemoveAds.setSummary(R.string.ads_not_removed);
         }
     }
-	
+
+    private class ATClearDb extends AsyncTask<Void, Void, Void>
+    {
+        ProgressDialog pdLoading;
+
+        public ATClearDb()
+        {
+            pdLoading = new ProgressDialog(SettingsActivity.this);
+            pdLoading.setMessage(getString(R.string.please_wait));
+        }
+
+        @Override
+        protected Void doInBackground(Void... voids)
+        {
+            MainApp.getInstance().getDaoSession().getEventDao().deleteAll();
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid)
+        {
+            if (displaylimit != null)
+            {
+                final long eventCount = MainApp.getInstance().getDaoSession().getEventDao().queryBuilder().count();
+                final List<String> displayLimit = Arrays.asList(getResources().getStringArray(R.array.displayLimit));
+                displaylimit.setSummary(displayLimit.get(displayLimit.indexOf(SettingsManager.getItemsDisplayLimit())) + "/" + eventCount);
+            }
+            setClearDbSummary();
+            Intent intent = new Intent();
+            intent.setAction(MainActivity.ACTION_REFRESH_ALL);
+            LocalBroadcastManager.getInstance(SettingsActivity.this).sendBroadcast(intent);
+            if(pdLoading != null)
+            {
+                pdLoading.dismiss();
+            }
+        }
+
+        @Override
+        protected void onPreExecute()
+        {
+            if(pdLoading != null)
+            {
+                pdLoading.show();
+            }
+        }
+    }
+
 }

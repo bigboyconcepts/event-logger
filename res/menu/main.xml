@@ -23,9 +23,11 @@
           android:icon="@drawable/ic_action_share"
           app:showAsAction="ifRoom" />
 
+    <!--
     <item android:id="@+id/action_about"
           android:title="@string/action_about"
           android:icon="@drawable/ic_action_about"
           app:showAsAction="ifRoom" />
+    -->
 
 </menu>

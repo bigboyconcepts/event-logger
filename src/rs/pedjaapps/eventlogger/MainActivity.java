@@ -347,8 +347,6 @@ public class MainActivity extends AbsActivity implements AdapterView.OnItemClick
     {
         switch (item.getItemId())
         {
-            case R.id.action_about:
-                break;
             case R.id.action_settings:
                 startActivity(new Intent(this, SettingsActivity.class));
                 break;

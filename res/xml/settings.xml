@@ -18,6 +18,10 @@
             android:title="@string/display_limit"
             android:defaultValue="200"/>
 
+        <PreferenceScreen
+            android:key="prefs_clear_db"
+            android:title="@string/clear_db"/>
+
 	</PreferenceCategory>
 
 	<PreferenceCategory

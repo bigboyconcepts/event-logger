@@ -2,8 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
           xmlns:tools="http://schemas.android.com/tools"
           package="rs.pedjaapps.eventlogger"
-          android:versionCode="20140807"
-          android:versionName="1.1.0"
+          android:versionCode="20140907"
+          android:versionName="1.1.0.1"
           android:installLocation="internalOnly">
 
     <uses-sdk
