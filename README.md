@@ -36,20 +36,16 @@
 
 ☐ HDMI Plugged/Unplugged  
 ☐ NFC On/Off  
-☐ Application Installed/Removed/Replaced/Cleared  
 ☐ Service Started/Stopped  
 ☐ Mobile Network On/Off  
 ☐ SD Card Removed/Inserted/Mounted/Unmounted  
 Suggestions are welcome, but please be realistic  
 
 ## TODO:
-☐ Filter events  
 ☐ You tell me  
 
 ## Bugs:
 ☐ Sometimes events are added to the list without them actually happening(Headphone plugged, volume level changed, orientation changed)  
-☐ List sometimes doesn't scroll to bottom when app is started  
-☐ Media Play/Pause apparently doesn't work  
 ☐ When app is killed by the system due to low memory (on android 4.4) it doesn't get restarted - only happens on 4.4+  
 
 ## PERMISSIONS:
