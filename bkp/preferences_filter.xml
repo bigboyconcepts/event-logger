@@ -1,0 +1,9 @@
+<?xml version='1.0' encoding='utf-8' standalone='yes' ?>
+<map>
+    <boolean name="filter_level_info" value="true" />
+    <boolean name="filter_level_ok" value="true" />
+    <boolean name="filter_level_error" value="true" />
+    <string name="filter_types">wifi,bluetooth,gps,media,usb,orientation,locale,screen,sms,call,headset,boot,time,date,airplane,battery,wallpaper,volume</string>
+    <boolean name="type_filter_enabled" value="true" />
+    <boolean name="filter_level_warning" value="true" />
+</map>

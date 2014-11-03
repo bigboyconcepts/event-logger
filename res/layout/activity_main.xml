@@ -5,7 +5,7 @@
                 android:layout_height="match_parent"
                 android:padding="5dp"
                 tools:context="rs.pedjaapps.eventlogger.MainActivity"
-                android:background="@android:color/darker_gray">
+                >
 
     <view
         class="rs.pedjaapps.eventlogger.view.EventListView"
@@ -13,7 +13,7 @@
         android:layout_height="match_parent"
         android:id="@+id/lvEvents"
         android:divider="@android:color/transparent"
-        android:dividerHeight="2dp"
+        android:dividerHeight="0dp"
         android:smoothScrollbar="false"
         android:fadingEdge="none"
         android:cacheColorHint="@android:color/white"

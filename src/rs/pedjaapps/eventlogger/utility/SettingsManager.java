@@ -235,7 +235,7 @@ public class SettingsManager
 
     public static void setIconChanged()
     {
-        SharedPreferences.Editor editor = prefsLicence.edit();
+        SharedPreferences.Editor editor = prefsDefault.edit();
         editor.putString(Key.icon_changed.toString(), prefsLicence.getString(Key.is_pro.toString(), rs.nextString()));
         editor.apply();
     }

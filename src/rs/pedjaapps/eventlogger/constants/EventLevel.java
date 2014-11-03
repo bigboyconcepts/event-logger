@@ -43,6 +43,23 @@ public enum EventLevel
         return mColor;
     }
 
+	public static int getDrawableForLevel(EventLevel level)
+    {
+        switch (level)
+        {
+            case error:
+                return R.drawable.log_level_error_drawable;
+            case warning:
+                return R.drawable.log_level_warning_drawable;
+            case info:
+                return R.drawable.log_level_info_drawable;
+            case ok:
+                return R.drawable.log_level_ok_drawable;
+            default:
+                return R.drawable.log_level_info_drawable;
+        }
+    }
+	
     public static EventLevel getLevelForInt(int level)
     {
         switch (level)

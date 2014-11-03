@@ -82,7 +82,7 @@ class EventsRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory
 
         Event event = mWidgetItems.get(position);
         rv.setTextViewText(R.id.tvDescription, Html.fromHtml(event.getShort_desc()));
-        rv.setInt(R.id.tvColorStamp, "setBackgroundColor", EventLevel.getLevelForInt(event.getLevel()).color());
+        rv.setInt(R.id.ivLogLevel, "setImageResource", EventLevel.getDrawableForLevel(EventLevel.getLevelForInt(event.getLevel())));
         if("passed".equals(SettingsManager.getTimeDisplay()))
         {
             rv.setTextViewText(R.id.tvTimestamp, Utility.getTime(event.getTimestamp().getTime()));

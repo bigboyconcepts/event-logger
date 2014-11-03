@@ -23,6 +23,7 @@ import rs.pedjaapps.eventlogger.constants.EventType;
 import rs.pedjaapps.eventlogger.model.Event;
 import rs.pedjaapps.eventlogger.utility.SettingsManager;
 import rs.pedjaapps.eventlogger.utility.Utility;
+import android.graphics.drawable.GradientDrawable;
 
 /**
  * Created by pedja on 12.4.14..
@@ -47,7 +48,7 @@ public class EventAdapter extends ArrayAdapter<Event>
             convertView = ((LayoutInflater)getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(R.layout.event_item_layout, null);
             holder = new ViewHolder();
             holder.ivType = (ImageView)convertView.findViewById(R.id.ivType);
-            holder.tvColorStamp = (TextView)convertView.findViewById(R.id.tvColorStamp);
+            holder.ivLogLevel = (ImageView)convertView.findViewById(R.id.ivLogLevel);
             holder.tvDescription = (TextView)convertView.findViewById(R.id.tvDescription);
             holder.tvTimestamp = (TextView)convertView.findViewById(R.id.tvTimestamp);
             convertView.setTag(holder);
@@ -58,7 +59,7 @@ public class EventAdapter extends ArrayAdapter<Event>
         }
 
         holder.tvDescription.setText(Html.fromHtml(event.getShort_desc()));
-        holder.tvColorStamp.setBackgroundColor(EventLevel.getLevelForInt(event.getLevel()).color());
+        holder.ivLogLevel.setImageResource(EventLevel.getDrawableForLevel(EventLevel.getLevelForInt(event.getLevel())));
         
 		if("passed".equals(SettingsManager.getTimeDisplay()))
 		{
@@ -93,7 +94,7 @@ public class EventAdapter extends ArrayAdapter<Event>
 
     class ViewHolder
     {
-        TextView tvColorStamp, tvTimestamp, tvDescription;
-        ImageView ivType;
+        TextView tvTimestamp, tvDescription;
+        ImageView ivType, ivLogLevel;
     }
 }

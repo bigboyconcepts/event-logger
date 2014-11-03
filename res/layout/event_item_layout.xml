@@ -1,47 +1,60 @@
 <?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.widget.CardView
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_height="wrap_content"
+	android:layout_width="match_parent">
+	
+	<LinearLayout
+		android:layout_height="wrap_content"
+		android:layout_width="match_parent"
+		android:orientation="vertical"
+		android:id="@+id/llItemContainer">
 
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:orientation="horizontal"
-              android:layout_width="match_parent"
-              android:layout_height="wrap_content"
-              android:padding="2dp"
-              android:background="@android:color/white"
-    android:id="@+id/llItemContainer">
+		<LinearLayout
+			android:orientation="horizontal"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:padding="2dp">
 
-    <TextView
-        android:layout_width="5dp"
-        android:layout_height="match_parent"
-        android:id="@+id/tvColorStamp"/>
+			<ImageView
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:src="@drawable/ic_action_timestamp"/>
 
-    <ImageView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:src="@drawable/ic_action_timestamp"
-        android:layout_marginLeft="5dp"/>
+			<TextView
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:layout_gravity="center_vertical"
+				android:layout_marginLeft="3dp"
+				android:id="@+id/tvTimestamp"
+				android:textSize="12sp"
+				android:minWidth="36dp"/>
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_vertical"
-        android:layout_marginLeft="3dp"
-        android:id="@+id/tvTimestamp"
-        android:textSize="12sp"
-		android:minWidth="36dp"/>
+			<ImageView
+				android:layout_width="32dp"
+				android:layout_height="32dp"
+				android:id="@+id/ivType"
+				android:layout_gravity="center_vertical"
+				android:layout_marginLeft="10dp"/>
 
-    <ImageView
-        android:layout_width="32dp"
-        android:layout_height="32dp"
-        android:id="@+id/ivType"
-        android:layout_gravity="center_vertical"
-        android:layout_marginLeft="10dp"/>
+			<TextView
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:layout_gravity="center_vertical"
+				android:layout_marginLeft="3dp"
+				android:singleLine="true"
+				android:id="@+id/tvDescription"
+				android:textSize="12sp"/>
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_vertical"
-        android:layout_marginLeft="3dp"
-        android:singleLine="true"
-        android:id="@+id/tvDescription"
-        android:textSize="12sp"/>
+		</LinearLayout>
 
-</LinearLayout>
+		<ImageView
+			android:layout_height="1dp"
+			android:layout_width="match_parent"
+			android:id="@+id/ivLogLevel"
+			android:scaleType="fitXY"
+			android:src="@drawable/log_level_error_drawable"/>
+
+	</LinearLayout>
+	
+</android.support.v7.widget.CardView>
