@@ -18,6 +18,7 @@ public class Constants
     public static final long ONE_DAY_MS = 1000 * 60 * 60 * 24;
     public static final long ONE_HOUR_MS = 1000 * 60 * 60;
     public static final String PREFS_FILTER = "preferences_filter";
+    public static final String PREFS_LICENCE = "preferences_licence";
     public static final String EXTERNAL_APP_FOLDER = Environment.getExternalStorageDirectory().getAbsolutePath()
             + File.separator + "event_logger" + File.separator;
     public static final String EXPORT_FILENAME = "event_logger.csv";

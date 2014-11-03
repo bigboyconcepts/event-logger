@@ -1,16 +1,22 @@
 package rs.pedjaapps.eventlogger;
 
+import android.app.Activity;
+import android.app.ActivityManager;
 import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
 import android.content.res.Configuration;
 import android.graphics.Point;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
+import android.util.Log;
 import android.view.Display;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -21,6 +27,7 @@ import android.widget.AdapterView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.crashlytics.android.Crashlytics;
 import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
@@ -31,6 +38,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.text.DateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -44,6 +52,10 @@ import rs.pedjaapps.eventlogger.constants.EventLevel;
 import rs.pedjaapps.eventlogger.constants.EventType;
 import rs.pedjaapps.eventlogger.fragment.EventFilterDialog;
 import rs.pedjaapps.eventlogger.fragment.EventInfoDialog;
+import rs.pedjaapps.eventlogger.iab.IabHelper;
+import rs.pedjaapps.eventlogger.iab.IabResult;
+import rs.pedjaapps.eventlogger.iab.Inventory;
+import rs.pedjaapps.eventlogger.iab.Purchase;
 import rs.pedjaapps.eventlogger.model.Event;
 import rs.pedjaapps.eventlogger.model.EventDao;
 import rs.pedjaapps.eventlogger.service.EventService;
@@ -51,7 +63,7 @@ import rs.pedjaapps.eventlogger.utility.SettingsManager;
 import rs.pedjaapps.eventlogger.utility.Utility;
 import rs.pedjaapps.eventlogger.view.EventListView;
 
-public class MainActivity extends AbsActivity implements AdapterView.OnItemClickListener
+public class MainActivity extends AbsActivity implements AdapterView.OnItemClickListener, IabHelper.OnIabSetupFinishedListener
 {
     // Any change in height in the message list view greater than this threshold will not
     // cause a smooth scroll. Instead, we jump the list directly to the desired position.
@@ -66,6 +78,7 @@ public class MainActivity extends AbsActivity implements AdapterView.OnItemClick
     protected EventAdapter mEventListAdapter;
     protected int mLastSmoothScrollPosition;
     final Object refreshLock = new Object();
+    final Object mIabHelperSetupLock = new Object();
     boolean autorefreshList = false;
     boolean doRefresh = true;
 
@@ -78,6 +91,14 @@ public class MainActivity extends AbsActivity implements AdapterView.OnItemClick
     TextView tvNoEvents;
     ProgressBar pbLoading;
     AdView adView;
+    boolean interstitialLoaded = false;
+
+    //IAB
+    public static final int REQUEST_CODE_PURCHASE = 1001;
+
+    private String SKU_PRO = /*"pro_3_99"*/"android.test.purchased";
+    private IabHelper mHelper;
+    private boolean iabSettupInProgress = false;
 
 	public static final String ACTION_REFRESH_ALL = "action_refresh_all";
 
@@ -87,6 +108,11 @@ public class MainActivity extends AbsActivity implements AdapterView.OnItemClick
         super.onCreate(savedInstanceState);
         setupActivityStyle();
         setContentView(R.layout.activity_main);
+
+        mHelper = new IabHelper(this, Utility.getIABLKey());
+        mHelper.enableDebugLogging(true, Constants.LOG_TAG);
+        iabSettupInProgress = true;
+        mHelper.startSetup(this);
 
         tvNoEvents = (TextView) findViewById(R.id.tvNoEvents);
         pbLoading = (ProgressBar) findViewById(R.id.pbLoading);
@@ -165,7 +191,7 @@ public class MainActivity extends AbsActivity implements AdapterView.OnItemClick
                 .addTestDevice("5750ECFACEA6FCE685DE7A97D8C59A5F")
                 .addTestDevice("05FBCDCAC44495595ACE7DC1AEC5C208")
                 .build();
-        if(!SettingsManager.adsRemoved())adView.loadAd(adRequest);
+        if(!SettingsManager.isPro())adView.loadAd(adRequest);
         adView.setAdListener(new AdListener()
         {
             @Override
@@ -178,19 +204,25 @@ public class MainActivity extends AbsActivity implements AdapterView.OnItemClick
 
         //test interstitial ad
         // Create the interstitial.
-        /*interstitial = new InterstitialAd(this);
+        interstitial = new InterstitialAd(this);
         interstitial.setAdUnitId("ca-app-pub-6294976772687752/1839387229");
-        if(!SettingsManager.adsRemoved() && SettingsManager.canDisplayAdds())interstitial.loadAd(adRequest);
+        if(!SettingsManager.isPro())interstitial.loadAd(adRequest);
         interstitial.setAdListener(new AdListener()
         {
             @Override
             public void onAdLoaded()
             {
                 super.onAdLoaded();
-                displayInterstitial();
+                interstitialLoaded = true;
             }
-        });*/
+        });
         new ATLoadEvents().execute();
+        setupTitle();
+    }
+
+    private void setupTitle()
+    {
+        getSupportActionBar().setTitle(SettingsManager.isPro() ? R.string.app_name_pro : R.string.app_name);
     }
 
     @Override
@@ -245,7 +277,7 @@ public class MainActivity extends AbsActivity implements AdapterView.OnItemClick
 
     public void displayInterstitial()
     {
-        if (interstitial.isLoaded())
+        if (interstitial.isLoaded() && !SettingsManager.isPro())
         {
             interstitial.show();
             SettingsManager.setAdShownTs();
@@ -275,6 +307,20 @@ public class MainActivity extends AbsActivity implements AdapterView.OnItemClick
     {
         super.onDestroy();
         doRefresh = false;
+        if (mHelper != null) mHelper.dispose();
+        mHelper = null;
+
+        if(adView != null)adView.destroy();
+    }
+
+    @Override
+    public void onBackPressed()
+    {
+        super.onBackPressed();
+        if(interstitialLoaded)
+        {
+            displayInterstitial();
+        }
     }
 
     BroadcastReceiver localReceiver = new BroadcastReceiver()
@@ -298,6 +344,7 @@ public class MainActivity extends AbsActivity implements AdapterView.OnItemClick
                     adView.destroy();
                     adView.setVisibility(View.GONE);
                 }
+                interstitialLoaded = false;
             }
 			if(ACTION_REFRESH_ALL.equals(intent.getAction()))
             {
@@ -371,6 +418,9 @@ public class MainActivity extends AbsActivity implements AdapterView.OnItemClick
                     e.printStackTrace();
                     Utility.showMessageAlertDialog(this, getString(R.string.share_failed, e.getMessage()), null, null);
                 }
+                break;
+            case R.id.action_upgrade:
+                upgradeToPro();
                 break;
         }
         return super.onOptionsItemSelected(item);
@@ -481,6 +531,22 @@ public class MainActivity extends AbsActivity implements AdapterView.OnItemClick
     public void refreshList()
     {
         new ATLoadEvents().execute();
+    }
+
+    @Override
+    public void onIabSetupFinished(IabResult result)
+    {
+        iabSettupInProgress = false;
+        if (result.isFailure())
+        {
+            Utility.showToast(this, getString(R.string.play_billing_error));
+            return;
+        }
+        queryInventoryAsync(true);
+        synchronized (mIabHelperSetupLock)
+        {
+            mIabHelperSetupLock.notify();
+        }
     }
 
     public class ATLoadEvents extends AsyncTask<String, Void, List<Event>>
@@ -683,5 +749,215 @@ public class MainActivity extends AbsActivity implements AdapterView.OnItemClick
             Utility.showMessageAlertDialog(MainActivity.this, aBoolean ? getString(R.string.export_success, Constants.EXPORT_FILE.getAbsolutePath()) : getString(R.string.export_failed, failMessage), null, null);
             progressDialog.dismiss();
         }
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data)
+    {
+        if (mHelper == null || !mHelper.handleActivityResult(requestCode, resultCode, data))
+        {
+            super.onActivityResult(requestCode, resultCode, data);
+        }
+    }
+
+    private void queryInventoryAsync(final boolean silent)
+    {
+        mHelper.queryInventoryAsync(true, Arrays.asList(SKU_PRO), new IabHelper.QueryInventoryFinishedListener()
+        {
+            @Override
+            public void onQueryInventoryFinished(IabResult result, Inventory inv)
+            {
+                if (result.isFailure())
+                {
+                    if(silent)
+                    {
+                        Log.e(Constants.LOG_TAG, getString(R.string.billing_get_list_error));
+                    }
+                    else
+                    {
+                        Utility.showMessageAlertDialog(MainActivity.this, getString(R.string.billing_get_list_error), null, null);
+                    }
+                    return;
+                }
+                Purchase purchase = inv.getPurchase(SKU_PRO);
+                if(purchase != null)
+                {
+                    SettingsManager.setPro(true);
+                    Intent intent = new Intent();
+                    intent.setAction(MainActivity.ACTION_REMOVE_ADS);
+                    LocalBroadcastManager.getInstance(MainActivity.this).sendBroadcast(intent);
+                }
+                else
+                {
+                    SettingsManager.setPro(false);
+                }
+                setupTitle();
+                setIcon();
+            }
+        });
+    }
+
+    private void showError(int response)
+    {
+
+        int errorMessage = -1;
+        switch (response)
+        {
+            case 2:
+                errorMessage = R.string.iab_unknown_error;
+                break;
+            case 5:
+                errorMessage = R.string.iab_developer_error;
+                break;
+            case 6:
+            case -1006:
+            case -1008:
+                errorMessage = R.string.iab_unknown_error;
+                break;
+            case 7:
+                errorMessage = R.string.iab_item_owned;
+                break;
+            case 8:
+                errorMessage = R.string.iab_item_not_owned;
+                break;
+            case 3:
+                errorMessage = R.string.billing_unavailable;
+                break;
+            case 4:
+                errorMessage = R.string.item_not_available;
+                break;
+            case -1001:
+                errorMessage = R.string.iab_remote_error;
+                break;
+            case -1002:
+                errorMessage = R.string.iab_bad_response;
+                break;
+            case -1003:
+                errorMessage = R.string.iab_signature_error;
+                break;
+            case -1004:
+                errorMessage = R.string.iab_send_intent_failed;
+                break;
+            case -1007:
+                errorMessage = R.string.iab_missing_token;
+                break;
+            case -1009:
+                errorMessage = R.string.iab_subscriptions_not_available;
+                break;
+            case -1010:
+                errorMessage = R.string.iab_invalid_consumption_attempt;
+                break;
+        }
+        if(errorMessage != -1)Utility.showMessageAlertDialog(this, errorMessage, 0, null);
+
+        try
+        {
+            //only only way to force crashlytics logging
+            if(errorMessage != -1)throw new RuntimeException("Intentional crashlytics exception");
+        }
+        catch(Exception e)
+        {
+            Crashlytics.setString("iab_error_message", IabHelper.getResponseDesc(response));
+            Crashlytics.logException(e);
+        }
+    }
+
+    private void upgradeToPro()
+    {
+        if(mHelper == null)return;
+        final ProgressDialog pd = new ProgressDialog(this);
+        pd.setMessage(getString(R.string.please_wait));
+        pd.show();
+        Thread thread = new Thread(new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                while(iabSettupInProgress)
+                {
+                    synchronized (mIabHelperSetupLock)
+                    {
+                        try
+                        {
+                            mIabHelperSetupLock.wait();
+                        }
+                        catch (InterruptedException e)
+                        {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+                runOnUiThread(new Runnable()
+                {
+                    @Override
+                    public void run()
+                    {
+                        pd.dismiss();
+                        if(!mHelper.isSetupDone())
+                        {
+                            Utility.showToast(MainActivity.this, R.string.play_billing_error);
+                            return;
+                        }
+                        mHelper.launchPurchaseFlow(MainActivity.this, SKU_PRO, REQUEST_CODE_PURCHASE, new IabHelper.OnIabPurchaseFinishedListener()
+                        {
+                            @Override
+                            public void onIabPurchaseFinished(IabResult result, Purchase info)
+                            {
+                                if (result.isFailure())
+                                {
+                                    showError(result.getResponse());
+                                    return;
+                                }
+                                queryInventoryAsync(false);
+                            }
+                        });
+                    }
+                });
+            }
+        });
+        thread.start();
+    }
+
+    private void setIcon()
+    {
+        if(SettingsManager.isIconAlreadyChanged())return;
+        int icon = SettingsManager.isPro() ? R.drawable.ic_launcher_pro : R.drawable.ic_launcher;
+        PackageManager pm = getPackageManager();
+        ActivityManager am = (ActivityManager) getSystemService(Activity.ACTIVITY_SERVICE);
+
+        // Enable/disable activity-aliases
+
+        pm.setComponentEnabledSetting(
+                new ComponentName(this, "rs.pedjaapps.eventlogger.MainActivity-Free"),
+                icon == R.drawable.ic_launcher ?
+                        PackageManager.COMPONENT_ENABLED_STATE_ENABLED :
+                        PackageManager.COMPONENT_ENABLED_STATE_DISABLED,
+                PackageManager.DONT_KILL_APP
+        );
+
+        pm.setComponentEnabledSetting(
+                new ComponentName(this, "rs.pedjaapps.eventlogger.MainActivity-Pro"),
+                icon == R.drawable.ic_launcher_pro ?
+                        PackageManager.COMPONENT_ENABLED_STATE_ENABLED :
+                        PackageManager.COMPONENT_ENABLED_STATE_DISABLED,
+                PackageManager.DONT_KILL_APP
+        );
+
+        // Find launcher and kill it
+
+        Intent i = new Intent(Intent.ACTION_MAIN);
+        i.addCategory(Intent.CATEGORY_HOME);
+        i.addCategory(Intent.CATEGORY_DEFAULT);
+        List<ResolveInfo> resolves = pm.queryIntentActivities(i, 0);
+        for (ResolveInfo res : resolves) {
+            if (res.activityInfo != null) {
+                am.killBackgroundProcesses(res.activityInfo.packageName);
+            }
+        }
+
+        // Change ActionBar icon
+
+        getSupportActionBar().setIcon(icon);
+        SettingsManager.setIconChanged();
     }
 }

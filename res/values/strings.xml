@@ -2,6 +2,7 @@
 <resources>
 
     <string name="app_name">Event Logger</string>
+    <string name="app_name_pro">Event Logger Pro</string>
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
     <string name="wifi_state_changed" formatted="false"><![CDATA[WiFi State Changed: <font color="%s">[%s]</font>]]></string>
@@ -210,5 +211,24 @@
     <string name="clear_db">Clear Database</string>
     <string name="db_size">Database Size:</string>
     <string name="clear_db_warning">All logs will be deleted.\nMake sure to export logs first if you want to save them.\nClear Database Now?</string>
+
+    <string name="iab_no_products">No Products Found</string>
+    <string name="billing_unavailable">In App Billing is not Available</string>
+    <string name="item_not_available">Item not available</string>
+    <string name="iab_developer_error">In-App Billing Developer Error</string>
+    <string name="iab_item_owned">Item Already Owned</string>
+    <string name="iab_item_not_owned">Item not owned</string>
+    <string name="iab_remote_error">Remote exception during initialization</string>
+    <string name="iab_bad_response">Bad response received</string>
+    <string name="iab_signature_error">Purchase signature verification failed</string>
+    <string name="iab_send_intent_failed">Send intent failed</string>
+    <string name="iab_missing_token">Missing token</string>
+    <string name="iab_subscriptions_not_available">Subscriptions not available</string>
+    <string name="iab_invalid_consumption_attempt">Invalid consumption attempt</string>
+    <string name="gps_error">Your device is not supported for In-app Billing.</string>
+    <string name="iab_unknown_error">In-App Billing Error Occurred</string>
+    <string name="play_billing_error">Problem setting up in-app billing.</string>
+    <string name="billing_get_list_error">Problem retrieving list of products.</string>
+    <string name="action_upgrade">Upgrade to Pro</string>
 
 </resources>

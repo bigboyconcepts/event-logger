@@ -14,56 +14,35 @@ import rs.pedjaapps.eventlogger.constants.Constants;
  */
 public class SettingsManager
 {
+    private static final RandomString rs = new RandomString(32);
     public static SharedPreferences prefsDefault = PreferenceManager.getDefaultSharedPreferences(MainApp.getContext());
     public static SharedPreferences prefsFilter = MainApp.getContext().getSharedPreferences(Constants.PREFS_FILTER, Activity.MODE_PRIVATE);
+    public static SharedPreferences prefsLicence = MainApp.getContext().getSharedPreferences(Constants.PREFS_LICENCE, Activity.MODE_PRIVATE);
 
     public enum Key
     {
-        remove_ads, remove_ads_disabled, unlock_attempts_left, filter_date, add_shown_ts, time_filter_enabled,
+        filter_date, add_shown_ts, time_filter_enabled,
         type_filter_enabled, level_filter_enabled, filter_time_from, filter_time_to, filter_level_error,
         filter_level_warning, filter_level_info, filter_level_ok, show_remove_ads, filter_types, time_display,
-        items_display_limit
-    }
+        items_display_limit, is_pro("74547660a2b3f21f12eff07d3543bc9b23b1dcaf"), icon_changed;
 
-    public static void setAdsRemoved()
-    {
-        SharedPreferences.Editor editor = prefsDefault.edit();
-        editor.putBoolean(Key.remove_ads.toString(), true);
-        editor.apply();
-    }
+        String mValue;
 
-    public static boolean adsRemoved()
-    {
-        return prefsDefault.getBoolean(Key.remove_ads.toString(), false);
-    }
-
-    public static int getUnlockAttemptsLeft()
-    {
-        return prefsDefault.getInt(Key.unlock_attempts_left.toString(), 3);
-    }
-
-    public static synchronized void setUnlockAttemptsLeft()
-    {
-        SharedPreferences.Editor editor = prefsDefault.edit();
-        int attemptsLeft = getUnlockAttemptsLeft();
-        attemptsLeft--;
-        if (attemptsLeft <= 0)
+        Key(String mValue)
         {
-            editor.putBoolean(Key.remove_ads_disabled.toString(), true);
+            this.mValue = mValue;
         }
-        editor.putInt(Key.unlock_attempts_left.toString(), attemptsLeft);
-        editor.apply();
-    }
 
-    public static boolean removeDisabled()
-    {
-        return prefsDefault.getBoolean(Key.remove_ads_disabled.toString(), false);
-    }
+        Key()
+        {
+        }
 
-    public static boolean canDisplayAdds()
-    {
-        long now = new Date().getTime();
-        return now - prefsDefault.getLong(Key.add_shown_ts.toString(), now - Constants.ONE_HOUR_MS) >= Constants.ONE_HOUR_MS;
+
+        @Override
+        public String toString()
+        {
+            return mValue == null ? super.toString() : mValue;
+        }
     }
 
     public static void setAdShownTs()
@@ -234,5 +213,30 @@ public class SettingsManager
     public static String getItemsDisplayLimit()
     {
         return prefsDefault.getString(Key.items_display_limit.toString(), "200");
+    }
+
+    public static final String LICENCE_IS_PRO = "rOMGzTkE367E97fQIFcJQczAlCfsR/MA";
+    public static boolean isPro()
+    {
+        return LICENCE_IS_PRO.equals(prefsLicence.getString(Key.is_pro.toString(), rs.nextString()));
+    }
+
+    public static void setPro(boolean pro)
+    {
+        SharedPreferences.Editor editor = prefsLicence.edit();
+        editor.putString(Key.is_pro.toString(), pro ? LICENCE_IS_PRO : rs.nextString());
+        editor.apply();
+    }
+
+    public static boolean isIconAlreadyChanged()
+    {
+        return prefsLicence.getString(Key.is_pro.toString(), rs.nextString()).equals(prefsDefault.getString(Key.icon_changed.toString(), rs.nextString()));
+    }
+
+    public static void setIconChanged()
+    {
+        SharedPreferences.Editor editor = prefsLicence.edit();
+        editor.putString(Key.icon_changed.toString(), prefsLicence.getString(Key.is_pro.toString(), rs.nextString()));
+        editor.apply();
     }
 }

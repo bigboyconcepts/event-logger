@@ -4,4 +4,10 @@
     <color name="yellow">#ffff00</color>
     <color name="green">#00ff00</color>
     <color name="cyan">#00ffff</color>
+
+    <color name="primary">#8bc34a</color>
+    <color name="primaryDark">#689f38</color>
+    <color name="accent">#b2ff59</color>
+
+
 </resources>

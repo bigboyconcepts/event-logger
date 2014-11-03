@@ -69,8 +69,8 @@ public class Utility
                                                      int title, DialogInterface.OnClickListener listener)
     {
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
-        builder.setTitle(Html.fromHtml(context.getString(title)));
-        builder.setMessage(Html.fromHtml(context.getString(message)));
+        if(title > 0)builder.setTitle(Html.fromHtml(context.getString(title)));
+        if(message > 0)builder.setMessage(Html.fromHtml(context.getString(message)));
         builder.setPositiveButton(android.R.string.ok, listener);
         AlertDialog dialog = builder.create();
         dialog.show();
@@ -369,4 +369,11 @@ public class Utility
         return hrSize;
 
     }
+
+	static
+    {
+        System.loadLibrary("el-jni");
+    }
+
+    public static native String getIABLKey();
 }

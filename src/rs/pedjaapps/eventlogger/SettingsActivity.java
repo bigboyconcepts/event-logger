@@ -8,20 +8,17 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.preference.EditTextPreference;
 import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.Preference.OnPreferenceChangeListener;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceScreen;
 import android.support.v4.content.LocalBroadcastManager;
-import android.widget.ProgressBar;
 
 import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 
-import rs.pedjaapps.eventlogger.constants.Constants;
 import rs.pedjaapps.eventlogger.utility.SettingsManager;
 import rs.pedjaapps.eventlogger.utility.Utility;
 /**
@@ -29,8 +26,8 @@ import rs.pedjaapps.eventlogger.utility.Utility;
  */
 public class SettingsActivity extends PreferenceActivity
 {
-    long aboutFirstClickTs = 0;
-    int aboutClickCount = 0;
+    //long aboutFirstClickTs = 0;
+    //int aboutClickCount = 0;
     ListPreference displaylimit;
     PreferenceScreen clearDb;
 
@@ -39,7 +36,7 @@ public class SettingsActivity extends PreferenceActivity
     {
         super.onCreate(savedInstanceState);
         addPreferencesFromResource(R.xml.settings);
-        final EditTextPreference etpRemoveAds = (EditTextPreference) findPreference("remove_ads_unlock_key");
+        /*final EditTextPreference etpRemoveAds = (EditTextPreference) findPreference("remove_ads_unlock_key");
         if(etpRemoveAds != null)
         {
             if(!SettingsManager.showRemoveAds())
@@ -73,7 +70,7 @@ public class SettingsActivity extends PreferenceActivity
                     return false;
                 }
             });
-        }
+        }*/
 
         PreferenceScreen about = (PreferenceScreen) findPreference("prefs_about");
         if(about != null)
@@ -90,7 +87,7 @@ public class SettingsActivity extends PreferenceActivity
                 //should never happen
             }
             about.setTitle(getString(R.string.app_name) + " " + version);
-            about.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener()
+            /*about.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener()
             {
                 @Override
                 public boolean onPreferenceClick(Preference preference)
@@ -112,7 +109,7 @@ public class SettingsActivity extends PreferenceActivity
                     }
                     return true;
                 }
-            });
+            });*/
         }
 
 		final ListPreference timeDisplay = (ListPreference) findPreference("time_display");
@@ -191,7 +188,7 @@ public class SettingsActivity extends PreferenceActivity
         builder.show();
     }
 
-    private void refreshRemoveAds(EditTextPreference etpRemoveAds)
+    /*private void refreshRemoveAds(EditTextPreference etpRemoveAds)
     {
         if(SettingsManager.removeDisabled())
         {
@@ -208,7 +205,7 @@ public class SettingsActivity extends PreferenceActivity
             etpRemoveAds.setEnabled(true);
             etpRemoveAds.setSummary(R.string.ads_not_removed);
         }
-    }
+    }*/
 
     private class ATClearDb extends AsyncTask<Void, Void, Void>
     {
