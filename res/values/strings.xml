@@ -231,4 +231,7 @@
     <string name="billing_get_list_error">Problem retrieving list of products.</string>
     <string name="action_upgrade">Upgrade to Pro</string>
 
+    <string name="drawer_open">open</string>
+    <string name="drawer_closed">closed</string>
+    
 </resources>

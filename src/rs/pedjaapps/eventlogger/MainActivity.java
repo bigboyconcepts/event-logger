@@ -16,6 +16,9 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
+import android.support.v4.view.GravityCompat;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.util.Log;
 import android.view.Display;
 import android.view.Menu;
@@ -24,15 +27,18 @@ import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.AdapterView;
+import android.widget.ListView;
 import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
-
+import au.com.bytecode.opencsv.CSVWriter;
 import com.crashlytics.android.Crashlytics;
 import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 import com.google.android.gms.ads.InterstitialAd;
-
+import de.greenrobot.dao.query.QueryBuilder;
+import de.greenrobot.dao.query.WhereCondition;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -42,11 +48,8 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
-
-import au.com.bytecode.opencsv.CSVWriter;
-import de.greenrobot.dao.query.QueryBuilder;
-import de.greenrobot.dao.query.WhereCondition;
 import rs.pedjaapps.eventlogger.adapter.EventAdapter;
+import rs.pedjaapps.eventlogger.adapter.NavigationDrawerAdapter;
 import rs.pedjaapps.eventlogger.constants.Constants;
 import rs.pedjaapps.eventlogger.constants.EventLevel;
 import rs.pedjaapps.eventlogger.constants.EventType;
@@ -58,6 +61,7 @@ import rs.pedjaapps.eventlogger.iab.Inventory;
 import rs.pedjaapps.eventlogger.iab.Purchase;
 import rs.pedjaapps.eventlogger.model.Event;
 import rs.pedjaapps.eventlogger.model.EventDao;
+import rs.pedjaapps.eventlogger.model.NDItem;
 import rs.pedjaapps.eventlogger.service.EventService;
 import rs.pedjaapps.eventlogger.utility.SettingsManager;
 import rs.pedjaapps.eventlogger.utility.Utility;
@@ -101,6 +105,19 @@ public class MainActivity extends AbsActivity implements AdapterView.OnItemClick
     private boolean iabSettupInProgress = false;
 
 	public static final String ACTION_REFRESH_ALL = "action_refresh_all";
+	
+	private DrawerLayout mDrawerLayout;
+    private RelativeLayout mDrawerContent;
+    private ListView lvDrawer;
+    NavigationDrawerAdapter ndAdapter;
+    private ActionBarDrawerToggle mDrawerToggle;
+
+    private CharSequence mDrawerTitle;
+    private CharSequence mTitle;
+
+	private List<NDItem> menuItems;
+
+    private int currentItem = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -218,6 +235,60 @@ public class MainActivity extends AbsActivity implements AdapterView.OnItemClick
         });
         new ATLoadEvents().execute();
         setupTitle();
+		
+		
+		//setup nd
+		mTitle = mDrawerTitle = getTitle();
+
+        mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+        mDrawerContent = (RelativeLayout) findViewById(R.id.left_drawer);
+        lvDrawer = (ListView) findViewById(R.id.lvDrawer);
+
+        // set a custom shadow that overlays the main content when the drawer opens
+        mDrawerLayout.setDrawerShadow(R.drawable.drawer_shadow, GravityCompat.START);
+
+        // enable ActionBar app icon to behave as action to toggle nav drawer
+        getSupportActionBar().setHomeButtonEnabled(true);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+        //tvLoginLogout = (TextView)findViewById(R.id.tvMenuLoginLogout);
+        //tvLoginLogout.setOnClickListener(this);
+
+		menuItems = generateMenuOptions();
+        // set up the drawer's list view with items and click listener
+        ndAdapter = new NavigationDrawerAdapter(this, menuItems);
+        lvDrawer.setAdapter(ndAdapter);
+        lvDrawer.setOnItemClickListener(this);
+
+
+        // ActionBarDrawerToggle ties together the the proper interactions
+        // between the sliding drawer and the action bar app icon
+        mDrawerToggle = new ActionBarDrawerToggle(
+			this,                  /* host Activity */
+			mDrawerLayout,         /* DrawerLayout object */
+			R.string.drawer_open,  /* "open drawer" description for accessibility */
+			R.string.drawer_closed  /* "close drawer" description for accessibility */
+        ) {
+            public void onDrawerClosed(View view) {
+                getSupportActionBar().setTitle(mTitle);
+                supportInvalidateOptionsMenu(); // creates call to onPrepareOptionsMenu()
+            }
+
+            public void onDrawerOpened(View drawerView) {
+                getSupportActionBar().setTitle(mDrawerTitle);
+                supportInvalidateOptionsMenu(); // creates call to onPrepareOptionsMenu()
+            }
+        };
+
+        // Defer code dependent on restoration of previous instance state.
+        mDrawerLayout.post(new Runnable() {
+				@Override
+				public void run() {
+					mDrawerToggle.syncState();
+				}
+			});
+
+        mDrawerLayout.setDrawerListener(mDrawerToggle);
     }
 
     private void setupTitle()
@@ -388,10 +459,22 @@ public class MainActivity extends AbsActivity implements AdapterView.OnItemClick
         getMenuInflater().inflate(R.menu.main, menu);
         return true;
     }
+	
+	@Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        // If the nav drawer is open, hide action items related to the content view
+        //boolean drawerOpen = mDrawerLayout.isDrawerOpen(drawerContent);
+        //menu.findItem(R.id.action_websearch).setVisible(!drawerOpen);
+        return super.onPrepareOptionsMenu(menu);
+    }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item)
     {
+		if (mDrawerToggle.onOptionsItemSelected(item))
+		{
+			return true;
+        }
         switch (item.getItemId())
         {
             case R.id.action_settings:
@@ -524,8 +607,26 @@ public class MainActivity extends AbsActivity implements AdapterView.OnItemClick
     @Override
     public void onItemClick(AdapterView<?> adapterView, View view, int i, long l)
     {
-        EventInfoDialog dialog = EventInfoDialog.newInstance(mEventListAdapter.getItem(i));
-        dialog.show(getSupportFragmentManager(), "event_details");
+		if(adapterView.getId() == R.id.lvEvents)
+		{
+        	EventInfoDialog dialog = EventInfoDialog.newInstance(mEventListAdapter.getItem(i));
+        	dialog.show(getSupportFragmentManager(), "event_details");
+		}
+		else if(adapterView.getId() == R.id.lvDrawer)
+		{
+			NDItem item = ndAdapter.getItem(i);
+			if(item.type == NDItem.TYPE_MAIN)
+			{
+				switch (item.id)
+				{
+					case login_logout:
+						break;
+					case settings:
+						break;
+				}
+				lvDrawer.setItemChecked(currentItem, true);
+			}
+		}
     }
 
     public void refreshList()
@@ -960,4 +1061,69 @@ public class MainActivity extends AbsActivity implements AdapterView.OnItemClick
         getSupportActionBar().setIcon(icon);
         SettingsManager.setIconChanged();
     }
+	
+	
+	//nd
+
+    /**
+     * When using the ActionBarDrawerToggle, you must call it during
+     * onPostCreate() and onConfigurationChanged()...
+     */
+
+    @Override
+    protected void onPostCreate(Bundle savedInstanceState) {
+        super.onPostCreate(savedInstanceState);
+        // Sync the toggle state after onRestoreInstanceState has occurred.
+        mDrawerToggle.syncState();
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        // Pass any configuration change to the drawer toggls
+        mDrawerToggle.onConfigurationChanged(newConfig);
+    }
+
+	private List<NDItem> generateMenuOptions()
+	{
+		List<NDItem> items = new ArrayList<>();
+		/*NDItem item = new NDItem();
+		item.title = getString(R.string.trending_shows);
+		item.id = NDItem.Id.trending;
+		item.type = NDItem.TYPE_MAIN;
+        item.iconRes = R.drawable.ic_action_people;
+		items.add(item);
+
+		item = new NDItem();
+		item.title = getString(R.string.my_shows);
+		item.id = NDItem.Id.my_shows;
+		item.type = NDItem.TYPE_MAIN;
+        item.iconRes = R.drawable.ic_action_favorite;
+		items.add(item);
+
+        item = new NDItem();
+        item.title = getString(R.string.my_watchlist);
+        item.id = NDItem.Id.my_watchlist;
+        item.type = NDItem.TYPE_MAIN;
+        item.iconRes = R.drawable.ic_action_watchlist;
+        items.add(item);
+
+        item = new NDItem();
+        item.type = NDItem.TYPE_SEPARATOR;
+        items.add(item);
+
+        item = new NDItem();
+        item.title = getString(R.string.login);
+        item.id = NDItem.Id.login_logout;
+        item.type = NDItem.TYPE_OPT;
+        items.add(item);
+
+        item = new NDItem();
+        item.title = getString(R.string.settings);
+        item.id = NDItem.Id.settings;
+        item.type = NDItem.TYPE_OPT;
+        items.add(item);*/
+
+		return items;
+	}
 }
