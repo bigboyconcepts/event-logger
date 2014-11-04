@@ -12,7 +12,6 @@ import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.BatteryManager;
 import android.os.Bundle;
-import android.provider.Telephony;
 import android.support.v4.content.LocalBroadcastManager;
 import android.telephony.SmsMessage;
 import android.telephony.TelephonyManager;
@@ -183,7 +182,7 @@ public class EventReceiver extends BroadcastReceiver
             eventDao.insert(event);
             sendLocalBroadcast(event);
         }
-        if(intent.getAction().equals(Telephony.Sms.Intents.SMS_RECEIVED_ACTION))
+        if(intent.getAction().equals("android.provider.Telephony.SMS_RECEIVED"))
         {
             Event event = new Event();
             event.setTimestamp(new Date());

@@ -91,7 +91,7 @@
         <ListView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:choiceMode="singleChoice"
+            android:choiceMode="none"
             android:divider="@android:color/transparent"
             android:dividerHeight="10dp"
             android:background="@android:color/white"

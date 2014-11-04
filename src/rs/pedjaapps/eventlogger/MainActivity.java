@@ -2,10 +2,12 @@ package rs.pedjaapps.eventlogger;
 
 import android.app.Activity;
 import android.app.ActivityManager;
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
@@ -19,6 +21,7 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.text.Html;
 import android.util.Log;
 import android.view.Display;
 import android.view.Menu;
@@ -31,14 +34,13 @@ import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import au.com.bytecode.opencsv.CSVWriter;
+
 import com.crashlytics.android.Crashlytics;
 import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 import com.google.android.gms.ads.InterstitialAd;
-import de.greenrobot.dao.query.QueryBuilder;
-import de.greenrobot.dao.query.WhereCondition;
+
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -48,6 +50,10 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+
+import au.com.bytecode.opencsv.CSVWriter;
+import de.greenrobot.dao.query.QueryBuilder;
+import de.greenrobot.dao.query.WhereCondition;
 import rs.pedjaapps.eventlogger.adapter.EventAdapter;
 import rs.pedjaapps.eventlogger.adapter.NavigationDrawerAdapter;
 import rs.pedjaapps.eventlogger.constants.Constants;
@@ -112,12 +118,6 @@ public class MainActivity extends AbsActivity implements AdapterView.OnItemClick
     NavigationDrawerAdapter ndAdapter;
     private ActionBarDrawerToggle mDrawerToggle;
 
-    private CharSequence mDrawerTitle;
-    private CharSequence mTitle;
-
-	private List<NDItem> menuItems;
-
-    private int currentItem = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -238,7 +238,6 @@ public class MainActivity extends AbsActivity implements AdapterView.OnItemClick
 		
 		
 		//setup nd
-		mTitle = mDrawerTitle = getTitle();
 
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         mDrawerContent = (RelativeLayout) findViewById(R.id.left_drawer);
@@ -254,7 +253,7 @@ public class MainActivity extends AbsActivity implements AdapterView.OnItemClick
         //tvLoginLogout = (TextView)findViewById(R.id.tvMenuLoginLogout);
         //tvLoginLogout.setOnClickListener(this);
 
-		menuItems = generateMenuOptions();
+        List<NDItem> menuItems = generateMenuOptions();
         // set up the drawer's list view with items and click listener
         ndAdapter = new NavigationDrawerAdapter(this, menuItems);
         lvDrawer.setAdapter(ndAdapter);
@@ -270,12 +269,10 @@ public class MainActivity extends AbsActivity implements AdapterView.OnItemClick
 			R.string.drawer_closed  /* "close drawer" description for accessibility */
         ) {
             public void onDrawerClosed(View view) {
-                getSupportActionBar().setTitle(mTitle);
                 supportInvalidateOptionsMenu(); // creates call to onPrepareOptionsMenu()
             }
 
             public void onDrawerOpened(View drawerView) {
-                getSupportActionBar().setTitle(mDrawerTitle);
                 supportInvalidateOptionsMenu(); // creates call to onPrepareOptionsMenu()
             }
         };
@@ -293,7 +290,7 @@ public class MainActivity extends AbsActivity implements AdapterView.OnItemClick
 
     private void setupTitle()
     {
-        getSupportActionBar().setTitle(SettingsManager.isPro() ? R.string.app_name_pro : R.string.app_name);
+        getSupportActionBar().setTitle(SettingsManager.isPro() ? Html.fromHtml(getString(R.string.app_name_pro_styled)) : getString(R.string.app_name));
     }
 
     @Override
@@ -463,8 +460,8 @@ public class MainActivity extends AbsActivity implements AdapterView.OnItemClick
 	@Override
     public boolean onPrepareOptionsMenu(Menu menu) {
         // If the nav drawer is open, hide action items related to the content view
-        //boolean drawerOpen = mDrawerLayout.isDrawerOpen(drawerContent);
-        //menu.findItem(R.id.action_websearch).setVisible(!drawerOpen);
+        boolean drawerOpen = mDrawerLayout.isDrawerOpen(mDrawerContent);
+        menu.findItem(R.id.action_filter).setVisible(!drawerOpen);
         return super.onPrepareOptionsMenu(menu);
     }
 
@@ -477,33 +474,9 @@ public class MainActivity extends AbsActivity implements AdapterView.OnItemClick
         }
         switch (item.getItemId())
         {
-            case R.id.action_settings:
-                startActivity(new Intent(this, SettingsActivity.class));
-                break;
             case R.id.action_filter:
                 EventFilterDialog dialog = EventFilterDialog.newInstance();
                 dialog.show(getSupportFragmentManager(), "event_filter");
-                break;
-            case R.id.action_export:
-                new ATExportDB().execute();
-                break;
-            case R.id.action_share:
-                try
-                {
-                    Intent sendIntent = new Intent();
-                    sendIntent.setAction(Intent.ACTION_SEND);
-                    sendIntent.putExtra(Intent.EXTRA_TEXT, Utility.readFileToString(Constants.EXPORT_FILE));
-                    sendIntent.setType("text/plain");
-                    startActivity(Intent.createChooser(sendIntent, getResources().getText(R.string.send_to)));
-                }
-                catch (IOException e)
-                {
-                    e.printStackTrace();
-                    Utility.showMessageAlertDialog(this, getString(R.string.share_failed, e.getMessage()), null, null);
-                }
-                break;
-            case R.id.action_upgrade:
-                upgradeToPro();
                 break;
         }
         return super.onOptionsItemSelected(item);
@@ -619,12 +592,31 @@ public class MainActivity extends AbsActivity implements AdapterView.OnItemClick
 			{
 				switch (item.id)
 				{
-					case login_logout:
-						break;
-					case settings:
-						break;
-				}
-				lvDrawer.setItemChecked(currentItem, true);
+                    case export:
+                        new ATExportDB().execute();
+                        break;
+                    case share:
+                        try
+                        {
+                            Intent sendIntent = new Intent();
+                            sendIntent.setAction(Intent.ACTION_SEND);
+                            sendIntent.putExtra(Intent.EXTRA_TEXT, Utility.readFileToString(Constants.EXPORT_FILE));
+                            sendIntent.setType("text/plain");
+                            startActivity(Intent.createChooser(sendIntent, getResources().getText(R.string.send_to)));
+                        }
+                        catch (IOException e)
+                        {
+                            e.printStackTrace();
+                            Utility.showMessageAlertDialog(this, getString(R.string.share_failed, e.getMessage()), null, null);
+                        }
+                        break;
+                    case upgrade:
+                        upgradeConfirmDialog();
+                        break;
+                    case settings:
+                        startActivity(new Intent(this, SettingsActivity.class));
+                        break;
+                }
 			}
 		}
     }
@@ -887,13 +879,14 @@ public class MainActivity extends AbsActivity implements AdapterView.OnItemClick
                     Intent intent = new Intent();
                     intent.setAction(MainActivity.ACTION_REMOVE_ADS);
                     LocalBroadcastManager.getInstance(MainActivity.this).sendBroadcast(intent);
+                    setIcon();
                 }
                 else
                 {
                     SettingsManager.setPro(false);
                 }
                 setupTitle();
-                setIcon();
+                updateNdList(generateMenuOptions());
             }
         });
     }
@@ -1021,6 +1014,7 @@ public class MainActivity extends AbsActivity implements AdapterView.OnItemClick
 
     private void setIcon()
     {
+        if(BuildConfig.DEBUG)Log.d(Constants.LOG_TAG, "setIcon() : icon already change not changing");
         if(SettingsManager.isIconAlreadyChanged())return;
         int icon = SettingsManager.isPro() ? R.drawable.ic_launcher_pro : R.drawable.ic_launcher;
         PackageManager pm = getPackageManager();
@@ -1050,16 +1044,33 @@ public class MainActivity extends AbsActivity implements AdapterView.OnItemClick
         i.addCategory(Intent.CATEGORY_HOME);
         i.addCategory(Intent.CATEGORY_DEFAULT);
         List<ResolveInfo> resolves = pm.queryIntentActivities(i, 0);
-        for (ResolveInfo res : resolves) {
-            if (res.activityInfo != null) {
+        for (ResolveInfo res : resolves)
+        {
+            if (res.activityInfo != null)
+            {
                 am.killBackgroundProcesses(res.activityInfo.packageName);
             }
         }
 
-        // Change ActionBar icon
-
-        getSupportActionBar().setIcon(icon);
         SettingsManager.setIconChanged();
+        if(BuildConfig.DEBUG)Log.d(Constants.LOG_TAG, "setIcon() : changed app icon and restarted launcher");
+    }
+
+    public void upgradeConfirmDialog()
+    {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle(R.string.action_upgrade);
+        builder.setMessage(Html.fromHtml(getString(R.string.upgrade_dialog_message)));
+        builder.setPositiveButton(R.string.upgrade_now, new DialogInterface.OnClickListener()
+        {
+            @Override
+            public void onClick(DialogInterface dialog, int which)
+            {
+                upgradeToPro();
+            }
+        });
+        builder.setNegativeButton(R.string.no_thanks, null);
+        builder.show();
     }
 	
 	
@@ -1087,38 +1098,42 @@ public class MainActivity extends AbsActivity implements AdapterView.OnItemClick
 	private List<NDItem> generateMenuOptions()
 	{
 		List<NDItem> items = new ArrayList<>();
-		/*NDItem item = new NDItem();
-		item.title = getString(R.string.trending_shows);
-		item.id = NDItem.Id.trending;
+		NDItem item = new NDItem();
+		item.title = getString(R.string.action_export);
+		item.id = NDItem.Id.export;
 		item.type = NDItem.TYPE_MAIN;
-        item.iconRes = R.drawable.ic_action_people;
+        item.iconRes = R.drawable.ic_action_save;
 		items.add(item);
 
 		item = new NDItem();
-		item.title = getString(R.string.my_shows);
-		item.id = NDItem.Id.my_shows;
+		item.title = getString(R.string.action_share);
+		item.id = NDItem.Id.share;
 		item.type = NDItem.TYPE_MAIN;
-        item.iconRes = R.drawable.ic_action_favorite;
+        item.iconRes = R.drawable.ic_action_share;
 		items.add(item);
 
-        item = new NDItem();
-        item.title = getString(R.string.my_watchlist);
-        item.id = NDItem.Id.my_watchlist;
-        item.type = NDItem.TYPE_MAIN;
-        item.iconRes = R.drawable.ic_action_watchlist;
-        items.add(item);
+        if (!SettingsManager.isPro())
+        {
+            item = new NDItem();
+            item.title = getString(R.string.action_upgrade);
+            item.id = NDItem.Id.upgrade;
+            item.type = NDItem.TYPE_MAIN;
+            item.iconRes = R.drawable.ic_action_pro;
+            items.add(item);
+        }
 
-        item = new NDItem();
+        /*item = new NDItem();
         item.type = NDItem.TYPE_SEPARATOR;
-        items.add(item);
+        items.add(item);*/
 
         item = new NDItem();
-        item.title = getString(R.string.login);
-        item.id = NDItem.Id.login_logout;
-        item.type = NDItem.TYPE_OPT;
+        item.title = getString(R.string.action_settings);
+        item.id = NDItem.Id.settings;
+        item.type = NDItem.TYPE_MAIN;
+        item.iconRes = R.drawable.ic_action_settings;
         items.add(item);
 
-        item = new NDItem();
+        /*item = new NDItem();
         item.title = getString(R.string.settings);
         item.id = NDItem.Id.settings;
         item.type = NDItem.TYPE_OPT;
@@ -1126,4 +1141,11 @@ public class MainActivity extends AbsActivity implements AdapterView.OnItemClick
 
 		return items;
 	}
+
+    private void updateNdList(List<NDItem> menu)
+    {
+        ndAdapter.clear();
+        ndAdapter.addAll(menu);
+        ndAdapter.notifyDataSetChanged();
+    }
 }

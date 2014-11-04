@@ -3,6 +3,7 @@
 
     <string name="app_name">Event Logger</string>
     <string name="app_name_pro">Event Logger Pro</string>
+    <string name="app_name_pro_styled"><![CDATA[Event Logger <font color="#00B0FF">Pro</font>]]></string>
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
     <string name="wifi_state_changed" formatted="false"><![CDATA[WiFi State Changed: <font color="%s">[%s]</font>]]></string>
@@ -233,5 +234,13 @@
 
     <string name="drawer_open">open</string>
     <string name="drawer_closed">closed</string>
-    
+
+    <string name="upgrade_dialog_message"><![CDATA[Upgrading to <font color="#00B0FF">Pro</font> version will remove ads and unlock following features:<br>
+            •Custom events logging<br>
+            •Tasker integration<br>
+            •Lock Application<br>
+            •Auto database cleanup]]></string>
+    <string name="upgrade_now">Upgrade Now</string>
+    <string name="no_thanks">No Thanks</string>
+
 </resources>

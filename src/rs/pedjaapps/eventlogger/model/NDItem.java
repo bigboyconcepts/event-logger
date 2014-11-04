@@ -8,7 +8,7 @@ public class NDItem
 
 	public enum Id
 	{
-		undefined, trending, login_logout, my_watchlist, settings, my_shows
+		undefined, export, share, upgrade, settings
 	}
 	
 	public String title;

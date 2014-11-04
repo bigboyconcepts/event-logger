@@ -1,30 +1,8 @@
-☑ wifi toggle
-☑ bluetooth toggle
 - mobile network toggle - xposed
-☑ wifi connected/disconnected
-☑ gps toggle
-☑ media play/pause - xposed
-☑ power connected/disconnected
-☑ orientation changed
-☑ locale changed
-☑ screen on/off
-☑ screen unlocked
 ☒ notification received
-☑ sms/mms received
-☑ app started
-☑ call rejected/accepted/missed...
-☑ headset plugged unplugged
 ☒ sd card removed/inserted - no way to test this right now
-☑ media scanner started/stopped
-☑ phone booted/shutdown
-☑ changed time/date/timezone
-☑ airplane mode switched
-☑ battery low/ok
-☑ changed wallpaper
 ☒ hdmi plugged - xposed(i have no idea how to determine this)
 - nfc toggle - xposed
-☑ volume changed
-- application installed/removed
 - service start/stop - xposed
 - app fc-ed
 - application accesed gps/network location

@@ -58,7 +58,9 @@ public class EventService extends Service
         intentFilter.addAction(Intent.ACTION_REBOOT);
         intentFilter.addAction(Intent.ACTION_SHUTDOWN);
         intentFilter.addAction(TelephonyManager.ACTION_PHONE_STATE_CHANGED);
+        intentFilter.addAction("android.provider.Telephony.SMS_RECEIVED");
         intentFilter.addAction(Intent.ACTION_HEADSET_PLUG);
+        intentFilter.addAction(Intent.ACTION_AIRPLANE_MODE_CHANGED);
 
         //package
         /*intentFilter.addAction(Intent.ACTION_PACKAGE_ADDED);
@@ -72,6 +74,10 @@ public class EventService extends Service
         intentFilter.addAction(Intent.ACTION_LOCALE_CHANGED);
         intentFilter.addAction(Intent.ACTION_CONFIGURATION_CHANGED);
 
+        //date/time
+        intentFilter.addAction(Intent.ACTION_TIME_CHANGED);
+        intentFilter.addAction(Intent.ACTION_DATE_CHANGED);
+
         //media
         intentFilter.addAction(Intent.ACTION_MEDIA_BAD_REMOVAL);
         intentFilter.addAction(Intent.ACTION_MEDIA_CHECKING);
@@ -84,6 +90,7 @@ public class EventService extends Service
 
         intentFilter.addAction(Intent.ACTION_DEVICE_STORAGE_OK);
         intentFilter.addAction(Intent.ACTION_DEVICE_STORAGE_LOW);
+        intentFilter.addAction("android.media.VOLUME_CHANGED_ACTION");
 
         //power
         intentFilter.addAction(Intent.ACTION_BATTERY_LOW);

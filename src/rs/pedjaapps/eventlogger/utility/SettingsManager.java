@@ -230,13 +230,13 @@ public class SettingsManager
 
     public static boolean isIconAlreadyChanged()
     {
-        return prefsLicence.getString(Key.is_pro.toString(), rs.nextString()).equals(prefsDefault.getString(Key.icon_changed.toString(), rs.nextString()));
+        return prefsDefault.getBoolean(Key.icon_changed.toString(), false);
     }
 
     public static void setIconChanged()
     {
         SharedPreferences.Editor editor = prefsDefault.edit();
-        editor.putString(Key.icon_changed.toString(), prefsLicence.getString(Key.is_pro.toString(), rs.nextString()));
+        editor.putBoolean(Key.icon_changed.toString(), true);
         editor.apply();
     }
 }
