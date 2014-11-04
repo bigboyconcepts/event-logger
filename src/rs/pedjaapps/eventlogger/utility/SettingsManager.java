@@ -243,7 +243,7 @@ public class SettingsManager
     public static boolean isPinValid(String pinPlain)
     {
         String md5Pin = Utility.md5(pinPlain);
-        return md5Pin.equals(prefsDefault.getString(Key.lock_pin.toString(), null));
+        return md5Pin.equals(prefsDefault.getString(Key.lock_pin.toString(), "81dc9bdb52d04dc20036dbd8313ed055"));
     }
 
     /**null to disable*/

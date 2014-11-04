@@ -84,7 +84,7 @@ public class SettingsFragment extends PreferenceFragment
         }*/
         PreferenceCategory security = (PreferenceCategory) findPreference("prefs_security");
         CheckBoxPreference cbPinEnabled = (CheckBoxPreference) findPreference("pin_enabled");
-        final EditTextPreference etPin = (EditTextPreference) findPreference("lock_pin");
+        final PreferenceScreen etPin = (PreferenceScreen) findPreference("lock_pin");
         if (SettingsManager.isPro())
         {
             etPin.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener()
@@ -115,7 +115,7 @@ public class SettingsFragment extends PreferenceFragment
                     builder.setNegativeButton(android.R.string.cancel, null);
                     builder.setView(et);
                     builder.show();
-                    return true;
+                    return false;
                 }
             });
             etPin.setEnabled(SettingsManager.isPinEnabled());

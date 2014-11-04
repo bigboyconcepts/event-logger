@@ -34,7 +34,7 @@
             android:summary="@string/require_pin_to_unlock"
             android:defaultValue="false"/>
 
-        <EditTextPreference
+        <PreferenceScreen
             android:key="lock_pin"
             android:title="@string/pin"
             android:summary="@string/default_pin_is"
