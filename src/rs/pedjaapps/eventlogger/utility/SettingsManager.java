@@ -24,7 +24,7 @@ public class SettingsManager
         filter_date, add_shown_ts, time_filter_enabled,
         type_filter_enabled, level_filter_enabled, filter_time_from, filter_time_to, filter_level_error,
         filter_level_warning, filter_level_info, filter_level_ok, show_remove_ads, filter_types, time_display,
-        items_display_limit, is_pro("74547660a2b3f21f12eff07d3543bc9b23b1dcaf"), icon_changed;
+        items_display_limit, is_pro("74547660a2b3f21f12eff07d3543bc9b23b1dcaf"), icon_changed, lock_pin, pin_enabled;
 
         String mValue;
 
@@ -237,6 +237,32 @@ public class SettingsManager
     {
         SharedPreferences.Editor editor = prefsDefault.edit();
         editor.putBoolean(Key.icon_changed.toString(), true);
+        editor.apply();
+    }
+
+    public static boolean isPinValid(String pinPlain)
+    {
+        String md5Pin = Utility.md5(pinPlain);
+        return md5Pin.equals(prefsDefault.getString(Key.lock_pin.toString(), null));
+    }
+
+    /**null to disable*/
+    public static void setPin(String pinPlain)
+    {
+        SharedPreferences.Editor editor = prefsDefault.edit();
+        editor.putString(Key.lock_pin.toString(), pinPlain == null ? null : Utility.md5(pinPlain));
+        editor.apply();
+    }
+
+    public static boolean isPinEnabled()
+    {
+        return prefsDefault.getBoolean(Key.pin_enabled.toString(), false);
+    }
+
+    public static void setPasswordEnabled(boolean enabled)
+    {
+        SharedPreferences.Editor editor = prefsDefault.edit();
+        editor.putBoolean(Key.pin_enabled.toString(), enabled);
         editor.apply();
     }
 }

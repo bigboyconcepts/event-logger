@@ -235,12 +235,21 @@
     <string name="drawer_open">open</string>
     <string name="drawer_closed">closed</string>
 
-    <string name="upgrade_dialog_message"><![CDATA[Upgrading to <font color="#00B0FF">Pro</font> version will remove ads and unlock following features:<br>
+    <string name="upgrade_dialog_message"><![CDATA[Upgrading to <font color="#00B0FF">Pro</font> version will remove ads and unlock following features:<br><br>
             •Custom events logging<br>
             •Tasker integration<br>
             •Lock Application<br>
             •Auto database cleanup]]></string>
     <string name="upgrade_now">Upgrade Now</string>
     <string name="no_thanks">No Thanks</string>
+    <string name="back_ascii"><![CDATA[<—]]></string>
+    <string name="enter_pin_to_unlock">Enter PIN to Unlock</string>
+    <string name="invalid_pin">Invalid PIN</string>
+    <string name="security">Security</string>
+    <string name="pin_lock">PIN Lock</string>
+    <string name="require_pin_to_unlock">Require PIN to Unlock.</string>
+    <string name="pin">PIN</string>
+    <string name="default_pin_is">Default PIN is 1234</string>
+    <string name="pro_only">(Pro Version Only)</string>
 
 </resources>

@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
-	<PreferenceCategory
-		android:title="@string/options">
+    <PreferenceCategory
+        android:title="@string/options">
 
-		<ListPreference
-			android:entries="@array/timeDisplayEntries"
-			android:entryValues="@array/timeDisplayValues"
-			android:key="time_display"
-			android:title="@string/time_display"
-			android:defaultValue="passed"/>
+        <ListPreference
+            android:entries="@array/timeDisplayEntries"
+            android:entryValues="@array/timeDisplayValues"
+            android:key="time_display"
+            android:title="@string/time_display"
+            android:defaultValue="passed"/>
 
         <ListPreference
             android:entries="@array/displayLimit"
@@ -22,20 +22,41 @@
             android:key="prefs_clear_db"
             android:title="@string/clear_db"/>
 
-	</PreferenceCategory>
+    </PreferenceCategory>
 
-	<PreferenceCategory
-		android:title="@string/action_about">
+    <PreferenceCategory
+        android:key="prefs_security"
+        android:title="@string/security">
 
-		<!--<EditTextPreference
-			android:key="remove_ads_unlock_key"
-			android:title="@string/remove_ads"
-			android:dialogTitle="@string/enter_unlock_key"
-			android:inputType="textPassword"/>-->
+        <CheckBoxPreference
+            android:key="pin_enabled"
+            android:title="@string/pin_lock"
+            android:summary="@string/require_pin_to_unlock"
+            android:defaultValue="false"/>
 
-		<PreferenceScreen
-			android:key="prefs_about"
-			android:summary="@string/copyright"/>
+        <EditTextPreference
+            android:key="lock_pin"
+            android:title="@string/pin"
+            android:summary="@string/default_pin_is"
+            android:defaultValue="81dc9bdb52d04dc20036dbd8313ed055"
+            android:inputType="numberPassword"
+            android:selectAllOnFocus="true"
+            />
 
-	</PreferenceCategory>
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:title="@string/action_about">
+
+        <!--<EditTextPreference
+            android:key="remove_ads_unlock_key"
+            android:title="@string/remove_ads"
+            android:dialogTitle="@string/enter_unlock_key"
+            android:inputType="textPassword"/>-->
+
+        <PreferenceScreen
+            android:key="prefs_about"
+            android:summary="@string/copyright"/>
+
+    </PreferenceCategory>
 </PreferenceScreen>

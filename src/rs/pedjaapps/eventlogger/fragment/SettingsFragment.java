@@ -8,11 +8,17 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.preference.CheckBoxPreference;
+import android.preference.EditTextPreference;
 import android.preference.ListPreference;
 import android.preference.Preference;
+import android.preference.PreferenceCategory;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceScreen;
 import android.support.v4.content.LocalBroadcastManager;
+import android.text.InputType;
+import android.text.TextUtils;
+import android.widget.EditText;
 
 import java.io.File;
 import java.util.Arrays;
@@ -76,6 +82,70 @@ public class SettingsFragment extends PreferenceFragment
                 }
             });
         }*/
+        PreferenceCategory security = (PreferenceCategory) findPreference("prefs_security");
+        CheckBoxPreference cbPinEnabled = (CheckBoxPreference) findPreference("pin_enabled");
+        final EditTextPreference etPin = (EditTextPreference) findPreference("lock_pin");
+        if (SettingsManager.isPro())
+        {
+            etPin.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener()
+            {
+                @Override
+                public boolean onPreferenceClick(Preference preference)
+                {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                    builder.setTitle(etPin.getTitle());
+                    final EditText et = new EditText(getActivity());
+                    et.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_VARIATION_PASSWORD);
+                    builder.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener()
+                    {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which)
+                        {
+                            String pin = et.getText().toString();
+                            if(TextUtils.isDigitsOnly(pin))
+                            {
+                                SettingsManager.setPin(et.getText().toString());
+                            }
+                            else
+                            {
+                                Utility.showToast(getActivity(), R.string.invalid_pin);
+                            }
+                        }
+                    });
+                    builder.setNegativeButton(android.R.string.cancel, null);
+                    builder.setView(et);
+                    builder.show();
+                    return true;
+                }
+            });
+            etPin.setEnabled(SettingsManager.isPinEnabled());
+
+            cbPinEnabled.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener()
+            {
+                @Override
+                public boolean onPreferenceChange(Preference preference, Object newValue)
+                {
+                    etPin.setEnabled((boolean)newValue);
+                    return true;
+                }
+            });
+
+            /*etPin.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener()
+            {
+                @Override
+                public boolean onPreferenceChange(Preference preference, Object newValue)
+                {
+                    SettingsManager.setPin((String) newValue);
+                    return false;
+                }
+            });*/
+        }
+        else
+        {
+            etPin.setEnabled(false);
+            cbPinEnabled.setEnabled(false);
+            security.setTitle(getString(R.string.security) + getString(R.string.pro_only));
+        }
 
         PreferenceScreen about = (PreferenceScreen) findPreference("prefs_about");
         if(about != null)
