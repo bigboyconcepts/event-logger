@@ -23,4 +23,6 @@ public class Constants
             + File.separator + "event_logger" + File.separator;
     public static final String EXPORT_FILENAME = "event_logger.csv";
     public static final File EXPORT_FILE = new File(EXTERNAL_APP_FOLDER, EXPORT_FILENAME);
+    public static final String SKULL = "\u2620";
+    public static final String STAR = "*";
 }

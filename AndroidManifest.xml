@@ -88,7 +88,11 @@
             android:value="dfda65c0dfc9a63025b8d6e98dc98ce082190d2b"/>
 
         <activity
-            android:name=".MainActivity"
+        android:name=".MainActivity"
+        android:label="@string/app_name"/>
+
+        <activity
+            android:name=".LockActivity"
             android:label="@string/app_name">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
@@ -96,10 +100,10 @@
         </activity>
         <activity-alias
             android:enabled="true"
-            android:name=".MainActivity-Free"
+            android:name=".LockActivity-Free"
             android:label="@string/app_name"
             android:icon="@drawable/ic_launcher"
-            android:targetActivity=".MainActivity">
+            android:targetActivity=".LockActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -108,10 +112,10 @@
 
         <activity-alias
             android:enabled="false"
-            android:name=".MainActivity-Pro"
+            android:name=".LockActivity-Pro"
             android:label="@string/app_name_pro"
             android:icon="@drawable/ic_launcher_pro"
-            android:targetActivity=".MainActivity">
+            android:targetActivity=".LockActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />

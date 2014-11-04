@@ -1023,7 +1023,7 @@ public class MainActivity extends AbsActivity implements AdapterView.OnItemClick
         // Enable/disable activity-aliases
 
         pm.setComponentEnabledSetting(
-                new ComponentName(this, "rs.pedjaapps.eventlogger.MainActivity-Free"),
+                new ComponentName(this, "rs.pedjaapps.eventlogger.LockActivity-Free"),
                 icon == R.drawable.ic_launcher ?
                         PackageManager.COMPONENT_ENABLED_STATE_ENABLED :
                         PackageManager.COMPONENT_ENABLED_STATE_DISABLED,
@@ -1031,7 +1031,7 @@ public class MainActivity extends AbsActivity implements AdapterView.OnItemClick
         );
 
         pm.setComponentEnabledSetting(
-                new ComponentName(this, "rs.pedjaapps.eventlogger.MainActivity-Pro"),
+                new ComponentName(this, "rs.pedjaapps.eventlogger.LockActivity-Pro"),
                 icon == R.drawable.ic_launcher_pro ?
                         PackageManager.COMPONENT_ENABLED_STATE_ENABLED :
                         PackageManager.COMPONENT_ENABLED_STATE_DISABLED,

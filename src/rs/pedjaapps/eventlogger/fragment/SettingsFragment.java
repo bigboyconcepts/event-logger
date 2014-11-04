@@ -8,8 +8,11 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.preference.CheckBoxPreference;
+import android.preference.EditTextPreference;
 import android.preference.ListPreference;
 import android.preference.Preference;
+import android.preference.PreferenceCategory;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceScreen;
 import android.support.v4.content.LocalBroadcastManager;
@@ -76,6 +79,39 @@ public class SettingsFragment extends PreferenceFragment
                 }
             });
         }*/
+        PreferenceCategory security = (PreferenceCategory) findPreference("prefs_security");
+        CheckBoxPreference cbPinEnabled = (CheckBoxPreference) findPreference("pin_enabled");
+        final EditTextPreference etPin = (EditTextPreference) findPreference("lock_pin");
+        if (SettingsManager.isPro())
+        {
+            etPin.setEnabled(SettingsManager.isPinEnabled());
+
+            cbPinEnabled.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener()
+            {
+                @Override
+                public boolean onPreferenceChange(Preference preference, Object newValue)
+                {
+                    etPin.setEnabled((boolean)newValue);
+                    return true;
+                }
+            });
+
+            etPin.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener()
+            {
+                @Override
+                public boolean onPreferenceChange(Preference preference, Object newValue)
+                {
+                    SettingsManager.setPin((String) newValue);
+                    return false;
+                }
+            });
+        }
+        else
+        {
+            etPin.setEnabled(false);
+            cbPinEnabled.setEnabled(false);
+            security.setTitle(getString(R.string.security) + getString(R.string.pro_only));
+        }
 
         PreferenceScreen about = (PreferenceScreen) findPreference("prefs_about");
         if(about != null)
