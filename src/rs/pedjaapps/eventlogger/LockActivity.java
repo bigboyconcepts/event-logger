@@ -22,7 +22,7 @@ public class LockActivity extends AbsActivity implements View.OnClickListener
     TextView tvPass;
 
     String pass = "";
-    boolean showPassword;
+    boolean passwordVisible;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -115,7 +115,7 @@ public class LockActivity extends AbsActivity implements View.OnClickListener
         if (v.getId() != R.id.tvPass)
         {
 
-            tvPass.setText(generateStars());
+            tvPass.setText(passwordVisible ? pass : generateStars());
             if(BuildConfig.DEBUG)Log.d(Constants.LOG_TAG, pass);
         }
     }
@@ -132,7 +132,8 @@ public class LockActivity extends AbsActivity implements View.OnClickListener
 
     private void togglePasswordVisibility()
     {
-        if(showPassword)
+        passwordVisible = !passwordVisible;
+        if(passwordVisible)
         {
             tvPass.setText(pass);
         }
@@ -140,7 +141,6 @@ public class LockActivity extends AbsActivity implements View.OnClickListener
         {
             tvPass.setText(generateStars());
         }
-        showPassword = !showPassword;
     }
 
     private void unlock()
