@@ -126,6 +126,10 @@
             android:label="@string/action_settings">
         </activity>
         <activity
+            android:name=".EventDetailsActivity"
+            android:label="@string/event_details_title">
+        </activity>
+        <activity
             android:name="com.google.android.gms.ads.AdActivity"
             android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|uiMode|screenSize|smallestScreenSize"/>
 

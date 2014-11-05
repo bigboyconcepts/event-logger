@@ -60,7 +60,6 @@ import rs.pedjaapps.eventlogger.constants.Constants;
 import rs.pedjaapps.eventlogger.constants.EventLevel;
 import rs.pedjaapps.eventlogger.constants.EventType;
 import rs.pedjaapps.eventlogger.fragment.EventFilterDialog;
-import rs.pedjaapps.eventlogger.fragment.EventInfoDialog;
 import rs.pedjaapps.eventlogger.iab.IabHelper;
 import rs.pedjaapps.eventlogger.iab.IabResult;
 import rs.pedjaapps.eventlogger.iab.Inventory;
@@ -95,7 +94,6 @@ public class MainActivity extends AbsActivity implements AdapterView.OnItemClick
     public static final String ACTION_ADD_EVENT = "action_add_event";
     public static final String ACTION_REMOVE_ADS = "action_remove_ads";
     public static final String EXTRA_EVENT = "extra_event";
-    public static final String ACTION_SHOW_DETAILS = "show_details";
 
     InterstitialAd interstitial;
     TextView tvNoEvents;
@@ -291,21 +289,6 @@ public class MainActivity extends AbsActivity implements AdapterView.OnItemClick
     private void setupTitle()
     {
         getSupportActionBar().setTitle(SettingsManager.isPro() ? Html.fromHtml(getString(R.string.app_name_pro_styled)) : getString(R.string.app_name));
-    }
-
-    @Override
-    protected void onNewIntent(Intent intent)
-    {
-        super.onNewIntent(intent);
-        if(intent != null && ACTION_SHOW_DETAILS.equals(intent.getAction()))
-        {
-            Event event = intent.getParcelableExtra(EXTRA_EVENT);
-            if(event != null)
-            {
-                EventInfoDialog info = EventInfoDialog.newInstance(event);
-                info.show(getSupportFragmentManager(), "event_details");
-            }
-        }
     }
 
     private void setupActivityStyle()
@@ -582,8 +565,7 @@ public class MainActivity extends AbsActivity implements AdapterView.OnItemClick
     {
 		if(adapterView.getId() == R.id.lvEvents)
 		{
-        	EventInfoDialog dialog = EventInfoDialog.newInstance(mEventListAdapter.getItem(i));
-        	dialog.show(getSupportFragmentManager(), "event_details");
+            startActivity(new Intent(this, EventDetailsActivity.class).putExtra(EventDetailsActivity.EXTRA_EVENT, mEventListAdapter.getItem(i)));
 		}
 		else if(adapterView.getId() == R.id.lvDrawer)
 		{

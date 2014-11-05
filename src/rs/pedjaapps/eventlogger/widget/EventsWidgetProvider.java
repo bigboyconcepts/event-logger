@@ -11,6 +11,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.widget.RemoteViews;
 
+import rs.pedjaapps.eventlogger.EventDetailsActivity;
 import rs.pedjaapps.eventlogger.MainActivity;
 import rs.pedjaapps.eventlogger.R;
 import rs.pedjaapps.eventlogger.model.Event;
@@ -56,10 +57,7 @@ public class EventsWidgetProvider extends AppWidgetProvider
             Event event = intent.getParcelableExtra(EXTRA_ITEM);
             if(event != null)
             {
-                context.startActivity(new Intent(context, MainActivity.class)
-                        .setAction(MainActivity.ACTION_SHOW_DETAILS)
-                        .putExtra(MainActivity.EXTRA_EVENT, event)
-                        /*.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)*/);
+                context.startActivity(new Intent(context, EventDetailsActivity.class).putExtra(EventDetailsActivity.EXTRA_EVENT, event));
             }
         }
         else if(intent.getAction().equals(INTENT_ACTION_REFRESH_WIDGET))

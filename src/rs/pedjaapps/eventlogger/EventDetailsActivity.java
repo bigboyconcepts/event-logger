@@ -1,61 +1,43 @@
-package rs.pedjaapps.eventlogger.fragment;
+package rs.pedjaapps.eventlogger;
 
-
-import android.app.AlertDialog;
-import android.app.Dialog;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
-import android.support.v4.app.DialogFragment;
 import android.text.Html;
-import android.view.View;
 import android.widget.TextView;
 
 import java.text.DateFormat;
 import java.util.Locale;
 
-import rs.pedjaapps.eventlogger.R;
 import rs.pedjaapps.eventlogger.constants.EventLevel;
 import rs.pedjaapps.eventlogger.constants.EventType;
 import rs.pedjaapps.eventlogger.model.Event;
 
 /**
- * Created by pedja on 13.4.14..
+ * Created by pedja on 5.11.14. 09.58.
+ * This class is part of the event-logger
+ * Copyright © 2014 ${OWNER}
  */
-public class EventInfoDialog extends DialogFragment
+public class EventDetailsActivity extends AbsActivity
 {
     public static final String EXTRA_EVENT = "extra_event";
     Event event;
 
-    public static EventInfoDialog newInstance(Event event)
-    {
-        EventInfoDialog eventInfoDialog = new EventInfoDialog();
-        Bundle extras = new Bundle();
-        extras.putParcelable(EXTRA_EVENT, event);
-        eventInfoDialog.setArguments(extras);
-        return eventInfoDialog;
-    }
-
     @Override
-    public void onCreate(Bundle savedInstanceState)
+    protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-        event  = getArguments().getParcelable(EXTRA_EVENT);
-    }
+        setContentView(R.layout.activity_event_info);
 
-    @Override
-    public Dialog onCreateDialog(Bundle savedInstanceState)
-    {
-		AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        //builder.setTitle("bla");
-		DateFormat format = DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.MEDIUM, Locale.getDefault());
-        View view = getActivity().getLayoutInflater().inflate(R.layout.layout_event_info, null);
-        TextView tvTimestamp = (TextView)view.findViewById(R.id.tvTimestamp);
-        TextView tvEventLevelColor = (TextView)view.findViewById(R.id.tvEventLevelColor);
-        TextView tvEventLevelText = (TextView)view.findViewById(R.id.tvEventLevelText);
-        TextView tvLongDesc = (TextView)view.findViewById(R.id.tvLongDesc);
-        TextView tvEventDetails = (TextView)view.findViewById(R.id.tvEventDetails);
+        event = getIntent().getParcelableExtra(EXTRA_EVENT);
+
+        DateFormat format = DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.MEDIUM, Locale.getDefault());
+        TextView tvTimestamp = (TextView)findViewById(R.id.tvTimestamp);
+        TextView tvEventLevelColor = (TextView)findViewById(R.id.tvEventLevelColor);
+        TextView tvEventLevelText = (TextView)findViewById(R.id.tvEventLevelText);
+        TextView tvLongDesc = (TextView)findViewById(R.id.tvLongDesc);
+        TextView tvEventDetails = (TextView)findViewById(R.id.tvEventDetails);
         tvTimestamp.setText(format.format(event.getTimestamp().getTime()));
         tvEventLevelColor.setBackgroundColor(EventLevel.getLevelForInt(event.getLevel()).color());
         tvLongDesc.setText(Html.fromHtml(event.getLong_desc()));
@@ -81,9 +63,5 @@ public class EventInfoDialog extends DialogFragment
         }
 
         tvEventLevelText.setText(EventLevel.getTextForInt(event.getLevel()));
-        builder.setView(view);
-
-        return builder.create();
     }
-
 }

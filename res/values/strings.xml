@@ -251,5 +251,6 @@
     <string name="pin">PIN</string>
     <string name="default_pin_is">Default PIN is 1234</string>
     <string name="pro_only">(Pro Version Only)</string>
+    <string name="event_details_title">Event Details</string>
 
 </resources>

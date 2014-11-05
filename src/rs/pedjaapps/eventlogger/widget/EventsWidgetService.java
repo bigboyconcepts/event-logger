@@ -78,11 +78,11 @@ class EventsRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory
         // position will always range from 0 to getCount() - 1.
         // We construct a remote views item based on our widget item xml file, and set the
         // text based on the position.
-        RemoteViews rv = new RemoteViews(mContext.getPackageName(), R.layout.event_item_layout);
+        RemoteViews rv = new RemoteViews(mContext.getPackageName(), R.layout.event_item_layout_widget);
 
         Event event = mWidgetItems.get(position);
         rv.setTextViewText(R.id.tvDescription, Html.fromHtml(event.getShort_desc()));
-        rv.setInt(R.id.ivLogLevel, "setImageResource", EventLevel.getDrawableForLevel(EventLevel.getLevelForInt(event.getLevel())));
+        rv.setImageViewResource(R.id.ivLogLevel, EventLevel.getDrawableForLevel(EventLevel.getLevelForInt(event.getLevel())));
         if("passed".equals(SettingsManager.getTimeDisplay()))
         {
             rv.setTextViewText(R.id.tvTimestamp, Utility.getTime(event.getTimestamp().getTime()));
