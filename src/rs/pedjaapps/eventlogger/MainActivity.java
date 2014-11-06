@@ -104,7 +104,7 @@ public class MainActivity extends AbsActivity implements AdapterView.OnItemClick
     //IAB
     public static final int REQUEST_CODE_PURCHASE = 1001;
 
-    private String SKU_PRO = /*"pro_3_99"*/"android.test.purchased";
+    private String SKU_PRO = "pro_3_99"/*"android.test.purchased"*/;
     private IabHelper mHelper;
     private boolean iabSettupInProgress = false;
 
@@ -120,8 +120,9 @@ public class MainActivity extends AbsActivity implements AdapterView.OnItemClick
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
+		setupActivityStyle();
         super.onCreate(savedInstanceState);
-        setupActivityStyle();
+        
         setContentView(R.layout.activity_main);
 
         mHelper = new IabHelper(this, Utility.getIABLKey());
@@ -295,7 +296,7 @@ public class MainActivity extends AbsActivity implements AdapterView.OnItemClick
     {
         if (getResources().getBoolean(R.bool.isTablet))
         {
-            requestWindowFeature(Window.FEATURE_ACTION_BAR);
+            supportRequestWindowFeature(Window.FEATURE_ACTION_BAR);
             getWindow().setFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND, WindowManager.LayoutParams.FLAG_DIM_BEHIND);
             WindowManager.LayoutParams params = getWindow().getAttributes();
             params.alpha = 1.0f;
@@ -598,6 +599,9 @@ public class MainActivity extends AbsActivity implements AdapterView.OnItemClick
                     case settings:
                         startActivity(new Intent(this, SettingsActivity.class));
                         break;
+					case about:
+						startActivity(new Intent(this, AboutActivity.class));
+						break;
                 }
 			}
 		}
@@ -1113,6 +1117,13 @@ public class MainActivity extends AbsActivity implements AdapterView.OnItemClick
         item.id = NDItem.Id.settings;
         item.type = NDItem.TYPE_MAIN;
         item.iconRes = R.drawable.ic_action_settings;
+        items.add(item);
+		
+		item = new NDItem();
+        item.title = getString(R.string.action_about);
+        item.id = NDItem.Id.about;
+        item.type = NDItem.TYPE_MAIN;
+        item.iconRes = R.drawable.ic_action_about;
         items.add(item);
 
         /*item = new NDItem();

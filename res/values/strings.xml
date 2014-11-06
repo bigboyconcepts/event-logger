@@ -252,5 +252,16 @@
     <string name="default_pin_is">Default PIN is 1234</string>
     <string name="pro_only">(Pro Version Only)</string>
     <string name="event_details_title">Event Details</string>
-
+	<string name="about_text" formatted="false"><![CDATA[%s v%s<br>Copyright © Predrag Čokulov 2013-2014]]></string>
+	<string name="about">About</string>
+	<string name="osl">Open source licences</string>
+	<string name="osl_text"><![CDATA[•<b>android-support-v4</b> - Apache Licence Version 2.0<br>
+		•<b>android-support-v7-appcompat</b> - Apache Licence Version 2.0<br>
+		•<b>android-support-v7-cardview</b> - Apache Licence Version 2.0<br>
+		•<b>greendao</b> - Apache Licence Version 2.0<br>
+		•<b>opencsv</b> - Apache Licence Version 2.0<br>
+		•<b>universal-image-loader</b> - Apache Licence Version 2.0<br>]]></string>
+	<string name="developer">Development and Design</string>
+	<string name="developer_text"><![CDATA[•<b>pedja1</b> - Predrag Čokulov]]></string>
+	
 </resources>

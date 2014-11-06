@@ -8,7 +8,8 @@ public class NDItem
 
 	public enum Id
 	{
-		undefined, export, share, upgrade, settings
+		undefined, export, share, upgrade, settings,
+		about
 	}
 	
 	public String title;
