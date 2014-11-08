@@ -236,10 +236,10 @@
     <string name="drawer_closed">closed</string>
 
     <string name="upgrade_dialog_message"><![CDATA[Upgrading to <font color="#00B0FF">Pro</font> version will remove ads and unlock following features:<br><br>
-            •Custom events logging<br>
-            •Tasker integration<br>
-            •Lock Application<br>
-            •Auto database cleanup]]></string>
+            •Option to Lock Application(PIN Lock)]]></string>
+    <!--<br>
+            •Auto database cleanup•Custom events logging<br>
+            •Tasker integration<br>-->
     <string name="upgrade_now">Upgrade Now</string>
     <string name="no_thanks">No Thanks</string>
     <string name="back_ascii"><![CDATA[<—]]></string>

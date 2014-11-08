@@ -42,4 +42,8 @@
    public static final android.os.Parcelable$Creator *;
 }
 
+-keepclassmembers class * implements android.os.Parcelable {
+    static ** CREATOR;
+}
+
 -dontwarn java.beans.**

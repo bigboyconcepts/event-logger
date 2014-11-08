@@ -120,7 +120,7 @@ public class MainActivity extends AbsActivity implements AdapterView.OnItemClick
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
-		setupActivityStyle();
+		//setupActivityStyle();
         super.onCreate(savedInstanceState);
         
         setContentView(R.layout.activity_main);
