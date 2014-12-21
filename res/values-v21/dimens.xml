@@ -1,0 +1,4 @@
+<resources>
+    <dimen name="event_list_item_padding">0dp</dimen>
+
+</resources>
