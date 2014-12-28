@@ -27,9 +27,13 @@ import android.view.Display;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.AbsListView;
 import android.widget.AdapterView;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
@@ -71,6 +75,7 @@ import rs.pedjaapps.eventlogger.service.EventService;
 import rs.pedjaapps.eventlogger.utility.SettingsManager;
 import rs.pedjaapps.eventlogger.utility.Utility;
 import rs.pedjaapps.eventlogger.view.EventListView;
+import rs.pedjaapps.eventlogger.view.ScrimInsetsFrameLayout;
 
 public class MainActivity extends AbsActivity implements AdapterView.OnItemClickListener, IabHelper.OnIabSetupFinishedListener
 {
@@ -111,7 +116,7 @@ public class MainActivity extends AbsActivity implements AdapterView.OnItemClick
 	public static final String ACTION_REFRESH_ALL = "action_refresh_all";
 	
 	private DrawerLayout mDrawerLayout;
-    private RelativeLayout mDrawerContent;
+    private ScrimInsetsFrameLayout mDrawerContent;
     private ListView lvDrawer;
     NavigationDrawerAdapter ndAdapter;
     private ActionBarDrawerToggle mDrawerToggle;
@@ -124,6 +129,8 @@ public class MainActivity extends AbsActivity implements AdapterView.OnItemClick
         super.onCreate(savedInstanceState);
         
         setContentView(R.layout.activity_main);
+
+        moveDrawerToTop();
 
         mHelper = new IabHelper(this, Utility.getIABLKey());
         mHelper.enableDebugLogging(true, Constants.LOG_TAG);
@@ -239,11 +246,12 @@ public class MainActivity extends AbsActivity implements AdapterView.OnItemClick
 		//setup nd
 
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
-        mDrawerContent = (RelativeLayout) findViewById(R.id.left_drawer);
+        mDrawerContent = (ScrimInsetsFrameLayout) findViewById(R.id.left_drawer);
         lvDrawer = (ListView) findViewById(R.id.lvDrawer);
 
         // set a custom shadow that overlays the main content when the drawer opens
         mDrawerLayout.setDrawerShadow(R.drawable.drawer_shadow, GravityCompat.START);
+        mDrawerLayout.setStatusBarBackgroundColor(getResources().getColor(R.color.primary));
 
         // enable ActionBar app icon to behave as action to toggle nav drawer
         getSupportActionBar().setHomeButtonEnabled(true);
@@ -255,9 +263,12 @@ public class MainActivity extends AbsActivity implements AdapterView.OnItemClick
         List<NDItem> menuItems = generateMenuOptions();
         // set up the drawer's list view with items and click listener
         ndAdapter = new NavigationDrawerAdapter(this, menuItems);
+
+        ImageView drawerHeader = (ImageView) getLayoutInflater().inflate(R.layout.drawer_header, lvDrawer, false);
+        lvDrawer.addHeaderView(drawerHeader, null, false);
+
         lvDrawer.setAdapter(ndAdapter);
         lvDrawer.setOnItemClickListener(this);
-
 
         // ActionBarDrawerToggle ties together the the proper interactions
         // between the sliding drawer and the action bar app icon
@@ -285,6 +296,33 @@ public class MainActivity extends AbsActivity implements AdapterView.OnItemClick
 			});
 
         mDrawerLayout.setDrawerListener(mDrawerToggle);
+    }
+
+    private void moveDrawerToTop()
+    {
+        DrawerLayout drawer = (DrawerLayout) getLayoutInflater().inflate(R.layout.drawer_layout, null); // "null" is important.
+
+        // HACK: "steal" the first child of decor view
+        ViewGroup decor = (ViewGroup) getWindow().getDecorView();
+        View child = decor.getChildAt(0);
+        decor.removeView(child);
+        LinearLayout container = (LinearLayout) drawer.findViewById(R.id.drawer_content); // This is the container we defined just now.
+        container.addView(child, 0);
+        //drawer.findViewById(R.id.left_drawer).setPadding(0, getStatusBarHeight(), 0, 0);
+
+        // Make the drawer replace the first child
+        decor.addView(drawer);
+    }
+
+    public int getStatusBarHeight()
+    {
+        int result = 0;
+        int resourceId = getResources().getIdentifier("status_bar_height", "dimen", "android");
+        if (resourceId > 0)
+        {
+            result = getResources().getDimensionPixelSize(resourceId);
+        }
+        return result;
     }
 
     private void setupTitle()
@@ -562,15 +600,16 @@ public class MainActivity extends AbsActivity implements AdapterView.OnItemClick
     }
 
     @Override
-    public void onItemClick(AdapterView<?> adapterView, View view, int i, long l)
+    public void onItemClick(AdapterView<?> adapterView, View view, int position, long l)
     {
+        if(position == 0)return;
 		if(adapterView.getId() == R.id.lvEvents)
 		{
-            startActivity(new Intent(this, EventDetailsActivity.class).putExtra(EventDetailsActivity.EXTRA_EVENT, mEventListAdapter.getItem(i)));
+            startActivity(new Intent(this, EventDetailsActivity.class).putExtra(EventDetailsActivity.EXTRA_EVENT, mEventListAdapter.getItem(position - 1)));
 		}
 		else if(adapterView.getId() == R.id.lvDrawer)
 		{
-			NDItem item = ndAdapter.getItem(i);
+			NDItem item = ndAdapter.getItem(position - 1);
 			if(item.type == NDItem.TYPE_MAIN)
 			{
 				switch (item.id)

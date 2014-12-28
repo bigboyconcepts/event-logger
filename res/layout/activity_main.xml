@@ -1,102 +1,52 @@
-<android.support.v4.widget.DrawerLayout
+<RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-	xmlns:tools="http://schemas.android.com/tools"
-	xmlns:ads="http://schemas.android.com/apk/res-auto"
-	tools:context="rs.pedjaapps.eventlogger.MainActivity"
-	android:id="@+id/drawer_layout"
+    xmlns:ads="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:padding="5dp"
+    android:fitsSystemWindows="true">
 
-    <!-- As the main content view, the view below consumes the entire
-    space available using match_parent in both dimensions. -->
-    <!-- Your normal content view -->
-    <RelativeLayout 
-		android:layout_width="match_parent"
-		android:layout_height="match_parent"
-		android:padding="5dp">
-
-		<view
-			class="rs.pedjaapps.eventlogger.view.EventListView"
-			android:layout_width="match_parent"
-			android:layout_height="match_parent"
-			android:id="@+id/lvEvents"
-			android:divider="@android:color/transparent"
-			android:dividerHeight="0dp"
-			android:smoothScrollbar="false"
-			android:fadingEdge="none"
-			android:cacheColorHint="@android:color/white"
-			android:scrollbarAlwaysDrawVerticalTrack="false"
-			android:scrollbarStyle="insideOverlay"
-			android:layout_above="@+id/adView"/>
-
-		<com.google.android.gms.ads.AdView
-			android:id="@+id/adView"
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
-			ads:adUnitId="ca-app-pub-6294976772687752/8025521628"
-			ads:adSize="BANNER"
-			android:layout_centerHorizontal="true"
-			android:layout_alignParentBottom="true"
-			android:layout_marginTop="5dp"
-			android:visibility="gone"/>
-
-		<ProgressBar
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
-			android:id="@+id/pbLoading"
-			android:layout_centerInParent="true"
-			android:visibility="gone"/>
-
-		<TextView
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
-			android:textStyle="italic"
-			android:text="@string/no_events"
-			android:id="@+id/tvNoEvents"
-			android:visibility="gone"
-			android:padding="40dp"
-			android:layout_centerInParent="true"/>
-
-	</RelativeLayout>
-	
-    <!-- android:layout_gravity="start" tells DrawerLayout to treat
-    this as a sliding drawer on the left side for left-to-right
-    languages and on the right side for right-to-left languages.
-    The drawer is given a fixed width in dp and extends the full height of
-    the container. A solid background is used for contrast
-    with the content view. -->
-
-    <RelativeLayout
+    <view
+        class="rs.pedjaapps.eventlogger.view.EventListView"
+        android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_width="304dp"
-        android:layout_gravity="left|start"
-        android:id="@+id/left_drawer">
+        android:id="@+id/lvEvents"
+        android:divider="@android:color/transparent"
+        android:dividerHeight="0dp"
+        android:smoothScrollbar="false"
+        android:fadingEdge="none"
+        android:cacheColorHint="@android:color/white"
+        android:scrollbarAlwaysDrawVerticalTrack="false"
+        android:scrollbarStyle="insideOverlay"
+        android:layout_above="@+id/adView"/>
 
-		<!--
-        <TextView
-		android:layout_width="match_parent"
-		android:layout_height="wrap_content"
-		android:textSize="20sp"
-		android:text="@string/locations"
-		android:id="@+id/tvLocations"
-		android:background="#e4e4e4"
-		android:textColor="#4f4f4f"
-		android:paddingLeft="10dp"
-		android:paddingBottom="5dp"
-		android:paddingTop="5dp"
-		android:drawableLeft="@drawable/ic_action_locations"
-		android:gravity="center_vertical"/>
+    <com.google.android.gms.ads.AdView
+        android:id="@+id/adView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        ads:adUnitId="ca-app-pub-6294976772687752/8025521628"
+        ads:adSize="BANNER"
+        android:layout_centerHorizontal="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginTop="5dp"
+        android:visibility="gone"/>
 
-		-->
-        <ListView
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:choiceMode="none"
-            android:divider="@android:color/transparent"
-            android:dividerHeight="10dp"
-            android:background="@android:color/white"
-            android:id="@+id/lvDrawer"/>
+    <ProgressBar
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/pbLoading"
+        android:layout_centerInParent="true"
+        android:visibility="gone"/>
 
-    </RelativeLayout>
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textStyle="italic"
+        android:text="@string/no_events"
+        android:id="@+id/tvNoEvents"
+        android:visibility="gone"
+        android:padding="40dp"
+        android:layout_centerInParent="true"/>
 
-</android.support.v4.widget.DrawerLayout>
+</RelativeLayout>
+	
