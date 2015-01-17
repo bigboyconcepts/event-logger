@@ -36,6 +36,9 @@ import rs.pedjaapps.eventlogger.utility.Utility;
  */
 public class EventReceiver extends BroadcastReceiver
 {
+	public static final String INTENT_ACTION_APP_LAUNCHED = "rs.pedjaapps.elroothelper.APP_LAUNCHED";
+	public static final String INTENT_EXTRA_PACKAGE_NAME = "rs.pedjaapps.elroothelper.PACKAGE_NAME";
+	
     public static void sendLocalBroadcast(Event event)
     {
         sendLocalBroadcast(event, MainApp.getContext());
@@ -66,6 +69,23 @@ public class EventReceiver extends BroadcastReceiver
                 Log.d(Constants.LOG_TAG, "Bundle extras map key: " + s);
             }
         }
+		if(intent.getAction().equals(INTENT_ACTION_APP_LAUNCHED))
+		{
+			String packageName = intent.getStringExtra(INTENT_EXTRA_PACKAGE_NAME);
+			if(packageName == null)return;
+			String appName = Utility.getNameForPackage(context, packageName);
+			
+			Event event = new Event();
+			event.setTimestamp(new Date());
+			event.setLevel(EventLevel.getIntForLevel(EventLevel.info));
+			event.setType(EventType.getIntForType(EventType.app));
+			event.setShort_desc(context.getString(R.string.app_started, appName));
+			event.setLong_desc(context.getString(R.string.app_started_desc, appName, packageName));
+			event.setIcon(Utility.getApplicationIcon(context, packageName));
+			EventDao eventDao = MainApp.getInstance().getDaoSession().getEventDao();
+			eventDao.insert(event);
+			EventReceiver.sendLocalBroadcast(event);
+		}
         if(intent.getAction().equals(WifiManager.NETWORK_STATE_CHANGED_ACTION))
         {
             /*networkinfo(NetworkInfo), bssid(string), linkProperties(LinkProperties)*/
