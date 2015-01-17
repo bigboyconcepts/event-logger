@@ -8,14 +8,15 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.wifi.WifiManager;
-import android.os.Build;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.IBinder;
 import android.telephony.TelephonyManager;
 import android.util.Log;
+
 import java.util.Date;
 import java.util.List;
+
 import rs.pedjaapps.eventlogger.MainApp;
 import rs.pedjaapps.eventlogger.R;
 import rs.pedjaapps.eventlogger.ServiceRestartActivity;
@@ -106,13 +107,11 @@ public class EventService extends Service
         manualRegisterReceiver = new EventReceiver();
         registerReceiver(manualRegisterReceiver, intentFilter);
 
-		if(Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP)
-		{
-        	HandlerThread thread = new HandlerThread("AppLaunchCheckerThread");
-        	thread.start();
-        	handler = new Handler(thread.getLooper());
-        	handler.postDelayed(appLaunchChecker, Constants.APP_LAUNCH_CHECK_INTERVAL);
-		}
+        HandlerThread thread = new HandlerThread("AppLaunchCheckerThread");
+        thread.start();
+        handler = new Handler(thread.getLooper());
+        handler.postDelayed(appLaunchChecker, Constants.APP_LAUNCH_CHECK_INTERVAL);
+
         super.onCreate();
     }
 
@@ -166,12 +165,6 @@ public class EventService extends Service
     public int onStartCommand(Intent intent, int flags, int startId)
     {
         Log.d(Constants.LOG_TAG, "EventService :: onStartCommand");
-		if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
-		{
-			Intent sIntent = new Intent();
-			sIntent.setComponent(new ComponentName("rs.pedjaapps.elroothelper.app", "rs.pedjaapps.elroothelper.app.service.AppLaunchCheckService"));
-			startService(intent);
-		}
         return Service.START_STICKY;
     }
 
