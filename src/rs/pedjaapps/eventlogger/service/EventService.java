@@ -103,6 +103,9 @@ public class EventService extends Service
         intentFilter.addAction(WifiManager.NETWORK_STATE_CHANGED_ACTION);
         intentFilter.addAction(BluetoothAdapter.ACTION_STATE_CHANGED);
 
+
+        intentFilter.addAction(EventReceiver.INTENT_ACTION_APP_LAUNCHED);
+
         manualRegisterReceiver = new EventReceiver();
         registerReceiver(manualRegisterReceiver, intentFilter);
 
@@ -170,7 +173,7 @@ public class EventService extends Service
 		{
 			Intent sIntent = new Intent();
 			sIntent.setComponent(new ComponentName("rs.pedjaapps.elroothelper.app", "rs.pedjaapps.elroothelper.app.service.AppLaunchCheckService"));
-			startService(intent);
+			startService(sIntent);
 		}
         return Service.START_STICKY;
     }

@@ -175,7 +175,7 @@
                 <action android:name="android.intent.action.PACKAGE_RESTARTED"/>
                 <action android:name="android.intent.action.PACKAGE_DATA_CLEARED"/>
                 <action android:name="android.intent.action.PACKAGE_CHANGED"/>
-				<action android:name="rs.pedjaapps.elroothelper.app.APP_LAUNCHED"/>
+				<action android:name="rs.pedjaapps.elroothelper.APP_LAUNCHED"/>
                 <data android:scheme="package"/>
             </intent-filter>
         </receiver>

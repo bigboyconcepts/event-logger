@@ -256,12 +256,7 @@ public class Utility
             // This is ~55x faster than looping and String.formating()
             hash = bytesToHex( bytes );
         }
-        catch( NoSuchAlgorithmException e )
-        {
-            e.printStackTrace();
-            Crashlytics.logException(e);
-        }
-        catch( UnsupportedEncodingException e )
+        catch( NoSuchAlgorithmException | UnsupportedEncodingException e )
         {
             e.printStackTrace();
             Crashlytics.logException(e);
