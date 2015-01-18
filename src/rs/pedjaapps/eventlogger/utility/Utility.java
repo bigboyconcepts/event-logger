@@ -6,8 +6,10 @@ import android.content.DialogInterface;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.graphics.Canvas;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.graphics.drawable.VectorDrawable;
 import android.text.Html;
 import android.util.Log;
 import android.widget.Toast;
@@ -324,7 +326,18 @@ public class Utility
         try
         {
             Drawable icon = context.getPackageManager().getApplicationIcon(pn);
-            Bitmap bitmap = ((BitmapDrawable)icon).getBitmap();
+            Bitmap bitmap;
+            if(icon instanceof BitmapDrawable)
+            {
+                bitmap = ((BitmapDrawable)icon).getBitmap();
+            }
+            else
+            {
+                bitmap = Bitmap.createBitmap(icon.getIntrinsicWidth(), icon.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
+                Canvas canvas = new Canvas(bitmap);
+                icon.setBounds(0, 0, icon.getIntrinsicWidth(), icon.getIntrinsicHeight());
+                icon.draw(canvas);
+            }
             ByteArrayOutputStream stream = new ByteArrayOutputStream();
             bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
             return stream.toByteArray();
