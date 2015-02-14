@@ -2,8 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
           xmlns:tools="http://schemas.android.com/tools"
           package="rs.pedjaapps.eventlogger"
-          android:versionCode="20141228"
-          android:versionName="1.2.0.2"
+          android:versionCode="20150214"
+          android:versionName="1.2.1.0"
           android:installLocation="internalOnly">
 
     <uses-sdk
@@ -40,10 +40,6 @@
     <uses-permission android:name="com.android.vending.BILLING" />
     <!--for restarting launcher when icon is changed-->
     <uses-permission android:name="android.permission.KILL_BACKGROUND_PROCESSES" />
-
-	<!--root helper permissions-->
-	<uses-permission android:name="rs.pedjaapps.elroothelper.RECEIVE_BROADCASTS"/>
-	<uses-permission android:name="rs.pedjaapps.elroothelper.USE_SERVICES"/>
 	
     <permission
         android:name="rs.pedjaapps.eventlogger.RESTART_EVENT_SERVICE"
@@ -175,7 +171,6 @@
                 <action android:name="android.intent.action.PACKAGE_RESTARTED"/>
                 <action android:name="android.intent.action.PACKAGE_DATA_CLEARED"/>
                 <action android:name="android.intent.action.PACKAGE_CHANGED"/>
-				<action android:name="rs.pedjaapps.elroothelper.APP_LAUNCHED"/>
                 <data android:scheme="package"/>
             </intent-filter>
         </receiver>

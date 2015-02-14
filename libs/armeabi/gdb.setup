@@ -1,2 +1,0 @@
-set solib-search-path /home/pedja/workspace/event-logger/obj/local/armeabi
-directory /home/pedja/ndk/platforms/android-19/arch-arm/usr/include /home/pedja/ndk/sources/cxx-stl/stlport/stlport /home/pedja/ndk/sources/cxx-stl//gabi++/include /home/pedja/workspace/event-logger/jni

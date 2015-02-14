@@ -14,8 +14,13 @@ import android.os.HandlerThread;
 import android.os.IBinder;
 import android.telephony.TelephonyManager;
 import android.util.Log;
+
+import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+
+import rs.pedjaapps.eventlogger.BuildConfig;
 import rs.pedjaapps.eventlogger.MainApp;
 import rs.pedjaapps.eventlogger.R;
 import rs.pedjaapps.eventlogger.ServiceRestartActivity;
@@ -35,7 +40,7 @@ public class EventService extends Service
     private EventReceiver manualRegisterReceiver;
     private String lastActiveApp = "";
     Handler handler;
-    private AppLaunchChecker appLaunchChecker = new AppLaunchChecker();
+    private Runnable appLaunchChecker;
 
     @Override
     public IBinder onBind(Intent intent)
@@ -111,15 +116,21 @@ public class EventService extends Service
 
 		if(Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP)
 		{
-        	HandlerThread thread = new HandlerThread("AppLaunchCheckerThread");
-        	thread.start();
-        	handler = new Handler(thread.getLooper());
-        	handler.postDelayed(appLaunchChecker, Constants.APP_LAUNCH_CHECK_INTERVAL);
+            appLaunchChecker = new AppLaunchCheckerLegacy();
 		}
+        else
+        {
+            appLaunchChecker = new AppLaunchCheckerLP();
+        }
+
+        HandlerThread thread = new HandlerThread("AppLaunchCheckerThread");
+        thread.start();
+        handler = new Handler(thread.getLooper());
+        handler.postDelayed(appLaunchChecker, Constants.APP_LAUNCH_CHECK_INTERVAL);
         super.onCreate();
     }
 
-    private class AppLaunchChecker implements Runnable
+    private class AppLaunchCheckerLegacy implements Runnable
     {
         @Override
         public void run()
@@ -157,6 +168,55 @@ public class EventService extends Service
         }
     }
 
+    private class AppLaunchCheckerLP implements Runnable
+    {
+        @Override
+        public void run()
+        {
+            List<ActivityManager.RunningAppProcessInfo> processes = ((ActivityManager)getSystemService(Context.ACTIVITY_SERVICE)).getRunningAppProcesses();
+            if(processes != null)
+            {
+                List<String> packages = new ArrayList<>();
+                for(ActivityManager.RunningAppProcessInfo pi : processes)
+                {
+                    boolean hasActivities = true;
+                    try
+                    {
+                        Field flagsField = pi.getClass().getDeclaredField("flags");
+                        int flags = (int) flagsField.get(pi);
+                        hasActivities = (flags & 1<<2) == 1<<2;
+                    }
+                    catch (Exception e)
+                    {
+                        if(BuildConfig.DEBUG)e.printStackTrace();
+                    }
+                    if(hasActivities && pi.importance == ActivityManager.RunningAppProcessInfo.IMPORTANCE_FOREGROUND)
+                    {
+                        packages.add(pi.processName);
+                    }
+                }
+                String packageName = packages.isEmpty() ? null : packages.get(0);
+                if(packageName != null && !lastActiveApp.equals(packageName))
+                {
+                    lastActiveApp = packageName;
+                    String appName = Utility.getNameForPackage(EventService.this, packageName);
+
+                    Event event = new Event();
+                    event.setTimestamp(new Date());
+                    event.setLevel(EventLevel.getIntForLevel(EventLevel.info));
+                    event.setType(EventType.getIntForType(EventType.app));
+                    event.setShort_desc(getString(R.string.app_started, appName));
+                    event.setLong_desc(getString(R.string.app_started_desc, appName, packageName));
+                    event.setIcon(Utility.getApplicationIcon(EventService.this, packageName));
+                    EventDao eventDao = MainApp.getInstance().getDaoSession().getEventDao();
+                    eventDao.insert(event);
+                    EventReceiver.sendLocalBroadcast(event);
+                }
+            }
+            handler.postDelayed(appLaunchChecker, Constants.APP_LAUNCH_CHECK_INTERVAL);
+        }
+    }
+
     @Override
     public void onDestroy()
     {
@@ -169,12 +229,6 @@ public class EventService extends Service
     public int onStartCommand(Intent intent, int flags, int startId)
     {
         Log.d(Constants.LOG_TAG, "EventService :: onStartCommand");
-		if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
-		{
-			Intent sIntent = new Intent();
-			sIntent.setComponent(new ComponentName("rs.pedjaapps.elroothelper.app", "rs.pedjaapps.elroothelper.app.service.AppLaunchCheckService"));
-			startService(sIntent);
-		}
         return Service.START_STICKY;
     }
 
