@@ -555,13 +555,13 @@ public class MainActivity extends AbsActivity implements AdapterView.OnItemClick
     @Override
     public void onItemClick(AdapterView<?> adapterView, View view, int position, long l)
     {
-        if(position == 0)return;
 		if(adapterView.getId() == R.id.lvEvents)
 		{
-            startActivity(new Intent(this, EventDetailsActivity.class).putExtra(EventDetailsActivity.EXTRA_EVENT, mEventListAdapter.getItem(position - 1)));
+            startActivity(new Intent(this, EventDetailsActivity.class).putExtra(EventDetailsActivity.EXTRA_EVENT, mEventListAdapter.getItem(position)));
 		}
 		else if(adapterView.getId() == R.id.lvDrawer)
 		{
+			if(position == 0)return;
 			NDItem item = ndAdapter.getItem(position - 1);
 			if(item.type == NDItem.TYPE_MAIN)
 			{
