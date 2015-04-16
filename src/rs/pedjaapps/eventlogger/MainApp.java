@@ -30,12 +30,8 @@ public class MainApp extends Application
 
     private DisplayImageOptions defaultDisplayImageOptions;
 
-    public synchronized static MainApp getInstance()
+    public static MainApp getInstance()
     {
-        if(mainApp == null)
-        {
-            mainApp = new MainApp();
-        }
         return mainApp;
     }
 
@@ -43,7 +39,14 @@ public class MainApp extends Application
     public void onCreate()
     {
         super.onCreate();
-        Crashlytics.start(this);
+		try
+		{
+        	Crashlytics.start(this);
+		}
+		catch(Exception e)
+		{
+			//Crashlytics.logException(e);
+		}
         context = this.getApplicationContext();
         mainApp = this;
 
@@ -77,22 +80,15 @@ public class MainApp extends Application
                 .defaultDisplayImageOptions(defaultDisplayImageOptions)
                 .build();
         ImageLoader.getInstance().init(config);
+		
+		DaoMaster.DevOpenHelper helper = new DaoMaster.DevOpenHelper(context, Constants.DB_NAME, null);
+		SQLiteDatabase db = helper.getWritableDatabase();
+		DaoMaster daoMaster = new DaoMaster(db);
+		daoSession = daoMaster.newSession();
     }
 
     public DaoSession getDaoSession()
     {
-        return getDaoSession(this);
-    }
-
-    public DaoSession getDaoSession(Context context)
-    {
-        if (daoSession == null)
-        {
-            DaoMaster.DevOpenHelper helper = new DaoMaster.DevOpenHelper(context, Constants.DB_NAME, null);
-            SQLiteDatabase db = helper.getWritableDatabase();
-            DaoMaster daoMaster = new DaoMaster(db);
-            daoSession = daoMaster.newSession();
-        }
         return daoSession;
     }
 

@@ -1,81 +1,34 @@
 package rs.pedjaapps.eventlogger;
 
-import android.app.Activity;
-import android.app.ActivityManager;
-import android.app.AlertDialog;
-import android.app.ProgressDialog;
-import android.content.BroadcastReceiver;
-import android.content.ComponentName;
-import android.content.Context;
-import android.content.DialogInterface;
-import android.content.Intent;
-import android.content.IntentFilter;
-import android.content.pm.PackageManager;
-import android.content.pm.ResolveInfo;
-import android.content.res.Configuration;
-import android.graphics.Point;
-import android.os.AsyncTask;
-import android.os.Build;
-import android.os.Bundle;
-import android.support.v4.content.LocalBroadcastManager;
-import android.support.v4.view.GravityCompat;
-import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBarDrawerToggle;
-import android.text.Html;
-import android.util.Log;
-import android.view.Display;
-import android.view.Menu;
-import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewGroup;
-import android.view.Window;
-import android.view.WindowManager;
-import android.widget.AbsListView;
-import android.widget.AdapterView;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.ListView;
-import android.widget.ProgressBar;
-import android.widget.RelativeLayout;
-import android.widget.TextView;
-
-import com.crashlytics.android.Crashlytics;
-import com.google.android.gms.ads.AdListener;
-import com.google.android.gms.ads.AdRequest;
-import com.google.android.gms.ads.AdView;
-import com.google.android.gms.ads.InterstitialAd;
-
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.text.DateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-import java.util.Locale;
-
-import au.com.bytecode.opencsv.CSVWriter;
-import de.greenrobot.dao.query.QueryBuilder;
-import de.greenrobot.dao.query.WhereCondition;
-import rs.pedjaapps.eventlogger.adapter.EventAdapter;
-import rs.pedjaapps.eventlogger.adapter.NavigationDrawerAdapter;
-import rs.pedjaapps.eventlogger.constants.Constants;
-import rs.pedjaapps.eventlogger.constants.EventLevel;
-import rs.pedjaapps.eventlogger.constants.EventType;
-import rs.pedjaapps.eventlogger.fragment.EventFilterDialog;
-import rs.pedjaapps.eventlogger.iab.IabHelper;
-import rs.pedjaapps.eventlogger.iab.IabResult;
-import rs.pedjaapps.eventlogger.iab.Inventory;
-import rs.pedjaapps.eventlogger.iab.Purchase;
-import rs.pedjaapps.eventlogger.model.Event;
-import rs.pedjaapps.eventlogger.model.EventDao;
-import rs.pedjaapps.eventlogger.model.NDItem;
-import rs.pedjaapps.eventlogger.service.EventService;
-import rs.pedjaapps.eventlogger.utility.SettingsManager;
-import rs.pedjaapps.eventlogger.utility.Utility;
-import rs.pedjaapps.eventlogger.view.EventListView;
-import rs.pedjaapps.eventlogger.view.ScrimInsetsFrameLayout;
+import android.app.*;
+import android.content.*;
+import android.content.pm.*;
+import android.content.res.*;
+import android.graphics.*;
+import android.os.*;
+import android.support.v4.content.*;
+import android.support.v4.view.*;
+import android.support.v4.widget.*;
+import android.support.v7.app.*;
+import android.text.*;
+import android.util.*;
+import android.view.*;
+import android.widget.*;
+import au.com.bytecode.opencsv.*;
+import com.crashlytics.android.*;
+import com.google.android.gms.ads.*;
+import de.greenrobot.dao.query.*;
+import java.io.*;
+import java.text.*;
+import java.util.*;
+import rs.pedjaapps.eventlogger.adapter.*;
+import rs.pedjaapps.eventlogger.constants.*;
+import rs.pedjaapps.eventlogger.fragment.*;
+import rs.pedjaapps.eventlogger.iab.*;
+import rs.pedjaapps.eventlogger.model.*;
+import rs.pedjaapps.eventlogger.service.*;
+import rs.pedjaapps.eventlogger.utility.*;
+import rs.pedjaapps.eventlogger.view.*;
 
 public class MainActivity extends AbsActivity implements AdapterView.OnItemClickListener, IabHelper.OnIabSetupFinishedListener
 {
@@ -804,7 +757,7 @@ public class MainActivity extends AbsActivity implements AdapterView.OnItemClick
                 csvWrite = new CSVWriter(new FileWriter(file));
 
                 EventDao eventDao = MainApp.getInstance().getDaoSession().getEventDao();
-                List<Event> events = eventDao.loadAll();
+                LazyList<Event> events = eventDao.queryBuilder().listLazyUncached();
 
                 // this is the Column of the table and same for Header of CSV file
                 String header[] ={EventDao.Properties.Id.columnName, EventDao.Properties.Timestamp.columnName,
@@ -826,6 +779,7 @@ public class MainActivity extends AbsActivity implements AdapterView.OnItemClick
                         offset++;
                     }
                 }
+				events.close();
                 return true;
             }
             catch (IOException e)
