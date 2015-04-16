@@ -22,4 +22,20 @@
         <item>1000000</item>
         <item>All</item>
     </string-array>
+    <string-array name="activeAppCheckIntervalValues">
+        <item>1000</item>
+        <item>2000</item>
+        <item>5000</item>
+        <item>15000</item>
+        <item>30000</item>
+        <item>60000</item>
+    </string-array>
+    <string-array name="activeAppCheckIntervalEntries">
+        <item>1 second (default)</item>
+        <item>2 seconds</item>
+        <item>5 seconds</item>
+        <item>15 seconds</item>
+        <item>30 seconds</item>
+        <item>1 minute</item>
+    </string-array>
 </resources>

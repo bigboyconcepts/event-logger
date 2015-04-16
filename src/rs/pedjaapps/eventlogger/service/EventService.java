@@ -30,6 +30,7 @@ import rs.pedjaapps.eventlogger.constants.EventType;
 import rs.pedjaapps.eventlogger.model.Event;
 import rs.pedjaapps.eventlogger.model.EventDao;
 import rs.pedjaapps.eventlogger.receiver.EventReceiver;
+import rs.pedjaapps.eventlogger.utility.SettingsManager;
 import rs.pedjaapps.eventlogger.utility.Utility;
 
 /**
@@ -126,7 +127,7 @@ public class EventService extends Service
         HandlerThread thread = new HandlerThread("AppLaunchCheckerThread");
         thread.start();
         handler = new Handler(thread.getLooper());
-        handler.postDelayed(appLaunchChecker, Constants.APP_LAUNCH_CHECK_INTERVAL);
+        handler.postDelayed(appLaunchChecker, SettingsManager.getActiveAppCheckInterval());
         super.onCreate();
     }
 
@@ -164,7 +165,7 @@ public class EventService extends Service
                     }
                 }
             }
-            handler.postDelayed(appLaunchChecker, Constants.APP_LAUNCH_CHECK_INTERVAL);
+            handler.postDelayed(appLaunchChecker, SettingsManager.getActiveAppCheckInterval());
         }
     }
 
@@ -213,7 +214,7 @@ public class EventService extends Service
                     EventReceiver.sendLocalBroadcast(event);
                 }
             }
-            handler.postDelayed(appLaunchChecker, Constants.APP_LAUNCH_CHECK_INTERVAL);
+            handler.postDelayed(appLaunchChecker, SettingsManager.getActiveAppCheckInterval());
         }
     }
 

@@ -18,6 +18,14 @@
             android:title="@string/display_limit"
             android:defaultValue="200"/>
 
+        <ListPreference
+            android:entries="@array/activeAppCheckIntervalEntries"
+            android:entryValues="@array/activeAppCheckIntervalValues"
+            android:key="active_app_check_interval"
+            android:title="@string/active_app_check_interval"
+            android:defaultValue="1000"
+            />
+
         <PreferenceScreen
             android:key="prefs_clear_db"
             android:title="@string/clear_db"/>

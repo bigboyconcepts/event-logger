@@ -24,7 +24,8 @@ public class SettingsManager
         filter_date, add_shown_ts, time_filter_enabled,
         type_filter_enabled, level_filter_enabled, filter_time_from, filter_time_to, filter_level_error,
         filter_level_warning, filter_level_info, filter_level_ok, show_remove_ads, filter_types, time_display,
-        items_display_limit, is_pro("74547660a2b3f21f12eff07d3543bc9b23b1dcaf"), icon_changed, lock_pin, pin_enabled;
+        items_display_limit, is_pro("74547660a2b3f21f12eff07d3543bc9b23b1dcaf"), icon_changed, lock_pin, pin_enabled,
+        active_app_check_interval;
 
         String mValue;
 
@@ -149,6 +150,11 @@ public class SettingsManager
         SharedPreferences.Editor editor = prefsDefault.edit();
         editor.putBoolean(Key.show_remove_ads.toString(), show);
         editor.apply();
+    }
+
+    public static int getActiveAppCheckInterval()
+    {
+        return Utility.parseInt(prefsDefault.getString(Key.active_app_check_interval.toString(), "1000"), 1000);
     }
 
     /*public static boolean getBooleanPref(String key, boolean defValue)

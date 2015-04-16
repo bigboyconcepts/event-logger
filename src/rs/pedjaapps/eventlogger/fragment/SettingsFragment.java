@@ -236,6 +236,20 @@ public class SettingsFragment extends PreferenceFragment
                 }
             });
         }
+
+        final ListPreference activeAppCheckInterval = (ListPreference) findPreference("active_app_check_interval");
+        final List<String> activeAppCheckIntervalEntries = Arrays.asList(getResources().getStringArray(R.array.activeAppCheckIntervalEntries));
+        final List<String> activeAppCheckIntervalValues = Arrays.asList(getResources().getStringArray(R.array.activeAppCheckIntervalValues));
+        activeAppCheckInterval.setSummary(activeAppCheckIntervalEntries.get(activeAppCheckIntervalValues.indexOf(SettingsManager.getActiveAppCheckInterval() + "")));
+        activeAppCheckInterval.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener()
+        {
+            @Override
+            public boolean onPreferenceChange(Preference p1, Object p2)
+            {
+                activeAppCheckInterval.setSummary(activeAppCheckIntervalEntries.get(activeAppCheckIntervalValues.indexOf(p2.toString())));
+                return true;
+            }
+        });
     }
 
     private void setClearDbSummary()

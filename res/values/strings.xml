@@ -263,5 +263,6 @@
 		•<b>universal-image-loader</b> - Apache Licence Version 2.0<br>]]></string>
 	<string name="developer">Development and Design</string>
 	<string name="developer_text"><![CDATA[•<b>pedja1</b> - Predrag Čokulov]]></string>
-	
+    <string name="active_app_check_interval">Active Application Check Interval</string>
+
 </resources>
