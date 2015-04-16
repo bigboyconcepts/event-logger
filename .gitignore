@@ -9,3 +9,5 @@
 gen
 out
 bin
+build
+obj
