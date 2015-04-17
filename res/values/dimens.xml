@@ -7,5 +7,6 @@
     <dimen name="widget_margin">8dp</dimen>
     <dimen name="dp32">32dp</dimen>
     <dimen name="event_list_item_padding">-2dp</dimen>
-
+	<dimen name="drawer_width">240dp</dimen>
+	
 </resources>
