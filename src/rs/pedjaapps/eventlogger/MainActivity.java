@@ -261,7 +261,7 @@ public class MainActivity extends AbsActivity implements AdapterView.OnItemClick
         decor.removeView(child);
         LinearLayout container = (LinearLayout) drawer.findViewById(R.id.drawer_content); // This is the container we defined just now.
         container.addView(child, 0);
-        //drawer.findViewById(R.id.left_drawer).setPadding(0, getStatusBarHeight(), 0, 0);
+        if(!Android.hasLolipop())container.setPadding(0, getStatusBarHeight(), 0, 0);
 
         // Make the drawer replace the first child
         decor.addView(drawer);
