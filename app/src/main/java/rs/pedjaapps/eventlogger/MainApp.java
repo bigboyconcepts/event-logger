@@ -15,6 +15,7 @@ import io.fabric.sdk.android.Fabric;
 import rs.pedjaapps.eventlogger.constants.Constants;
 import rs.pedjaapps.eventlogger.model.DaoMaster;
 import rs.pedjaapps.eventlogger.model.DaoSession;
+import rs.pedjaapps.eventlogger.utility.DatabaseHelper;
 import rs.pedjaapps.eventlogger.utility.SqliteImageLoader;
 
 /**
@@ -82,7 +83,7 @@ public class MainApp extends Application
                 .build();
         ImageLoader.getInstance().init(config);
 		
-		DaoMaster.DevOpenHelper helper = new DaoMaster.DevOpenHelper(context, Constants.DB_NAME, null);
+		DaoMaster.OpenHelper helper = new DatabaseHelper(context, Constants.DB_NAME, null);
 		SQLiteDatabase db = helper.getWritableDatabase();
 		DaoMaster daoMaster = new DaoMaster(db);
 		daoSession = daoMaster.newSession();

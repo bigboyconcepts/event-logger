@@ -9,6 +9,7 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.support.v4.content.ContextCompat;
 import android.text.Html;
 import android.util.Log;
 import android.widget.Toast;
@@ -380,6 +381,11 @@ public class Utility
         }
         return hrSize;
 
+    }
+
+    public static boolean isPermissionGranted(Context context, String permission)
+    {
+        return ContextCompat.checkSelfPermission(context, permission) == PackageManager.PERMISSION_GRANTED;
     }
 
 	static

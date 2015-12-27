@@ -741,8 +741,8 @@ public class MainActivity extends AbsActivity implements AdapterView.OnItemClick
                 long count = queryBuilder.count();
                 queryBuilder.offset((int) (count - limit) - 1);
                 queryBuilder.limit(limit);
-                //queryBuilder.orderAsc(EventDao.Properties.Id);
             }
+            queryBuilder.orderAsc(EventDao.Properties.Timestamp);
 
             return queryBuilder.list();
         }

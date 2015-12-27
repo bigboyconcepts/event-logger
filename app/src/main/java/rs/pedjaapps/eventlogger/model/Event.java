@@ -185,7 +185,7 @@ public class Event implements Parcelable {
         dest.writeString(this.long_desc);
         dest.writeInt(this.type);
         dest.writeInt(this.level);
-        dest.writeLong(this.icon_id);
+        if(icon_id != null)dest.writeLong(this.icon_id);
     }
 
     private Event(Parcel in)
