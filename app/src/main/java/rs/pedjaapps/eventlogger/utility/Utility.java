@@ -9,7 +9,6 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
-import android.graphics.drawable.VectorDrawable;
 import android.text.Html;
 import android.util.Log;
 import android.widget.Toast;
@@ -285,6 +284,11 @@ public class Utility
             if(value.equals(s))return true;
         }
         return false;
+    }
+
+    public static String readFileToString(String file) throws IOException
+    {
+        return readFileToString(new File(file));
     }
 
     public static String readFileToString(File file) throws IOException

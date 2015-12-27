@@ -13,6 +13,7 @@ import java.util.Locale;
 import rs.pedjaapps.eventlogger.constants.EventLevel;
 import rs.pedjaapps.eventlogger.constants.EventType;
 import rs.pedjaapps.eventlogger.model.Event;
+import rs.pedjaapps.eventlogger.model.Icon;
 
 /**
  * Created by pedja on 5.11.14. 09.58.
@@ -41,14 +42,14 @@ public class EventDetailsActivity extends AbsActivity
         tvTimestamp.setText(format.format(event.getTimestamp().getTime()));
         tvEventLevelColor.setBackgroundColor(EventLevel.getLevelForInt(event.getLevel()).color());
         tvLongDesc.setText(Html.fromHtml(event.getLong_desc()));
-        byte[] icon = event.getIcon();
-        if(icon == null || icon.length == 0)
+        Icon icon = MainApp.getInstance().getDaoSession().getIconDao().load(event.getIcon_id());
+        if(icon == null || icon.getIcon() == null || icon.getIcon().length == 0)
         {
             tvEventDetails.setCompoundDrawablesWithIntrinsicBounds(EventType.getIconForId(event.getType()), 0, 0, 0);
         }
         else
         {
-            Bitmap bmp = BitmapFactory.decodeByteArray(icon, 0, icon.length);//DO this
+            Bitmap bmp = BitmapFactory.decodeByteArray(icon.getIcon(), 0, icon.getIcon().length);//DO this
             if(bmp != null)
             {
                 BitmapDrawable drawable = new BitmapDrawable(getResources(), bmp);

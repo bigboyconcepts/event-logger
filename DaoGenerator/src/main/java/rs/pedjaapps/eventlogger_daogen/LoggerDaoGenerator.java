@@ -16,6 +16,7 @@
 package rs.pedjaapps.eventlogger_daogen;
 
 import de.greenrobot.daogenerator.Entity;
+import de.greenrobot.daogenerator.Property;
 import de.greenrobot.daogenerator.Schema;
 
 public class LoggerDaoGenerator
@@ -23,7 +24,7 @@ public class LoggerDaoGenerator
 
     public static void main(String[] args) throws Exception
     {
-        Schema schema = new Schema(3, "rs.pedjaapps.eventlogger.model");
+        Schema schema = new Schema(4, "rs.pedjaapps.eventlogger.model");
 
         addEvents(schema);
 
@@ -41,7 +42,13 @@ public class LoggerDaoGenerator
         event.addStringProperty("long_desc");
         event.addIntProperty("type").notNull();
         event.addIntProperty("level").notNull();
-        event.addByteArrayProperty("icon");
+
+        Entity icon = schema.addEntity("Icon");
+        icon.addIdProperty();
+        icon.addByteArrayProperty("icon");
+
+        Property iconIdProperty = event.addLongProperty("icon_id").getProperty();
+        event.addToOne(icon, iconIdProperty);
     }
 
 }

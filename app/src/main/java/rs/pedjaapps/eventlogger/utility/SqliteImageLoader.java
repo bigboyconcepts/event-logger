@@ -8,6 +8,9 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
+import rs.pedjaapps.eventlogger.MainApp;
+import rs.pedjaapps.eventlogger.model.Icon;
+
 public class SqliteImageLoader extends BaseImageDownloader
 {
 
@@ -24,8 +27,10 @@ public class SqliteImageLoader extends BaseImageDownloader
     {
         if (imageUri.startsWith(DB_URI_PREFIX))
         {
-            byte[] imageData = (byte[]) extra;
-            return new ByteArrayInputStream(imageData);
+            Icon icon = MainApp.getInstance().getDaoSession().getIconDao().load((Long) extra);
+            if(icon == null || icon.getIcon() == null)
+                return null;
+            return new ByteArrayInputStream(icon.getIcon());
         }
         else
         {

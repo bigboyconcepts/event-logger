@@ -19,11 +19,9 @@ import java.util.Locale;
 import rs.pedjaapps.eventlogger.MainApp;
 import rs.pedjaapps.eventlogger.R;
 import rs.pedjaapps.eventlogger.constants.EventLevel;
-import rs.pedjaapps.eventlogger.constants.EventType;
 import rs.pedjaapps.eventlogger.model.Event;
 import rs.pedjaapps.eventlogger.utility.SettingsManager;
 import rs.pedjaapps.eventlogger.utility.Utility;
-import android.graphics.drawable.GradientDrawable;
 
 /**
  * Created by pedja on 12.4.14..
@@ -69,25 +67,9 @@ public class EventAdapter extends ArrayAdapter<Event>
 		{
 			holder.tvTimestamp.setText(format.format(event.getTimestamp()));
 		}
-        byte[] icon = event.getIcon();
-        if(icon == null || icon.length == 0)
-        {
-            holder.ivType.setImageResource(EventType.getIconForId(event.getType()));
-        }
-        else
-        {
-            /*Bitmap bmp = BitmapFactory.decodeByteArray(icon, 0, icon.length);//FIXME async decoding icon
-            if(bmp != null)
-            {
-                holder.ivType.setImageBitmap(bmp);
-            }
-            else
-            {
-                holder.ivType.setImageResource(EventType.getIconForId(event.getType()));
-            }*/
-            DisplayImageOptions dio = new DisplayImageOptions.Builder().cloneFrom(MainApp.getInstance().getDefaultDisplayImageOptions()).extraForDownloader(icon).build();
-            ImageLoader.getInstance().displayImage("db://" + event.getId(), holder.ivType, dio);
-        }
+
+        DisplayImageOptions dio = new DisplayImageOptions.Builder().cloneFrom(MainApp.getInstance().getDefaultDisplayImageOptions()).extraForDownloader(event.getIcon_id()).build();
+        ImageLoader.getInstance().displayImage("db://" + event.getId(), holder.ivType, dio);
 
         return convertView;
     }

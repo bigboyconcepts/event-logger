@@ -1,11 +1,14 @@
 package rs.pedjaapps.eventlogger.model;
 
+import java.util.List;
+import java.util.ArrayList;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteStatement;
 
 import de.greenrobot.dao.AbstractDao;
 import de.greenrobot.dao.Property;
+import de.greenrobot.dao.internal.SqlUtils;
 import de.greenrobot.dao.internal.DaoConfig;
 
 import rs.pedjaapps.eventlogger.model.Event;
@@ -29,8 +32,10 @@ public class EventDao extends AbstractDao<Event, Long> {
         public final static Property Long_desc = new Property(3, String.class, "long_desc", false, "LONG_DESC");
         public final static Property Type = new Property(4, int.class, "type", false, "TYPE");
         public final static Property Level = new Property(5, int.class, "level", false, "LEVEL");
-        public final static Property Icon = new Property(6, byte[].class, "icon", false, "ICON");
+        public final static Property Icon_id = new Property(6, Long.class, "icon_id", false, "ICON_ID");
     };
+
+    private DaoSession daoSession;
 
 
     public EventDao(DaoConfig config) {
@@ -39,6 +44,7 @@ public class EventDao extends AbstractDao<Event, Long> {
     
     public EventDao(DaoConfig config, DaoSession daoSession) {
         super(config, daoSession);
+        this.daoSession = daoSession;
     }
 
     /** Creates the underlying database table. */
@@ -51,7 +57,7 @@ public class EventDao extends AbstractDao<Event, Long> {
                 "\"LONG_DESC\" TEXT," + // 3: long_desc
                 "\"TYPE\" INTEGER NOT NULL ," + // 4: type
                 "\"LEVEL\" INTEGER NOT NULL ," + // 5: level
-                "\"ICON\" BLOB);"); // 6: icon
+                "\"ICON_ID\" INTEGER);"); // 6: icon_id
     }
 
     /** Drops the underlying database table. */
@@ -83,10 +89,16 @@ public class EventDao extends AbstractDao<Event, Long> {
         stmt.bindLong(5, entity.getType());
         stmt.bindLong(6, entity.getLevel());
  
-        byte[] icon = entity.getIcon();
-        if (icon != null) {
-            stmt.bindBlob(7, icon);
+        Long icon_id = entity.getIcon_id();
+        if (icon_id != null) {
+            stmt.bindLong(7, icon_id);
         }
+    }
+
+    @Override
+    protected void attachEntity(Event entity) {
+        super.attachEntity(entity);
+        entity.__setDaoSession(daoSession);
     }
 
     /** @inheritdoc */
@@ -105,7 +117,7 @@ public class EventDao extends AbstractDao<Event, Long> {
             cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3), // long_desc
             cursor.getInt(offset + 4), // type
             cursor.getInt(offset + 5), // level
-            cursor.isNull(offset + 6) ? null : cursor.getBlob(offset + 6) // icon
+            cursor.isNull(offset + 6) ? null : cursor.getLong(offset + 6) // icon_id
         );
         return entity;
     }
@@ -119,7 +131,7 @@ public class EventDao extends AbstractDao<Event, Long> {
         entity.setLong_desc(cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3));
         entity.setType(cursor.getInt(offset + 4));
         entity.setLevel(cursor.getInt(offset + 5));
-        entity.setIcon(cursor.isNull(offset + 6) ? null : cursor.getBlob(offset + 6));
+        entity.setIcon_id(cursor.isNull(offset + 6) ? null : cursor.getLong(offset + 6));
      }
     
     /** @inheritdoc */
@@ -145,4 +157,95 @@ public class EventDao extends AbstractDao<Event, Long> {
         return true;
     }
     
+    private String selectDeep;
+
+    protected String getSelectDeep() {
+        if (selectDeep == null) {
+            StringBuilder builder = new StringBuilder("SELECT ");
+            SqlUtils.appendColumns(builder, "T", getAllColumns());
+            builder.append(',');
+            SqlUtils.appendColumns(builder, "T0", daoSession.getIconDao().getAllColumns());
+            builder.append(" FROM EVENT T");
+            builder.append(" LEFT JOIN ICON T0 ON T.\"ICON_ID\"=T0.\"_id\"");
+            builder.append(' ');
+            selectDeep = builder.toString();
+        }
+        return selectDeep;
+    }
+    
+    protected Event loadCurrentDeep(Cursor cursor, boolean lock) {
+        Event entity = loadCurrent(cursor, 0, lock);
+        int offset = getAllColumns().length;
+
+        Icon icon = loadCurrentOther(daoSession.getIconDao(), cursor, offset);
+        entity.setIcon(icon);
+
+        return entity;    
+    }
+
+    public Event loadDeep(Long key) {
+        assertSinglePk();
+        if (key == null) {
+            return null;
+        }
+
+        StringBuilder builder = new StringBuilder(getSelectDeep());
+        builder.append("WHERE ");
+        SqlUtils.appendColumnsEqValue(builder, "T", getPkColumns());
+        String sql = builder.toString();
+        
+        String[] keyArray = new String[] { key.toString() };
+        Cursor cursor = db.rawQuery(sql, keyArray);
+        
+        try {
+            boolean available = cursor.moveToFirst();
+            if (!available) {
+                return null;
+            } else if (!cursor.isLast()) {
+                throw new IllegalStateException("Expected unique result, but count was " + cursor.getCount());
+            }
+            return loadCurrentDeep(cursor, true);
+        } finally {
+            cursor.close();
+        }
+    }
+    
+    /** Reads all available rows from the given cursor and returns a list of new ImageTO objects. */
+    public List<Event> loadAllDeepFromCursor(Cursor cursor) {
+        int count = cursor.getCount();
+        List<Event> list = new ArrayList<Event>(count);
+        
+        if (cursor.moveToFirst()) {
+            if (identityScope != null) {
+                identityScope.lock();
+                identityScope.reserveRoom(count);
+            }
+            try {
+                do {
+                    list.add(loadCurrentDeep(cursor, false));
+                } while (cursor.moveToNext());
+            } finally {
+                if (identityScope != null) {
+                    identityScope.unlock();
+                }
+            }
+        }
+        return list;
+    }
+    
+    protected List<Event> loadDeepAllAndCloseCursor(Cursor cursor) {
+        try {
+            return loadAllDeepFromCursor(cursor);
+        } finally {
+            cursor.close();
+        }
+    }
+    
+
+    /** A raw-style query where you can pass any WHERE clause and arguments. */
+    public List<Event> queryDeep(String where, String... selectionArg) {
+        Cursor cursor = db.rawQuery(getSelectDeep() + where, selectionArg);
+        return loadDeepAllAndCloseCursor(cursor);
+    }
+ 
 }

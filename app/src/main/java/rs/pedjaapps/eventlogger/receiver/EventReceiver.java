@@ -28,6 +28,7 @@ import rs.pedjaapps.eventlogger.constants.EventLevel;
 import rs.pedjaapps.eventlogger.constants.EventType;
 import rs.pedjaapps.eventlogger.model.Event;
 import rs.pedjaapps.eventlogger.model.EventDao;
+import rs.pedjaapps.eventlogger.model.Icon;
 import rs.pedjaapps.eventlogger.service.EventService;
 import rs.pedjaapps.eventlogger.utility.Utility;
 
@@ -81,7 +82,10 @@ public class EventReceiver extends BroadcastReceiver
 			event.setType(EventType.getIntForType(EventType.app));
 			event.setShort_desc(context.getString(R.string.app_started, appName));
 			event.setLong_desc(context.getString(R.string.app_started_desc, appName, packageName));
-			event.setIcon(Utility.getApplicationIcon(context, packageName));
+            Icon icon = new Icon();
+            icon.setIcon(Utility.getApplicationIcon(context, packageName));
+            long iconId = MainApp.getInstance().getDaoSession().getIconDao().insert(icon);
+			event.setIcon_id(iconId);
 			EventDao eventDao = MainApp.getInstance().getDaoSession().getEventDao();
 			eventDao.insert(event);
 			EventReceiver.sendLocalBroadcast(event);
@@ -682,7 +686,10 @@ public class EventReceiver extends BroadcastReceiver
                 event.setType(EventType.getIntForType(EventType.app));
                 event.setShort_desc(context.getString(R.string.app_installed, appName));
                 event.setLong_desc(context.getString(R.string.app_installed_desc, appName, pn));
-                event.setIcon(Utility.getApplicationIcon(context, pn));
+                Icon icon = new Icon();
+                icon.setIcon(Utility.getApplicationIcon(context, pn));
+                long iconId = MainApp.getInstance().getDaoSession().getIconDao().insert(icon);
+                event.setIcon_id(iconId);
                 EventDao eventDao = MainApp.getInstance().getDaoSession().getEventDao();
                 eventDao.insert(event);
                 sendLocalBroadcast(event);
@@ -698,7 +705,10 @@ public class EventReceiver extends BroadcastReceiver
             event.setType(EventType.getIntForType(EventType.app));
             event.setShort_desc(context.getString(R.string.app_data_cleared, appName));
             event.setLong_desc(context.getString(R.string.app_data_cleared_desc, appName, pn));
-            event.setIcon(Utility.getApplicationIcon(context, pn));
+            Icon icon = new Icon();
+            icon.setIcon(Utility.getApplicationIcon(context, pn));
+            long iconId = MainApp.getInstance().getDaoSession().getIconDao().insert(icon);
+            event.setIcon_id(iconId);
             EventDao eventDao = MainApp.getInstance().getDaoSession().getEventDao();
             eventDao.insert(event);
             sendLocalBroadcast(event);
@@ -713,7 +723,10 @@ public class EventReceiver extends BroadcastReceiver
             event.setType(EventType.getIntForType(EventType.app));
             event.setShort_desc(context.getString(R.string.app_killed, appName));
             event.setLong_desc(context.getString(R.string.app_killed_desc, appName, pn));
-            event.setIcon(Utility.getApplicationIcon(context, pn));
+            Icon icon = new Icon();
+            icon.setIcon(Utility.getApplicationIcon(context, pn));
+            long iconId = MainApp.getInstance().getDaoSession().getIconDao().insert(icon);
+            event.setIcon_id(iconId);
             EventDao eventDao = MainApp.getInstance().getDaoSession().getEventDao();
             eventDao.insert(event);
             sendLocalBroadcast(event);
@@ -728,7 +741,10 @@ public class EventReceiver extends BroadcastReceiver
             event.setType(EventType.getIntForType(EventType.app));
             event.setShort_desc(context.getString(R.string.app_reinstalled, appName));
             event.setLong_desc(context.getString(R.string.app_reinstalled_desc, appName, pn));
-            event.setIcon(Utility.getApplicationIcon(context, pn));
+            Icon icon = new Icon();
+            icon.setIcon(Utility.getApplicationIcon(context, pn));
+            long iconId = MainApp.getInstance().getDaoSession().getIconDao().insert(icon);
+            event.setIcon_id(iconId);
             EventDao eventDao = MainApp.getInstance().getDaoSession().getEventDao();
             eventDao.insert(event);
             sendLocalBroadcast(event);
