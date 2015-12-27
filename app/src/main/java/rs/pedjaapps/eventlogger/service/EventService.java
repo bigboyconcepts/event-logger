@@ -15,10 +15,14 @@ import android.os.IBinder;
 import android.telephony.TelephonyManager;
 import android.util.Log;
 
+import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import rs.pedjaapps.eventlogger.BuildConfig;
 import rs.pedjaapps.eventlogger.MainApp;
@@ -29,6 +33,7 @@ import rs.pedjaapps.eventlogger.constants.EventLevel;
 import rs.pedjaapps.eventlogger.constants.EventType;
 import rs.pedjaapps.eventlogger.model.Event;
 import rs.pedjaapps.eventlogger.model.EventDao;
+import rs.pedjaapps.eventlogger.model.Icon;
 import rs.pedjaapps.eventlogger.receiver.EventReceiver;
 import rs.pedjaapps.eventlogger.utility.SettingsManager;
 import rs.pedjaapps.eventlogger.utility.Utility;
@@ -38,6 +43,22 @@ import rs.pedjaapps.eventlogger.utility.Utility;
  */
 public class EventService extends Service
 {
+    /*2:cpu:/apps1:cpuacct:/uid_10001/pid_1249
+2:cpu:/1:cpuacct:/
+2:cpu:/apps1:cpuacct:/
+2:cpu:/apps/bg_non_interactive1:cpuacct:/uid_10039/pid_861*/
+    private static final Pattern PROC_CGROUP_PATTERN = Pattern.compile(".*/uid_(\\d+)/pid_(\\d+)");
+    private static final Matcher CGROUP_MATCHER = PROC_CGROUP_PATTERN.matcher("");
+    /**
+     * first app user
+     */
+    public static final int AID_APP = 10000;
+
+    /**
+     * offset for uid ranges for each user
+     */
+    public static final int AID_USER = 100000;
+
     private EventReceiver manualRegisterReceiver;
     private String lastActiveApp = "";
     Handler handler;
@@ -115,13 +136,17 @@ public class EventService extends Service
         manualRegisterReceiver = new EventReceiver();
         registerReceiver(manualRegisterReceiver, intentFilter);
 
-		if(Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP)
-		{
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP)
+        {
             appLaunchChecker = new AppLaunchCheckerLegacy();
-		}
-        else
+        }
+        else if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP_MR1)
         {
             appLaunchChecker = new AppLaunchCheckerLP();
+        }
+        else
+        {
+            appLaunchChecker = new AppLaunchCheckerLPMR1();
         }
 
         HandlerThread thread = new HandlerThread("AppLaunchCheckerThread");
@@ -136,17 +161,17 @@ public class EventService extends Service
         @Override
         public void run()
         {
-            List<ActivityManager.RunningTaskInfo> tasks = ((ActivityManager)getSystemService(Context.ACTIVITY_SERVICE)).getRunningTasks(1);
-            if(tasks != null && !tasks.isEmpty())
+            List<ActivityManager.RunningTaskInfo> tasks = ((ActivityManager) getSystemService(Context.ACTIVITY_SERVICE)).getRunningTasks(1);
+            if (tasks != null && !tasks.isEmpty())
             {
                 ActivityManager.RunningTaskInfo task = tasks.get(0);
-                if(task != null)
+                if (task != null)
                 {
                     ComponentName topActivity = task.topActivity;
                     if (topActivity != null)
                     {
                         String pn = topActivity.getPackageName();
-                        if(pn != null && !lastActiveApp.equals(pn))
+                        if (pn != null && !lastActiveApp.equals(pn))
                         {
                             lastActiveApp = pn;
                             String appName = Utility.getNameForPackage(EventService.this, pn);
@@ -157,7 +182,10 @@ public class EventService extends Service
                             event.setType(EventType.getIntForType(EventType.app));
                             event.setShort_desc(getString(R.string.app_started, appName));
                             event.setLong_desc(getString(R.string.app_started_desc, appName, pn));
-                            event.setIcon(Utility.getApplicationIcon(EventService.this, pn));
+                            Icon icon = new Icon();
+                            icon.setIcon(Utility.getApplicationIcon(EventService.this, pn));
+                            long iconId = MainApp.getInstance().getDaoSession().getIconDao().insert(icon);
+                            event.setIcon_id(iconId);
                             EventDao eventDao = MainApp.getInstance().getDaoSession().getEventDao();
                             eventDao.insert(event);
                             EventReceiver.sendLocalBroadcast(event);
@@ -174,30 +202,34 @@ public class EventService extends Service
         @Override
         public void run()
         {
-            List<ActivityManager.RunningAppProcessInfo> processes = ((ActivityManager)getSystemService(Context.ACTIVITY_SERVICE)).getRunningAppProcesses();
-            if(processes != null)
+            List<ActivityManager.RunningAppProcessInfo> processes = ((ActivityManager) getSystemService(Context.ACTIVITY_SERVICE)).getRunningAppProcesses();
+            if (processes != null)
             {
                 List<String> packages = new ArrayList<>();
-                for(ActivityManager.RunningAppProcessInfo pi : processes)
+                for (ActivityManager.RunningAppProcessInfo pi : processes)
                 {
                     boolean hasActivities = true;
                     try
                     {
                         Field flagsField = pi.getClass().getDeclaredField("flags");
                         int flags = (int) flagsField.get(pi);
-                        hasActivities = (flags & 1<<2) == 1<<2;
+                        hasActivities = (flags & 1 << 2) == 1 << 2;
                     }
                     catch (Exception e)
                     {
-                        if(BuildConfig.DEBUG)e.printStackTrace();
+                        if (BuildConfig.DEBUG) e.printStackTrace();
                     }
-                    if(hasActivities && pi.importance == ActivityManager.RunningAppProcessInfo.IMPORTANCE_FOREGROUND)
+                    if (pi.processName.contains("com.android.systemui") || pi.processName.contains("android.process.acore"))
+                    {
+                        continue;
+                    }
+                    if (hasActivities && pi.importance == ActivityManager.RunningAppProcessInfo.IMPORTANCE_FOREGROUND)
                     {
                         packages.add(pi.processName);
                     }
                 }
                 String packageName = packages.isEmpty() ? null : packages.get(0);
-                if(packageName != null && !lastActiveApp.equals(packageName))
+                if (packageName != null && !lastActiveApp.equals(packageName))
                 {
                     lastActiveApp = packageName;
                     String appName = Utility.getNameForPackage(EventService.this, packageName);
@@ -208,7 +240,10 @@ public class EventService extends Service
                     event.setType(EventType.getIntForType(EventType.app));
                     event.setShort_desc(getString(R.string.app_started, appName));
                     event.setLong_desc(getString(R.string.app_started_desc, appName, packageName));
-                    event.setIcon(Utility.getApplicationIcon(EventService.this, packageName));
+                    Icon icon = new Icon();
+                    icon.setIcon(Utility.getApplicationIcon(EventService.this, packageName));
+                    long iconId = MainApp.getInstance().getDaoSession().getIconDao().insert(icon);
+                    event.setIcon_id(iconId);
                     EventDao eventDao = MainApp.getInstance().getDaoSession().getEventDao();
                     eventDao.insert(event);
                     EventReceiver.sendLocalBroadcast(event);
@@ -216,6 +251,141 @@ public class EventService extends Service
             }
             handler.postDelayed(appLaunchChecker, SettingsManager.getActiveAppCheckInterval());
         }
+    }
+
+    private class AppLaunchCheckerLPMR1 implements Runnable
+    {
+        @Override
+        public void run()
+        {
+            String packageName = getForegroundAppByParsingProc();
+            if (packageName != null && !lastActiveApp.equals(packageName))
+            {
+                lastActiveApp = packageName;
+                String appName = Utility.getNameForPackage(EventService.this, packageName);
+
+                Event event = new Event();
+                event.setTimestamp(new Date());
+                event.setLevel(EventLevel.getIntForLevel(EventLevel.info));
+                event.setType(EventType.getIntForType(EventType.app));
+                event.setShort_desc(getString(R.string.app_started, appName));
+                event.setLong_desc(getString(R.string.app_started_desc, appName, packageName));
+                Icon icon = new Icon();
+                icon.setIcon(Utility.getApplicationIcon(EventService.this, packageName));
+                long iconId = MainApp.getInstance().getDaoSession().getIconDao().insert(icon);
+                event.setIcon_id(iconId);
+                EventDao eventDao = MainApp.getInstance().getDaoSession().getEventDao();
+                eventDao.insert(event);
+                EventReceiver.sendLocalBroadcast(event);
+            }
+            handler.postDelayed(appLaunchChecker, SettingsManager.getActiveAppCheckInterval());
+        }
+    }
+
+    public static String getForegroundAppByParsingProc()
+    {
+        File[] files = new File("/proc").listFiles();
+        int lowestOomScore = Integer.MAX_VALUE;
+        String foregroundProcess = null;
+
+        for (File file : files)
+        {
+            if (!file.isDirectory())
+            {
+                continue;
+            }
+
+            int pid;
+            try
+            {
+                pid = Integer.parseInt(file.getName());
+            }
+            catch (NumberFormatException e)
+            {
+                continue;
+            }
+
+            try
+            {
+                String cgroup = Utility.readFileToString(String.format("/proc/%d/cgroup", pid));
+
+                if (cgroup.contains("bg_non_interactive"))
+                {
+                    // background policy
+                    continue;
+                }
+
+                CGROUP_MATCHER.reset(cgroup);
+                if(!CGROUP_MATCHER.find())
+                {
+                    continue;
+                }
+
+                String cmdline = Utility.readFileToString(String.format("/proc/%d/cmdline", pid));
+
+                if (cmdline.contains("com.android.systemui") || cmdline.contains("android.process.acore"))
+                {
+                    continue;
+                }
+
+                int uid = Integer.parseInt(CGROUP_MATCHER.group(1));
+                if (uid >= 1000 && uid <= 1038)
+                {
+                    // system process
+                    continue;
+                }
+
+                int appId = uid - AID_APP;
+                int userId = 0;
+                // loop until we get the correct user id.
+                // 100000 is the offset for each user.
+                while (appId > AID_USER)
+                {
+                    appId -= AID_USER;
+                    userId++;
+                }
+
+                if (appId < 0)
+                {
+                    continue;
+                }
+
+                // u{user_id}_a{app_id} is used on API 17+ for multiple user account support.
+                // String uidName = String.format("u%d_a%d", userId, appId);
+
+                File oomScoreAdj = new File(String.format("/proc/%d/oom_score_adj", pid));
+                if (oomScoreAdj.canRead())
+                {
+                    int oomAdj = Integer.parseInt(Utility.readFileToString(oomScoreAdj.getAbsolutePath()));
+                    if (oomAdj != 0)
+                    {
+                        continue;
+                    }
+                }
+
+                int oomscore = Integer.parseInt(Utility.readFileToString(String.format("/proc/%d/oom_score", pid)));
+                if (oomscore < lowestOomScore)
+                {
+                    lowestOomScore = oomscore;
+                    foregroundProcess = cmdline;
+                }
+
+            }
+            catch (IOException e)
+            {
+                if (BuildConfig.DEBUG) e.printStackTrace();
+            }
+        }
+
+        if(foregroundProcess != null)
+            foregroundProcess = foregroundProcess.trim();
+
+        if(foregroundProcess != null && foregroundProcess.contains(":"))
+        {
+            foregroundProcess = foregroundProcess.split(":")[0];
+        }
+
+        return foregroundProcess;
     }
 
     @Override
@@ -238,6 +408,6 @@ public class EventService extends Service
     {
         Log.d(Constants.LOG_TAG, "EventService :: onTaskRemoved");
         super.onTaskRemoved(rootIntent);
-        startActivity(new Intent(this, ServiceRestartActivity.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK|Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS));
+        startActivity(new Intent(this, ServiceRestartActivity.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS));
     }
 }
