@@ -9,7 +9,6 @@ import android.content.pm.PackageManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.CheckBoxPreference;
-import android.preference.EditTextPreference;
 import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceCategory;
@@ -208,7 +207,7 @@ public class SettingsFragment extends PreferenceFragment
         final long eventCount = MainApp.getInstance().getDaoSession().getEventDao().queryBuilder().count();
         displaylimit = (ListPreference) findPreference("items_display_limit");
         final List<String> displayLimit = Arrays.asList(getResources().getStringArray(R.array.displayLimit));
-        displaylimit.setSummary(displayLimit.get(displayLimit.indexOf(SettingsManager.getItemsDisplayLimit())) + "/" + eventCount);
+        displaylimit.setSummary(SettingsManager.getItemsDisplayLimit() + "/" + eventCount);
         displaylimit.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener()
         {
             @Override
