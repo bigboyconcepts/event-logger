@@ -40,6 +40,7 @@ public class SettingsFragment extends PreferenceFragment
     //int aboutClickCount = 0;
     ListPreference displaylimit;
     PreferenceScreen clearDb;
+    ATClearDb atClearDb;
 
     @Override
     public void onCreate(Bundle savedInstanceState)
@@ -268,7 +269,8 @@ public class SettingsFragment extends PreferenceFragment
             @Override
             public void onClick(DialogInterface dialogInterface, int i)
             {
-                new ATClearDb().execute();
+                atClearDb = new ATClearDb();
+                atClearDb.execute();
             }
         });
         builder.setNegativeButton(R.string.no, null);
@@ -314,6 +316,8 @@ public class SettingsFragment extends PreferenceFragment
         @Override
         protected void onPostExecute(Void aVoid)
         {
+            if(!isAdded())
+                return;
             if (displaylimit != null)
             {
                 final long eventCount = MainApp.getInstance().getDaoSession().getEventDao().queryBuilder().count();
@@ -338,5 +342,13 @@ public class SettingsFragment extends PreferenceFragment
                 pdLoading.show();
             }
         }
+    }
+
+    @Override
+    public void onDestroy()
+    {
+        super.onDestroy();
+        if(atClearDb != null)
+            atClearDb.cancel(true);
     }
 }
