@@ -264,5 +264,6 @@
 	<string name="developer">Development and Design</string>
 	<string name="developer_text"><![CDATA[•<b>pedja1</b> - Predrag Čokulov]]></string>
     <string name="active_app_check_interval">Active Application Check Interval</string>
+    <string name="invalid_event">Event is not valid!</string>
 
 </resources>

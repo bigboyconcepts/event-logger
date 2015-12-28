@@ -14,6 +14,7 @@ import rs.pedjaapps.eventlogger.constants.EventLevel;
 import rs.pedjaapps.eventlogger.constants.EventType;
 import rs.pedjaapps.eventlogger.model.Event;
 import rs.pedjaapps.eventlogger.model.Icon;
+import rs.pedjaapps.eventlogger.utility.Utility;
 
 /**
  * Created by pedja on 5.11.14. 09.58.
@@ -29,9 +30,16 @@ public class EventDetailsActivity extends AbsActivity
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_event_info);
-
         event = getIntent().getParcelableExtra(EXTRA_EVENT);
+
+        if(event == null)
+        {
+            Utility.showToast(this, R.string.invalid_event);
+            finish();
+            return;
+        }
+
+        setContentView(R.layout.activity_event_info);
 
         DateFormat format = DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.MEDIUM, Locale.getDefault());
         TextView tvTimestamp = (TextView)findViewById(R.id.tvTimestamp);
