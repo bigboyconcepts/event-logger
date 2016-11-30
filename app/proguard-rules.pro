@@ -17,13 +17,18 @@
 #}
 -keepattributes SourceFile,LineNumberTable,Signature
 #-keep class android.support.** { *; }
--keepclassmembers class * extends de.greenrobot.dao.AbstractDao {
+-keepclassmembers class * extends org.greenrobot.dao.AbstractDao {
     public static java.lang.String TABLENAME;
 }
 -keep class **$Properties
 -keep class * extends java.util.ListResourceBundle {
     protected Object[][] getContents();
 }
+
+# If you do not use SQLCipher:
+-dontwarn org.greenrobot.greendao.database.**
+# If you do not use Rx:
+-dontwarn rx.**
 
 -keep public class com.google.android.gms.common.internal.safeparcel.SafeParcelable {
     public static final *** NULL;

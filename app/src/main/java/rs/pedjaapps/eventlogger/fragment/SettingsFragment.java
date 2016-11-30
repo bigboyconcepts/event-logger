@@ -6,6 +6,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.CheckBoxPreference;
@@ -255,7 +256,7 @@ public class SettingsFragment extends PreferenceFragment
     private void setClearDbSummary()
     {
         if(clearDb == null)return;
-        long dbSizeBytes = new File(MainApp.getInstance().getDaoSession().getDatabase().getPath()).length();
+        long dbSizeBytes = new File(((SQLiteDatabase)MainApp.getInstance().getDaoSession().getDatabase().getRawDatabase()).getPath()).length();
         clearDb.setSummary(getString(R.string.db_size) + " " + Utility.byteToHumanReadableSize(dbSizeBytes));
     }
 

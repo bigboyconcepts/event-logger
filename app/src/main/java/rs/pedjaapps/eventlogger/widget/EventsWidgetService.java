@@ -10,14 +10,15 @@ import android.text.Html;
 import android.widget.RemoteViews;
 import android.widget.RemoteViewsService;
 
+import org.greenrobot.greendao.query.QueryBuilder;
+import org.greenrobot.greendao.query.WhereCondition;
+
 import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
-import de.greenrobot.dao.query.QueryBuilder;
-import de.greenrobot.dao.query.WhereCondition;
 import rs.pedjaapps.eventlogger.MainApp;
 import rs.pedjaapps.eventlogger.R;
 import rs.pedjaapps.eventlogger.constants.EventLevel;

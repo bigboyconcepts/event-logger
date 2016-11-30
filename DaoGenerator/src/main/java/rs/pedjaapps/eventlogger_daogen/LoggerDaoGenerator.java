@@ -15,9 +15,11 @@
  */
 package rs.pedjaapps.eventlogger_daogen;
 
-import de.greenrobot.daogenerator.Entity;
-import de.greenrobot.daogenerator.Property;
-import de.greenrobot.daogenerator.Schema;
+
+import org.greenrobot.greendao.generator.DaoGenerator;
+import org.greenrobot.greendao.generator.Entity;
+import org.greenrobot.greendao.generator.Property;
+import org.greenrobot.greendao.generator.Schema;
 
 public class LoggerDaoGenerator
 {
@@ -28,7 +30,7 @@ public class LoggerDaoGenerator
 
         addEvents(schema);
 
-        new de.greenrobot.daogenerator.DaoGenerator().generateAll(schema, "./app/src/main/java");
+        new DaoGenerator().generateAll(schema, "./app/src/main/java");
     }
 
     private static void addEvents(Schema schema)

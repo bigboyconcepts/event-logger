@@ -3,6 +3,8 @@ package rs.pedjaapps.eventlogger.utility;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 
+import org.greenrobot.greendao.database.Database;
+
 import rs.pedjaapps.eventlogger.model.DaoMaster;
 import rs.pedjaapps.eventlogger.model.EventDao;
 import rs.pedjaapps.eventlogger.model.IconDao;
@@ -18,7 +20,7 @@ public class DatabaseHelper extends DaoMaster.OpenHelper
     }
 
     @Override
-    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion)
+    public void onUpgrade(Database db, int oldVersion, int newVersion)
     {
         if(oldVersion == 3)
         {

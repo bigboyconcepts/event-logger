@@ -44,6 +44,10 @@ import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 import com.google.android.gms.ads.InterstitialAd;
 
+import org.greenrobot.greendao.query.LazyList;
+import org.greenrobot.greendao.query.QueryBuilder;
+import org.greenrobot.greendao.query.WhereCondition;
+
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -55,9 +59,6 @@ import java.util.List;
 import java.util.Locale;
 
 import au.com.bytecode.opencsv.CSVWriter;
-import de.greenrobot.dao.query.LazyList;
-import de.greenrobot.dao.query.QueryBuilder;
-import de.greenrobot.dao.query.WhereCondition;
 import rs.pedjaapps.eventlogger.adapter.EventAdapter;
 import rs.pedjaapps.eventlogger.adapter.NavigationDrawerAdapter;
 import rs.pedjaapps.eventlogger.constants.Constants;
@@ -101,11 +102,9 @@ public class MainActivity extends AbsActivity implements AdapterView.OnItemClick
     public static final String ACTION_REMOVE_ADS = "action_remove_ads";
     public static final String EXTRA_EVENT = "extra_event";
 
-    InterstitialAd interstitial;
     TextView tvNoEvents;
     ProgressBar pbLoading;
     AdView adView;
-    boolean interstitialLoaded = false;
 
     //IAB
     public static final int REQUEST_CODE_PURCHASE = 1001;
@@ -226,20 +225,6 @@ public class MainActivity extends AbsActivity implements AdapterView.OnItemClick
             }
         });
 
-        //test interstitial ad
-        // Create the interstitial.
-        interstitial = new InterstitialAd(this);
-        interstitial.setAdUnitId("ca-app-pub-6294976772687752/1839387229");
-        if(!SettingsManager.isPro())interstitial.loadAd(adRequest);
-        interstitial.setAdListener(new AdListener()
-        {
-            @Override
-            public void onAdLoaded()
-            {
-                super.onAdLoaded();
-                interstitialLoaded = true;
-            }
-        });
         new ATLoadEvents().execute();
         setupTitle();
 		
@@ -366,15 +351,6 @@ public class MainActivity extends AbsActivity implements AdapterView.OnItemClick
         }
     }
 
-    public void displayInterstitial()
-    {
-        if (interstitial.isLoaded() && !SettingsManager.isPro())
-        {
-            interstitial.show();
-            SettingsManager.setAdShownTs();
-        }
-    }
-
     @Override
     protected void onResume()
     {
@@ -408,10 +384,6 @@ public class MainActivity extends AbsActivity implements AdapterView.OnItemClick
     public void onBackPressed()
     {
         super.onBackPressed();
-        if(interstitialLoaded)
-        {
-            displayInterstitial();
-        }
     }
 
     BroadcastReceiver localReceiver = new BroadcastReceiver()
@@ -435,7 +407,6 @@ public class MainActivity extends AbsActivity implements AdapterView.OnItemClick
                     adView.destroy();
                     adView.setVisibility(View.GONE);
                 }
-                interstitialLoaded = false;
             }
 			if(ACTION_REFRESH_ALL.equals(intent.getAction()))
             {
