@@ -17,8 +17,8 @@
 #}
 -keepattributes SourceFile,LineNumberTable,Signature
 #-keep class android.support.** { *; }
--keepclassmembers class * extends org.greenrobot.dao.AbstractDao {
-    public static java.lang.String TABLENAME;
+-keepclassmembers class * extends org.greenrobot.greendao.AbstractDao {
+public static java.lang.String TABLENAME;
 }
 -keep class **$Properties
 -keep class * extends java.util.ListResourceBundle {
