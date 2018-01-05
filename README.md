@@ -1,4 +1,10 @@
 # event-logger  
+
+[![Quality Gate](http://skynetsoftware.org:9000/api/badges/gate?key=event-logger)](http://skynetsoftware.org:9000/dashboard/index/event-logger)
+[![Quality Gate](http://skynetsoftware.org:9000/api/badges/measure?key=event-logger&metric=ncloc)](http://skynetsoftware.org:9000/dashboard/index/event-logger)
+[![Quality Gate](http://skynetsoftware.org:9000/api/badges/measure?key=event-logger&metric=vulnerabilities)](http://skynetsoftware.org:9000/dashboard/index/event-logger)
+[![Quality Gate](http://skynetsoftware.org:9000/api/badges/measure?key=event-logger&metric=bugs)](http://skynetsoftware.org:9000/dashboard/index/event-logger)
+
 ![Image 1](https://raw.githubusercontent.com/pedja1/event-logger/master/_market/device-2014-04-18-224223_nexus4_angle1.png "Image 1")
 ![Image 2](https://raw.githubusercontent.com/pedja1/event-logger/master/_market/device-2014-04-18-224223_nexus4_portrait.png "Image 2")
 
