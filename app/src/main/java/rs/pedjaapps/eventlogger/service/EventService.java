@@ -2,6 +2,8 @@ package rs.pedjaapps.eventlogger.service;
 
 import android.app.ActivityManager;
 import android.app.Service;
+import android.app.usage.UsageStats;
+import android.app.usage.UsageStatsManager;
 import android.bluetooth.BluetoothAdapter;
 import android.content.ComponentName;
 import android.content.Context;
@@ -12,6 +14,7 @@ import android.os.Build;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.IBinder;
+import android.support.annotation.RequiresApi;
 import android.telephony.TelephonyManager;
 import android.util.Log;
 
@@ -19,6 +22,9 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -144,9 +150,13 @@ public class EventService extends Service
         {
             appLaunchChecker = new AppLaunchCheckerLP();
         }
-        else
+        else if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N)
         {
             appLaunchChecker = new AppLaunchCheckerLPMR1();
+        }
+        else
+        {
+            appLaunchChecker = new AppLaunchCheckerN();
         }
 
         HandlerThread thread = new HandlerThread("AppLaunchCheckerThread");
@@ -259,6 +269,7 @@ public class EventService extends Service
         public void run()
         {
             String packageName = getForegroundAppByParsingProc();
+            System.out.println(packageName);
             if (packageName != null && !lastActiveApp.equals(packageName))
             {
                 lastActiveApp = packageName;
@@ -278,6 +289,52 @@ public class EventService extends Service
                 eventDao.insert(event);
                 EventReceiver.sendLocalBroadcast(event);
             }
+            handler.postDelayed(appLaunchChecker, SettingsManager.getActiveAppCheckInterval());
+        }
+    }
+
+    private class AppLaunchCheckerN implements Runnable
+    {
+        @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP_MR1)
+        @Override
+        public void run()
+        {
+            long now = System.currentTimeMillis();
+
+            UsageStatsManager usageStatsManager = (UsageStatsManager) EventService.this.getSystemService(Context.USAGE_STATS_SERVICE);
+            List<UsageStats> usageStatsList = usageStatsManager.queryUsageStats(UsageStatsManager.INTERVAL_BEST, now - SettingsManager.getActiveAppCheckInterval(), now);
+
+            if(!usageStatsList.isEmpty()) {
+                Collections.sort(usageStatsList, new Comparator<UsageStats>() {
+                    @Override
+                    public int compare(UsageStats o1, UsageStats o2) {
+                        return Long.compare(o2.getLastTimeUsed(), o1.getLastTimeUsed());
+                    }
+                });
+
+                UsageStats stats = usageStatsList.get(0);
+                if (!stats.getPackageName().equals(lastActiveApp))
+                {
+                    lastActiveApp = stats.getPackageName();
+
+                    String appName = Utility.getNameForPackage(EventService.this, lastActiveApp);
+
+                    Event event = new Event();
+                    event.setTimestamp(new Date());
+                    event.setLevel(EventLevel.getIntForLevel(EventLevel.info));
+                    event.setType(EventType.getIntForType(EventType.app));
+                    event.setShort_desc(getString(R.string.app_started, appName));
+                    event.setLong_desc(getString(R.string.app_started_desc, appName, lastActiveApp));
+                    Icon icon = new Icon();
+                    icon.setIcon(Utility.getApplicationIcon(EventService.this, lastActiveApp));
+                    long iconId = MainApp.getInstance().getDaoSession().getIconDao().insert(icon);
+                    event.setIcon_id(iconId);
+                    EventDao eventDao = MainApp.getInstance().getDaoSession().getEventDao();
+                    eventDao.insert(event);
+                    EventReceiver.sendLocalBroadcast(event);
+                }
+            }
+
             handler.postDelayed(appLaunchChecker, SettingsManager.getActiveAppCheckInterval());
         }
     }

@@ -6,6 +6,7 @@ import android.preference.PreferenceManager;
 
 import java.util.Date;
 
+import rs.pedjaapps.eventlogger.BuildConfig;
 import rs.pedjaapps.eventlogger.MainApp;
 import rs.pedjaapps.eventlogger.constants.Constants;
 
@@ -224,7 +225,7 @@ public class SettingsManager
     public static final String LICENCE_IS_PRO = "rOMGzTkE367E97fQIFcJQczAlCfsR/MA";
     public static boolean isPro()
     {
-        return LICENCE_IS_PRO.equals(prefsLicence.getString(Key.is_pro.toString(), rs.nextString()));
+        return BuildConfig.DEBUG || LICENCE_IS_PRO.equals(prefsLicence.getString(Key.is_pro.toString(), rs.nextString()));
     }
 
     public static void setPro(boolean pro)

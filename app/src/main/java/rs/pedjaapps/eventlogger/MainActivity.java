@@ -635,7 +635,7 @@ public class MainActivity extends AbsActivity implements AdapterView.OnItemClick
         queryInventoryAsync(true);
         synchronized (mIabHelperSetupLock)
         {
-            mIabHelperSetupLock.notify();
+            mIabHelperSetupLock.notifyAll();
         }
     }
 

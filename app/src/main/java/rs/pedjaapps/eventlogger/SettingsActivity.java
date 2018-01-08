@@ -1,13 +1,13 @@
 package rs.pedjaapps.eventlogger;
 
 import android.os.Bundle;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 
 import rs.pedjaapps.eventlogger.fragment.SettingsFragment;
 /**
  * Created by pedja on 20.4.14..
  */
-public class SettingsActivity extends ActionBarActivity
+public class SettingsActivity extends AppCompatActivity
 {
 
     @Override
