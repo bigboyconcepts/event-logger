@@ -1,13 +1,17 @@
 - mobile network toggle - xposed
-☒ notification received
-☒ sd card removed/inserted - no way to test this right now
-☒ hdmi plugged - xposed(i have no idea how to determine this)
+- notification received
+- sd card removed/inserted - no way to test this right now
+- hdmi plugged - xposed(i have no idea how to determine this)
 - nfc toggle - xposed
-- service start/stop - xposed
+- service start/stop - xposed - pre 26 getRunningServices
 - app fc-ed
 - application accesed gps/network location
 - app opened data connection
-
+- keyboard shown/hidden
+- catch all broadcasts
+- tcp connection initialized
+- shell opened
+- root shell opened
 
 bugs
 - sometimes events are added to the list without them actually happening(Headphone plugged, volume level changed, orientation changed)
@@ -23,3 +27,57 @@ ACCESS_FINE_LOCATION
 READ_PHONE_STATE
 RECEIVE_SMS
 WRITE_EXTERNAL_STORAGE
+
+
+
+
+
+com.samsung.intent.action.MAX_BRIGHTNESS_CHANGED
+android.media.RINGER_MODE_CHANGED
+android.intent.action.HDMI_PLUGGED
+android.media.MASTER_MUTE_CHANGED_ACTION
+android.intent.action.SIM_STATE_CHANGED
+android.intent.action.TWILIGHT_CHANGED
+android.intent.action.SERVICE_STATE
+com.google.android.gms.gcm.ACTION_HEARTBEAT_NOW
+com.google.android.intent.action.MCS_HEARTBEAT
+com.google.android.gms.gcm.HEARTBEAT_ALARM
+android.intent.action.USER_SWITCHED
+android.intent.action.USER_REMOVED
+android.intent.action.USER_ADDED
+android.intent.action.LTE_BAND
+
+Action: "com.samsung.android.app.shealth.intent.action.SPORT_WORKOUT_STARTED"
+      Action: "com.samsung.android.app.shealth.intent.action.SPORT_WORKOUT_STOPPED"
+      Action: "com.samsung.android.app.shealth.intent.action.WORKOUT_STATUS_CHANGED"
+      Action: "com.samsung.android.app.shealth.intent.action.LOCATION_STATUS_CHANGED"
+      Action: "com.samsung.android.health.wearable.data.CONNECTION_STATUS_CHANGE"
+
+      Action: "com.samsung.systemui.statusbar.COLLAPSED"
+            Action: "com.samsung.systemui.statusbar.EXPANDED"
+            Action: "com.sec.app.screenrecorder.on"
+            Action: "com.sec.app.screenrecorder.off"
+
+      Action: "android.nfc.action.ADAPTER_STATE_CHANGED"
+
+      Action: "com.samsung.ssrm.RESOLUTION_CHANGED"
+
+      Action: "com.android.systemui.LOGOUT_USER"
+
+      Action: "com.samsung.settings.FONT_SIZE_CHANGED"
+      android.hardware.usb.action.USB_STATE
+
+      Action: "android.app.action.ENTER_CAR_MODE"
+            Action: "android.app.action.EXIT_CAR_MODE"
+      Action: "android.os.action.POWER_SAVE_MODE_CHANGED"
+      android.intent.action.SERVICE_STATE
+      Action: "com.samsung.android.net.wifi.WIFI_AP_CHANNEL_CHANGED"
+      android.bluetooth.headset.profile.action.CONNECTION_STATE_CHANGED
+      Action: "android.intent.action.DOCK_EVENT"
+      android.hardware.usb.action.USB_DEVICE_ATTACHED
+      Action: "com.samsung.intent.action.SIMHOTSWAP"
+
+
+      Action: "(.+\.[A-Z]{1}.+)"
+
+      ^((?!Action:).)*$
