@@ -1,54 +1,57 @@
 <?xml version="1.0" encoding="utf-8"?>
-
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:orientation="vertical"
-              android:layout_width="match_parent"
-              android:layout_height="wrap_content"
-    android:padding="15dp"
-    >
-
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/tvTimestamp"
-        android:drawableLeft="@drawable/ic_action_timestamp"
-
-        android:gravity="center_vertical"/>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="3dp">
+        android:orientation="vertical"
+        android:padding="15dp">
 
         <TextView
-            android:layout_width="5dp"
-            android:layout_height="wrap_content"
-            android:id="@+id/tvEventLevelColor"
-            android:background="@color/red"
-            android:layout_marginLeft="14dp"/>
-
-        <TextView
+            android:id="@+id/tvTimestamp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/tvEventLevelText"
-            android:layout_marginLeft="14dp"/>
+            android:drawableLeft="@drawable/ic_action_timestamp"
+
+            android:gravity="center_vertical" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="3dp">
+
+            <TextView
+                android:id="@+id/tvEventLevelColor"
+                android:layout_width="5dp"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="14dp"
+                android:background="@color/red" />
+
+            <TextView
+                android:id="@+id/tvEventLevelText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="14dp" />
+
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/tvEventDetails"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="3dp"
+            android:drawableLeft="@drawable/ic_action_info"
+            android:gravity="center_vertical"
+            android:text="@string/event_details" />
+
+        <TextView
+            android:id="@+id/tvLongDesc"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="32dp"
+            android:gravity="center_vertical" />
 
     </LinearLayout>
-
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:drawableLeft="@drawable/ic_action_info"
-        android:layout_marginTop="3dp"
-        android:text="@string/event_details"
-        android:gravity="center_vertical"
-        android:id="@+id/tvEventDetails"/>
-
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center_vertical"
-        android:layout_marginLeft="32dp"
-        android:id="@+id/tvLongDesc"/>
-
-</LinearLayout>
+</ScrollView>

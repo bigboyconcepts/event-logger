@@ -265,5 +265,9 @@
 	<string name="developer_text"><![CDATA[•<b>pedja1</b> - Predrag Čokulov]]></string>
     <string name="active_app_check_interval">Active Application Check Interval</string>
     <string name="invalid_event">Event is not valid!</string>
+    <string name="arbitary_event_template" ><![CDATA[Bundle extras from this broadcast<br>
+                •Action: %s<br>
+                •Extras:<br><br><pre>%s</pre>]]></string>
+    <string name="intent_extra_template"><![CDATA[<b>Key:</b> \'%s\', <b>Value:</b> \'%s\', <b>Value Class:</b> \'%s\']]></string>
 
 </resources>

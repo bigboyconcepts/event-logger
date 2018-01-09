@@ -18,14 +18,19 @@ import android.support.annotation.RequiresApi;
 import android.telephony.TelephonyManager;
 import android.util.Log;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -37,7 +42,6 @@ import rs.pedjaapps.eventlogger.constants.Constants;
 import rs.pedjaapps.eventlogger.constants.EventLevel;
 import rs.pedjaapps.eventlogger.constants.EventType;
 import rs.pedjaapps.eventlogger.model.Event;
-import rs.pedjaapps.eventlogger.model.EventDao;
 import rs.pedjaapps.eventlogger.model.Icon;
 import rs.pedjaapps.eventlogger.receiver.AllReceiver;
 import rs.pedjaapps.eventlogger.receiver.EventReceiver;
@@ -181,6 +185,24 @@ public class EventService extends Service
             e.printStackTrace();
         }
 
+        try {
+            Process p = Runtime.getRuntime().exec("dumpsys activity b");
+            BufferedReader r = new BufferedReader(new InputStreamReader(p.getInputStream()));
+
+            Set<String> actionsDumpsys = new HashSet<>();
+
+            String line;
+            while ((line = r.readLine()) != null) {
+
+                if(line.startsWith("      Action:")) {
+                line = line.substring(15, line.length() - 1);
+                    actionsDumpsys.add(line);
+                }
+            }
+            System.out.println("dumpsys" + Arrays.toString(actionsDumpsys.toArray()));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
         super.onCreate();
     }

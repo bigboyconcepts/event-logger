@@ -42,7 +42,6 @@ import com.crashlytics.android.Crashlytics;
 import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
-import com.google.android.gms.ads.InterstitialAd;
 
 import org.greenrobot.greendao.query.LazyList;
 import org.greenrobot.greendao.query.QueryBuilder;
@@ -70,7 +69,6 @@ import rs.pedjaapps.eventlogger.iab.IabResult;
 import rs.pedjaapps.eventlogger.iab.Inventory;
 import rs.pedjaapps.eventlogger.iab.Purchase;
 import rs.pedjaapps.eventlogger.model.Event;
-import rs.pedjaapps.eventlogger.model.EventDao;
 import rs.pedjaapps.eventlogger.model.NDItem;
 import rs.pedjaapps.eventlogger.service.EventService;
 import rs.pedjaapps.eventlogger.utility.Android;

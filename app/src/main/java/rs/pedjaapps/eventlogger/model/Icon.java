@@ -14,7 +14,7 @@ public class Icon {
     private Long id;
     private byte[] icon;
 
-    @Generated
+    @Generated(hash = 1790162963)
     public Icon() {
     }
 
@@ -22,7 +22,7 @@ public class Icon {
         this.id = id;
     }
 
-    @Generated
+    @Generated(hash = 283766193)
     public Icon(Long id, byte[] icon) {
         this.id = id;
         this.icon = icon;

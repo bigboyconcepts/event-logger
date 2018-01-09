@@ -81,3 +81,5 @@ Action: "com.samsung.android.app.shealth.intent.action.SPORT_WORKOUT_STARTED"
       Action: "(.+\.[A-Z]{1}.+)"
 
       ^((?!Action:).)*$
+
+      adb shell dumpsys activity b | grep "      Action:" | cut -c16- | rev | cut -c2- | rev

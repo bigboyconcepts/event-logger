@@ -34,23 +34,20 @@ public class Event implements Parcelable {
     private Long icon_id;
 
     /** Used to resolve relations */
-    @Generated
+    @Generated(hash = 2040040024)
     private transient DaoSession daoSession;
 
     /** Used for active entity operations. */
-    @Generated
+    @Generated(hash = 1542254534)
     private transient EventDao myDao;
 
     @ToOne(joinProperty = "icon_id")
     private Icon icon;
 
-    @Generated
+    @Generated(hash = 1941781955)
     private transient Long icon__resolvedKey;
 
-    // KEEP FIELDS - put your custom fields here
-    // KEEP FIELDS END
-
-    @Generated
+    @Generated(hash = 344677835)
     public Event() {
     }
 
@@ -58,8 +55,8 @@ public class Event implements Parcelable {
         this.id = id;
     }
 
-    @Generated
-    public Event(Long id, java.util.Date timestamp, String short_desc, String long_desc, int type, int level, Long icon_id) {
+    @Generated(hash = 1709928360)
+    public Event(Long id, @NotNull java.util.Date timestamp, String short_desc, String long_desc, int type, int level, Long icon_id) {
         this.id = id;
         this.timestamp = timestamp;
         this.short_desc = short_desc;
@@ -70,7 +67,7 @@ public class Event implements Parcelable {
     }
 
     /** called by internal mechanisms, do not call yourself. */
-    @Generated
+    @Generated(hash = 1459865304)
     public void __setDaoSession(DaoSession daoSession) {
         this.daoSession = daoSession;
         myDao = daoSession != null ? daoSession.getEventDao() : null;
@@ -135,22 +132,26 @@ public class Event implements Parcelable {
     }
 
     /** To-one relationship, resolved on first access. */
-    @Generated
+    @Generated(hash = 2034234485)
     public Icon getIcon() {
         Long __key = this.icon_id;
         if (icon__resolvedKey == null || !icon__resolvedKey.equals(__key)) {
-            __throwIfDetached();
+            final DaoSession daoSession = this.daoSession;
+            if (daoSession == null) {
+                throw new DaoException("Entity is detached from DAO context");
+            }
             IconDao targetDao = daoSession.getIconDao();
             Icon iconNew = targetDao.load(__key);
             synchronized (this) {
                 icon = iconNew;
-            	icon__resolvedKey = __key;
+                icon__resolvedKey = __key;
             }
         }
         return icon;
     }
 
-    @Generated
+    /** called by internal mechanisms, do not call yourself. */
+    @Generated(hash = 1539831925)
     public void setIcon(Icon icon) {
         synchronized (this) {
             this.icon = icon;
@@ -160,44 +161,40 @@ public class Event implements Parcelable {
     }
 
     /**
-    * Convenient call for {@link org.greenrobot.greendao.AbstractDao#delete(Object)}.
-    * Entity must attached to an entity context.
-    */
-    @Generated
+     * Convenient call for {@link org.greenrobot.greendao.AbstractDao#delete(Object)}.
+     * Entity must attached to an entity context.
+     */
+    @Generated(hash = 128553479)
     public void delete() {
-        __throwIfDetached();
+        if (myDao == null) {
+            throw new DaoException("Entity is detached from DAO context");
+        }
         myDao.delete(this);
     }
 
     /**
-    * Convenient call for {@link org.greenrobot.greendao.AbstractDao#update(Object)}.
-    * Entity must attached to an entity context.
-    */
-    @Generated
+     * Convenient call for {@link org.greenrobot.greendao.AbstractDao#update(Object)}.
+     * Entity must attached to an entity context.
+     */
+    @Generated(hash = 713229351)
     public void update() {
-        __throwIfDetached();
+        if (myDao == null) {
+            throw new DaoException("Entity is detached from DAO context");
+        }
         myDao.update(this);
     }
 
     /**
-    * Convenient call for {@link org.greenrobot.greendao.AbstractDao#refresh(Object)}.
-    * Entity must attached to an entity context.
-    */
-    @Generated
+     * Convenient call for {@link org.greenrobot.greendao.AbstractDao#refresh(Object)}.
+     * Entity must attached to an entity context.
+     */
+    @Generated(hash = 1942392019)
     public void refresh() {
-        __throwIfDetached();
-        myDao.refresh(this);
-    }
-
-    @Generated
-    private void __throwIfDetached() {
         if (myDao == null) {
             throw new DaoException("Entity is detached from DAO context");
         }
+        myDao.refresh(this);
     }
-
-    // KEEP METHODS - put your custom methods here
-
 
     @Override
     public int describeContents()
@@ -254,6 +251,5 @@ public class Event implements Parcelable {
                 ", level=" + level +
                 '}';
     }
-    // KEEP METHODS END
 
 }

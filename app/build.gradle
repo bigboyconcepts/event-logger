@@ -7,10 +7,12 @@ buildscript {
     dependencies {
         classpath 'com.android.tools.build:gradle:3.0.1'
         classpath 'io.fabric.tools:gradle:1.+'
+        classpath 'org.greenrobot:greendao-gradle-plugin:3.2.2'
     }
 }
 apply plugin: 'com.android.application'
 apply plugin: 'io.fabric'
+apply plugin: 'org.greenrobot.greendao'
 
 repositories {
     jcenter()
@@ -61,6 +63,10 @@ android {
     sourceSets.main.jniLibs.srcDirs = ['src/main/libs']
 }
 
+greendao {
+    schemaVersion 4
+}
+
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     compile 'com.google.android.gms:play-services-ads:11.8.0'
@@ -69,7 +75,7 @@ dependencies {
     compile('com.crashlytics.sdk.android:crashlytics:2.5.5@aar') {
         transitive = true
     }
-    compile 'org.greenrobot:greendao:3.2.0'
+    compile 'org.greenrobot:greendao:3.2.2'
     compile 'com.nostra13.universalimageloader:universal-image-loader:1.9.4'
     compile 'net.sf.opencsv:opencsv:2.3'
 }
