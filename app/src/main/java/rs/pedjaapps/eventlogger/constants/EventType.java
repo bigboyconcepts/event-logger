@@ -8,7 +8,7 @@ import rs.pedjaapps.eventlogger.R;
 public enum EventType
 {
     wifi, bluetooth, nfc, gps, mobile, media, usb, orientation, locale, screen, sms, app, call, headset,
-    storage, boot, time, airplane, battery, wallpaper, volume, date, pckg;
+    storage, boot, time, airplane, battery, wallpaper, volume, date, pckg, general;
 
     public static int getIconForType(EventType type)
     {

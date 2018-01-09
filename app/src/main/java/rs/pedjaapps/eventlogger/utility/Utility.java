@@ -238,7 +238,7 @@ public class Utility
         StringBuilder sb = new StringBuilder();
         while ((read = br.readLine()) != null)
         {
-            sb.append(read);
+            sb.append(read).append("\n");
         }
         return sb.toString();
     }

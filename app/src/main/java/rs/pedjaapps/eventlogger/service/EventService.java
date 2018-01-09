@@ -22,7 +22,6 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
@@ -40,6 +39,7 @@ import rs.pedjaapps.eventlogger.constants.EventType;
 import rs.pedjaapps.eventlogger.model.Event;
 import rs.pedjaapps.eventlogger.model.EventDao;
 import rs.pedjaapps.eventlogger.model.Icon;
+import rs.pedjaapps.eventlogger.receiver.AllReceiver;
 import rs.pedjaapps.eventlogger.receiver.EventReceiver;
 import rs.pedjaapps.eventlogger.utility.SettingsManager;
 import rs.pedjaapps.eventlogger.utility.Utility;
@@ -66,6 +66,7 @@ public class EventService extends Service
     public static final int AID_USER = 100000;
 
     private EventReceiver manualRegisterReceiver;
+    private AllReceiver allReceiver;
     private String lastActiveApp = "";
     Handler handler;
     private Runnable appLaunchChecker;
@@ -163,6 +164,24 @@ public class EventService extends Service
         thread.start();
         handler = new Handler(thread.getLooper());
         handler.postDelayed(appLaunchChecker, SettingsManager.getActiveAppCheckInterval());
+
+        try
+        {
+            String[] actions = Utility.readRawFile(R.raw.broadcast_actions).split("\n");
+            intentFilter = new IntentFilter();
+
+            for(String action : actions)
+                intentFilter.addAction(action.trim());
+
+            allReceiver = new AllReceiver();
+            registerReceiver(allReceiver, intentFilter);
+        }
+        catch (IOException e)
+        {
+            e.printStackTrace();
+        }
+
+
         super.onCreate();
     }
 
