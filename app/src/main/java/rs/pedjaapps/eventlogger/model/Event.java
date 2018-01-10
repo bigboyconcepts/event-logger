@@ -66,13 +66,6 @@ public class Event implements Parcelable {
         this.icon_id = icon_id;
     }
 
-    /** called by internal mechanisms, do not call yourself. */
-    @Generated(hash = 1459865304)
-    public void __setDaoSession(DaoSession daoSession) {
-        this.daoSession = daoSession;
-        myDao = daoSession != null ? daoSession.getEventDao() : null;
-    }
-
     public Long getId() {
         return id;
     }
@@ -250,6 +243,13 @@ public class Event implements Parcelable {
                 ", type=" + type +
                 ", level=" + level +
                 '}';
+    }
+
+    /** called by internal mechanisms, do not call yourself. */
+    @Generated(hash = 1459865304)
+    public void __setDaoSession(DaoSession daoSession) {
+        this.daoSession = daoSession;
+        myDao = daoSession != null ? daoSession.getEventDao() : null;
     }
 
 }

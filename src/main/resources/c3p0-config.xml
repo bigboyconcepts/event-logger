@@ -1,6 +1,0 @@
-<c3p0-config>
-    <default-config>
-        <property name="testConnectionOnCheckout">true</property>
-        <property name="preferredTestQuery">SELECT 1;</property>
-    </default-config>
-</c3p0-config>

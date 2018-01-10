@@ -19,20 +19,16 @@ import android.telephony.TelephonyManager;
 import android.util.Log;
 
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import rs.pedjaapps.eventlogger.BuildConfig;
 import rs.pedjaapps.eventlogger.MainApp;
@@ -41,7 +37,9 @@ import rs.pedjaapps.eventlogger.ServiceRestartActivity;
 import rs.pedjaapps.eventlogger.constants.Constants;
 import rs.pedjaapps.eventlogger.constants.EventLevel;
 import rs.pedjaapps.eventlogger.constants.EventType;
+import rs.pedjaapps.eventlogger.model.BroadcastAction;
 import rs.pedjaapps.eventlogger.model.Event;
+import rs.pedjaapps.eventlogger.model.EventDao;
 import rs.pedjaapps.eventlogger.model.Icon;
 import rs.pedjaapps.eventlogger.receiver.AllReceiver;
 import rs.pedjaapps.eventlogger.receiver.EventReceiver;
@@ -53,27 +51,10 @@ import rs.pedjaapps.eventlogger.utility.Utility;
  */
 public class EventService extends Service
 {
-    /*2:cpu:/apps1:cpuacct:/uid_10001/pid_1249
-2:cpu:/1:cpuacct:/
-2:cpu:/apps1:cpuacct:/
-2:cpu:/apps/bg_non_interactive1:cpuacct:/uid_10039/pid_861*/
-    private static final Pattern PROC_CGROUP_PATTERN = Pattern.compile(".*/uid_(\\d+)/pid_(\\d+)");
-    private static final Matcher CGROUP_MATCHER = PROC_CGROUP_PATTERN.matcher("");
-    /**
-     * first app user
-     */
-    public static final int AID_APP = 10000;
-
-    /**
-     * offset for uid ranges for each user
-     */
-    public static final int AID_USER = 100000;
-
+    public static final long DUMPSYS_CHECK_INTERVAL = 60 * 60 * 1000;
     private EventReceiver manualRegisterReceiver;
-    private AllReceiver allReceiver;
     private String lastActiveApp = "";
-    Handler handler;
-    private Runnable appLaunchChecker;
+    private Handler handler;
 
     @Override
     public IBinder onBind(Intent intent)
@@ -147,6 +128,7 @@ public class EventService extends Service
         manualRegisterReceiver = new EventReceiver();
         registerReceiver(manualRegisterReceiver, intentFilter);
 
+        Runnable appLaunchChecker;
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP)
         {
             appLaunchChecker = new AppLaunchCheckerLegacy();
@@ -154,10 +136,6 @@ public class EventService extends Service
         else if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP_MR1)
         {
             appLaunchChecker = new AppLaunchCheckerLP();
-        }
-        else if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N)
-        {
-            appLaunchChecker = new AppLaunchCheckerLPMR1();
         }
         else
         {
@@ -169,40 +147,8 @@ public class EventService extends Service
         handler = new Handler(thread.getLooper());
         handler.postDelayed(appLaunchChecker, SettingsManager.getActiveAppCheckInterval());
 
-        try
-        {
-            String[] actions = Utility.readRawFile(R.raw.broadcast_actions).split("\n");
-            intentFilter = new IntentFilter();
-
-            for(String action : actions)
-                intentFilter.addAction(action.trim());
-
-            allReceiver = new AllReceiver();
-            registerReceiver(allReceiver, intentFilter);
-        }
-        catch (IOException e)
-        {
-            e.printStackTrace();
-        }
-
-        try {
-            Process p = Runtime.getRuntime().exec("dumpsys activity b");
-            BufferedReader r = new BufferedReader(new InputStreamReader(p.getInputStream()));
-
-            Set<String> actionsDumpsys = new HashSet<>();
-
-            String line;
-            while ((line = r.readLine()) != null) {
-
-                if(line.startsWith("      Action:")) {
-                line = line.substring(15, line.length() - 1);
-                    actionsDumpsys.add(line);
-                }
-            }
-            System.out.println("dumpsys" + Arrays.toString(actionsDumpsys.toArray()));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        Runnable dumpsysChecker = new DumpsysChecker();
+        handler.post(dumpsysChecker);
 
         super.onCreate();
     }
@@ -244,7 +190,7 @@ public class EventService extends Service
                     }
                 }
             }
-            handler.postDelayed(appLaunchChecker, SettingsManager.getActiveAppCheckInterval());
+            handler.postDelayed(this, SettingsManager.getActiveAppCheckInterval());
         }
     }
 
@@ -300,37 +246,7 @@ public class EventService extends Service
                     EventReceiver.sendLocalBroadcast(event);
                 }
             }
-            handler.postDelayed(appLaunchChecker, SettingsManager.getActiveAppCheckInterval());
-        }
-    }
-
-    private class AppLaunchCheckerLPMR1 implements Runnable
-    {
-        @Override
-        public void run()
-        {
-            String packageName = getForegroundAppByParsingProc();
-            System.out.println(packageName);
-            if (packageName != null && !lastActiveApp.equals(packageName))
-            {
-                lastActiveApp = packageName;
-                String appName = Utility.getNameForPackage(EventService.this, packageName);
-
-                Event event = new Event();
-                event.setTimestamp(new Date());
-                event.setLevel(EventLevel.getIntForLevel(EventLevel.info));
-                event.setType(EventType.getIntForType(EventType.app));
-                event.setShort_desc(getString(R.string.app_started, appName));
-                event.setLong_desc(getString(R.string.app_started_desc, appName, packageName));
-                Icon icon = new Icon();
-                icon.setIcon(Utility.getApplicationIcon(EventService.this, packageName));
-                long iconId = MainApp.getInstance().getDaoSession().getIconDao().insert(icon);
-                event.setIcon_id(iconId);
-                EventDao eventDao = MainApp.getInstance().getDaoSession().getEventDao();
-                eventDao.insert(event);
-                EventReceiver.sendLocalBroadcast(event);
-            }
-            handler.postDelayed(appLaunchChecker, SettingsManager.getActiveAppCheckInterval());
+            handler.postDelayed(this, SettingsManager.getActiveAppCheckInterval());
         }
     }
 
@@ -345,10 +261,13 @@ public class EventService extends Service
             UsageStatsManager usageStatsManager = (UsageStatsManager) EventService.this.getSystemService(Context.USAGE_STATS_SERVICE);
             List<UsageStats> usageStatsList = usageStatsManager.queryUsageStats(UsageStatsManager.INTERVAL_BEST, now - SettingsManager.getActiveAppCheckInterval(), now);
 
-            if(!usageStatsList.isEmpty()) {
-                Collections.sort(usageStatsList, new Comparator<UsageStats>() {
+            if (!usageStatsList.isEmpty())
+            {
+                Collections.sort(usageStatsList, new Comparator<UsageStats>()
+                {
                     @Override
-                    public int compare(UsageStats o1, UsageStats o2) {
+                    public int compare(UsageStats o1, UsageStats o2)
+                    {
                         return Long.compare(o2.getLastTimeUsed(), o1.getLastTimeUsed());
                     }
                 });
@@ -376,114 +295,59 @@ public class EventService extends Service
                 }
             }
 
-            handler.postDelayed(appLaunchChecker, SettingsManager.getActiveAppCheckInterval());
+            handler.postDelayed(this, SettingsManager.getActiveAppCheckInterval());
         }
     }
 
-    public static String getForegroundAppByParsingProc()
+    private class DumpsysChecker implements Runnable
     {
-        File[] files = new File("/proc").listFiles();
-        int lowestOomScore = Integer.MAX_VALUE;
-        String foregroundProcess = null;
-
-        for (File file : files)
+        @Override
+        public void run()
         {
-            if (!file.isDirectory())
+            List<BroadcastAction> actions = MainApp.getInstance().getDaoSession().getBroadcastActionDao().loadAll();
+            if(actions.isEmpty())
             {
-                continue;
-            }
 
-            int pid;
+            }
             try
             {
-                pid = Integer.parseInt(file.getName());
-            }
-            catch (NumberFormatException e)
-            {
-                continue;
-            }
+                Process p = Runtime.getRuntime().exec("dumpsys activity b");
+                BufferedReader r = new BufferedReader(new InputStreamReader(p.getInputStream()));
 
-            try
-            {
-                String cgroup = Utility.readFileToString(String.format("/proc/%d/cgroup", pid));
+                Set<String> actionsDumpsys = new HashSet<>();
 
-                if (cgroup.contains("bg_non_interactive"))
+                String line;
+                while ((line = r.readLine()) != null)
                 {
-                    // background policy
-                    continue;
-                }
-
-                CGROUP_MATCHER.reset(cgroup);
-                if(!CGROUP_MATCHER.find())
-                {
-                    continue;
-                }
-
-                String cmdline = Utility.readFileToString(String.format("/proc/%d/cmdline", pid));
-
-                if (cmdline.contains("com.android.systemui") || cmdline.contains("android.process.acore"))
-                {
-                    continue;
-                }
-
-                int uid = Integer.parseInt(CGROUP_MATCHER.group(1));
-                if (uid >= 1000 && uid <= 1038)
-                {
-                    // system process
-                    continue;
-                }
-
-                int appId = uid - AID_APP;
-                int userId = 0;
-                // loop until we get the correct user id.
-                // 100000 is the offset for each user.
-                while (appId > AID_USER)
-                {
-                    appId -= AID_USER;
-                    userId++;
-                }
-
-                if (appId < 0)
-                {
-                    continue;
-                }
-
-                // u{user_id}_a{app_id} is used on API 17+ for multiple user account support.
-                // String uidName = String.format("u%d_a%d", userId, appId);
-
-                File oomScoreAdj = new File(String.format("/proc/%d/oom_score_adj", pid));
-                if (oomScoreAdj.canRead())
-                {
-                    int oomAdj = Integer.parseInt(Utility.readFileToString(oomScoreAdj.getAbsolutePath()));
-                    if (oomAdj != 0)
+                    if (line.startsWith("      Action:"))
                     {
-                        continue;
+                        line = line.substring(15, line.length() - 1);
+                        actionsDumpsys.add(line);
                     }
                 }
-
-                int oomscore = Integer.parseInt(Utility.readFileToString(String.format("/proc/%d/oom_score", pid)));
-                if (oomscore < lowestOomScore)
-                {
-                    lowestOomScore = oomscore;
-                    foregroundProcess = cmdline;
-                }
-
             }
             catch (IOException e)
             {
-                if (BuildConfig.DEBUG) e.printStackTrace();
+                e.printStackTrace();
             }
+
+            try
+            {
+                String[] actions = Utility.readRawFile(R.raw.broadcast_actions).split("\n");
+                IntentFilter intentFilter = new IntentFilter();
+
+                for (String action : actions)
+                    intentFilter.addAction(action.trim());
+
+                AllReceiver allReceiver = new AllReceiver();
+                registerReceiver(allReceiver, intentFilter);
+            }
+            catch (IOException e)
+            {
+                e.printStackTrace();
+            }
+            handler.postDelayed(this, DUMPSYS_CHECK_INTERVAL);
         }
-
-        if(foregroundProcess != null)
-            foregroundProcess = foregroundProcess.trim();
-
-        if(foregroundProcess != null && foregroundProcess.contains(":"))
-        {
-            foregroundProcess = foregroundProcess.split(":")[0];
-        }
-
-        return foregroundProcess;
     }
 
     @Override
