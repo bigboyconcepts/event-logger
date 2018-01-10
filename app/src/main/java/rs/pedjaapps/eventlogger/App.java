@@ -2,9 +2,9 @@ package rs.pedjaapps.eventlogger;
 
 import android.app.Activity;
 import android.app.Application;
-import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
+import android.os.AsyncTask;
 
 import com.crashlytics.android.Crashlytics;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
@@ -15,16 +15,16 @@ import io.fabric.sdk.android.Fabric;
 import rs.pedjaapps.eventlogger.constants.Constants;
 import rs.pedjaapps.eventlogger.model.DaoMaster;
 import rs.pedjaapps.eventlogger.model.DaoSession;
+import rs.pedjaapps.eventlogger.utility.BroadcastActionsManager;
 import rs.pedjaapps.eventlogger.utility.DatabaseHelper;
 import rs.pedjaapps.eventlogger.utility.SqliteImageLoader;
 
 /**
  * Created by pedja on 10/8/13.
  */
-public class MainApp extends Application
+public class App extends Application
 {
-    private static  MainApp mainApp = null;
-    private static Context context;
+    private static App app = null;
 
     private Activity foregroundActivity = null;
 
@@ -32,9 +32,9 @@ public class MainApp extends Application
 
     private DisplayImageOptions defaultDisplayImageOptions;
 
-    public static MainApp getInstance()
+    public static App getInstance()
     {
-        return mainApp;
+        return app;
     }
 
     @Override
@@ -49,8 +49,7 @@ public class MainApp extends Application
 		{
 			//Crashlytics.logException(e);
 		}
-        context = this.getApplicationContext();
-        mainApp = this;
+        app = this;
 
         /*if (AppData.LOGGING)
         {
@@ -83,20 +82,17 @@ public class MainApp extends Application
                 .build();
         ImageLoader.getInstance().init(config);
 		
-		DaoMaster.OpenHelper helper = new DatabaseHelper(context, Constants.DB_NAME, null);
+		DaoMaster.OpenHelper helper = new DatabaseHelper(this, Constants.DB_NAME, null);
 		SQLiteDatabase db = helper.getWritableDatabase();
 		DaoMaster daoMaster = new DaoMaster(db);
 		daoSession = daoMaster.newSession();
+
+        new ATImportActions().execute();
     }
 
     public DaoSession getDaoSession()
     {
         return daoSession;
-    }
-
-    public static Context getContext()
-    {
-        return context;
     }
 
     public Activity getForegroundActivity()
@@ -112,5 +108,15 @@ public class MainApp extends Application
     public DisplayImageOptions getDefaultDisplayImageOptions()
     {
         return defaultDisplayImageOptions;
+    }
+
+    public static class ATImportActions extends AsyncTask<Void, Void, Void>
+    {
+        @Override
+        protected Void doInBackground(Void... voids) {
+
+            BroadcastActionsManager.getInstance().importBundledActions();
+            return null;
+        }
     }
 }

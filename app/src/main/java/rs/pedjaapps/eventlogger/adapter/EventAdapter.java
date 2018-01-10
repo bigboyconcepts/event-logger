@@ -16,7 +16,7 @@ import java.text.DateFormat;
 import java.util.List;
 import java.util.Locale;
 
-import rs.pedjaapps.eventlogger.MainApp;
+import rs.pedjaapps.eventlogger.App;
 import rs.pedjaapps.eventlogger.R;
 import rs.pedjaapps.eventlogger.constants.EventLevel;
 import rs.pedjaapps.eventlogger.model.Event;
@@ -68,7 +68,7 @@ public class EventAdapter extends ArrayAdapter<Event>
 			holder.tvTimestamp.setText(format.format(event.getTimestamp()));
 		}
 
-        DisplayImageOptions dio = new DisplayImageOptions.Builder().cloneFrom(MainApp.getInstance().getDefaultDisplayImageOptions()).extraForDownloader(event.getIcon_id()).build();
+        DisplayImageOptions dio = new DisplayImageOptions.Builder().cloneFrom(App.getInstance().getDefaultDisplayImageOptions()).extraForDownloader(event.getIcon_id()).build();
         ImageLoader.getInstance().displayImage("db://" + event.getId(), holder.ivType, dio);
 
         return convertView;

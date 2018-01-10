@@ -4,7 +4,6 @@
     <string name="app_name">Event Logger</string>
     <string name="app_name_pro">Event Logger Pro</string>
     <string name="app_name_pro_styled"><![CDATA[Event Logger <font color="#00B0FF">Pro</font>]]></string>
-    <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
     <string name="wifi_state_changed" formatted="false"><![CDATA[WiFi State Changed: <font color="%s">[%s]</font>]]></string>
     <string name="disabled_upper">DISABLED</string>
@@ -269,5 +268,7 @@
                 •Action: %s<br>
                 •Extras:<br><br><pre>%s</pre>]]></string>
     <string name="intent_extra_template"><![CDATA[<b>Key:</b> \'%s\', <b>Value:</b> \'%s\', <b>Value Class:</b> \'%s\']]></string>
+    <string name="log_all_broadcasts">Log all broadcasts</string>
+    <string name="log_all_broadcasts_desc">Logs all implicit roadcasts, will probably use more battery</string>
 
 </resources>

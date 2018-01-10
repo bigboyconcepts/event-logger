@@ -30,7 +30,7 @@ import java.security.NoSuchAlgorithmException;
 import java.text.DecimalFormat;
 import java.util.Date;
 
-import rs.pedjaapps.eventlogger.MainApp;
+import rs.pedjaapps.eventlogger.App;
 import rs.pedjaapps.eventlogger.R;
 import rs.pedjaapps.eventlogger.constants.Constants;
 
@@ -183,35 +183,35 @@ public class Utility
 
         if (minutes <= 0)
         {
-            return MainApp.getContext().getString(R.string.now);
+            return App.getInstance().getString(R.string.now);
         }
         else if (minutes < 60)
         {
-            return minutes + MainApp.getContext().getString(R.string.minut);
+            return minutes + App.getInstance().getString(R.string.minut);
         }
         else if (hours < 24)
         {
-            return hours + MainApp.getContext().getString(R.string.hour);
+            return hours + App.getInstance().getString(R.string.hour);
         }
         else if (days < 7)
         {
-            return days + MainApp.getContext().getString(R.string.day);
+            return days + App.getInstance().getString(R.string.day);
         }
         else if (weeks < 4)
         {
-            return weeks + MainApp.getContext().getString(R.string.week);
+            return weeks + App.getInstance().getString(R.string.week);
         }
         else if (months < 12)
         {
-            return months + MainApp.getContext().getString(R.string.month);
+            return months + App.getInstance().getString(R.string.month);
         }
         else if (years < 30)
         {
-            return years + MainApp.getContext().getString(R.string.year);
+            return years + App.getInstance().getString(R.string.year);
         }
         else
         {
-            return MainApp.getContext().getString(R.string._);
+            return App.getInstance().getString(R.string._);
         }
     }
 
@@ -230,15 +230,29 @@ public class Utility
      * @param rawResId of the file
      * @return Content of the file as string
      */
-    public static String readRawFile(int rawResId) throws IOException
+    public static String readRawFile(int rawResId)
     {
-        InputStream is = MainApp.getContext().getResources().openRawResource(rawResId);
-        BufferedReader br = new BufferedReader(new InputStreamReader(is));
-        String read;
         StringBuilder sb = new StringBuilder();
-        while ((read = br.readLine()) != null)
-        {
-            sb.append(read).append("\n");
+        BufferedReader br = null;
+        try {
+            InputStream is = App.getInstance().getResources().openRawResource(rawResId);
+            br = new BufferedReader(new InputStreamReader(is));
+            String read;
+            while ((read = br.readLine()) != null)
+            {
+                sb.append(read).append("\n");
+            }
+        } catch (IOException e) {
+            Log.e(Constants.LOG_TAG, e.getMessage(), e);
+            return "";
+        }
+        finally {
+            try {
+                if(br != null)
+                    br.close();
+            } catch (IOException ignore) {
+
+            }
         }
         return sb.toString();
     }

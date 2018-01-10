@@ -69,6 +69,7 @@ import rs.pedjaapps.eventlogger.iab.IabResult;
 import rs.pedjaapps.eventlogger.iab.Inventory;
 import rs.pedjaapps.eventlogger.iab.Purchase;
 import rs.pedjaapps.eventlogger.model.Event;
+import rs.pedjaapps.eventlogger.model.EventDao;
 import rs.pedjaapps.eventlogger.model.NDItem;
 import rs.pedjaapps.eventlogger.service.EventService;
 import rs.pedjaapps.eventlogger.utility.Android;
@@ -773,7 +774,7 @@ public class MainActivity extends AbsActivity implements AdapterView.OnItemClick
 
                 csvWrite = new CSVWriter(new FileWriter(file));
 
-                EventDao eventDao = MainApp.getInstance().getDaoSession().getEventDao();
+                EventDao eventDao = App.getInstance().getDaoSession().getEventDao();
                 LazyList<Event> events = eventDao.queryBuilder().listLazyUncached();
 
                 // this is the Column of the table and same for Header of CSV file

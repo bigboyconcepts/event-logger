@@ -7,7 +7,7 @@ import android.preference.PreferenceManager;
 import java.util.Date;
 
 import rs.pedjaapps.eventlogger.BuildConfig;
-import rs.pedjaapps.eventlogger.MainApp;
+import rs.pedjaapps.eventlogger.App;
 import rs.pedjaapps.eventlogger.constants.Constants;
 
 /**
@@ -16,9 +16,9 @@ import rs.pedjaapps.eventlogger.constants.Constants;
 public class SettingsManager
 {
     private static final RandomString rs = new RandomString(32);
-    public static SharedPreferences prefsDefault = PreferenceManager.getDefaultSharedPreferences(MainApp.getContext());
-    public static SharedPreferences prefsFilter = MainApp.getContext().getSharedPreferences(Constants.PREFS_FILTER, Activity.MODE_PRIVATE);
-    public static SharedPreferences prefsLicence = MainApp.getContext().getSharedPreferences(Constants.PREFS_LICENCE, Activity.MODE_PRIVATE);
+    public static SharedPreferences prefsDefault = PreferenceManager.getDefaultSharedPreferences(App.getInstance());
+    public static SharedPreferences prefsFilter = App.getInstance().getSharedPreferences(Constants.PREFS_FILTER, Activity.MODE_PRIVATE);
+    public static SharedPreferences prefsLicence = App.getInstance().getSharedPreferences(Constants.PREFS_LICENCE, Activity.MODE_PRIVATE);
 
     public enum Key
     {
@@ -26,7 +26,7 @@ public class SettingsManager
         type_filter_enabled, level_filter_enabled, filter_time_from, filter_time_to, filter_level_error,
         filter_level_warning, filter_level_info, filter_level_ok, show_remove_ads, filter_types, time_display,
         items_display_limit, is_pro("74547660a2b3f21f12eff07d3543bc9b23b1dcaf"), icon_changed, lock_pin, pin_enabled,
-        active_app_check_interval;
+        active_app_check_interval, log_all_broadcasts;
 
         String mValue;
 
@@ -270,6 +270,18 @@ public class SettingsManager
     {
         SharedPreferences.Editor editor = prefsDefault.edit();
         editor.putBoolean(Key.pin_enabled.toString(), enabled);
+        editor.apply();
+    }
+
+    public static boolean isLogAllBroadcasts()
+    {
+        return prefsDefault.getBoolean(Key.log_all_broadcasts.toString(), false);
+    }
+
+    public static void setLogAllBroadcasts(boolean log)
+    {
+        SharedPreferences.Editor editor = prefsDefault.edit();
+        editor.putBoolean(Key.log_all_broadcasts.toString(), log);
         editor.apply();
     }
 }

@@ -50,7 +50,7 @@ public class EventDetailsActivity extends AbsActivity
         tvTimestamp.setText(format.format(event.getTimestamp().getTime()));
         tvEventLevelColor.setBackgroundColor(EventLevel.getLevelForInt(event.getLevel()).color());
         tvLongDesc.setText(Html.fromHtml(event.getLong_desc()));
-        Icon icon = MainApp.getInstance().getDaoSession().getIconDao().load(event.getIcon_id());
+        Icon icon = App.getInstance().getDaoSession().getIconDao().load(event.getIcon_id());
         if(icon == null || icon.getIcon() == null || icon.getIcon().length == 0)
         {
             tvEventDetails.setCompoundDrawablesWithIntrinsicBounds(EventType.getIconForId(event.getType()), 0, 0, 0);

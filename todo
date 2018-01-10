@@ -21,6 +21,9 @@ bugs
 todo
 PACKAGE_CHANGED
 
+indicator that filter is on
+blacklist
+
 
 ***6.0 permissions
 ACCESS_FINE_LOCATION

@@ -26,6 +26,12 @@
             android:defaultValue="1000"
             />
 
+        <CheckBoxPreference
+            android:key="log_all_broadcasts"
+            android:title="@string/log_all_broadcasts"
+            android:summary="@string/log_all_broadcasts_desc"
+            android:defaultValue="false"/>
+
         <PreferenceScreen
             android:key="prefs_clear_db"
             android:title="@string/clear_db"/>

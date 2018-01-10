@@ -25,8 +25,9 @@ import java.util.Arrays;
 import java.util.List;
 
 import rs.pedjaapps.eventlogger.MainActivity;
-import rs.pedjaapps.eventlogger.MainApp;
+import rs.pedjaapps.eventlogger.App;
 import rs.pedjaapps.eventlogger.R;
+import rs.pedjaapps.eventlogger.service.EventService;
 import rs.pedjaapps.eventlogger.utility.SettingsManager;
 import rs.pedjaapps.eventlogger.utility.Utility;
 
@@ -148,6 +149,18 @@ public class SettingsFragment extends PreferenceFragment
             security.setTitle(getString(R.string.security) + getString(R.string.pro_only));
         }
 
+        CheckBoxPreference logAllBroadcasts = (CheckBoxPreference) findPreference("log_all_broadcasts");
+        logAllBroadcasts.setChecked(SettingsManager.isLogAllBroadcasts());
+        logAllBroadcasts.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener()
+        {
+            @Override
+            public boolean onPreferenceClick(Preference preference)
+            {
+                getActivity().startService(new Intent(getActivity(), EventService.class));
+                return true;
+            }
+        });
+
         PreferenceScreen about = (PreferenceScreen) findPreference("prefs_about");
         if(about != null)
         {
@@ -206,7 +219,7 @@ public class SettingsFragment extends PreferenceFragment
         });
 
 
-        final long eventCount = MainApp.getInstance().getDaoSession().getEventDao().queryBuilder().count();
+        final long eventCount = App.getInstance().getDaoSession().getEventDao().queryBuilder().count();
         displaylimit = (ListPreference) findPreference("items_display_limit");
         final List<String> displayLimit = Arrays.asList(getResources().getStringArray(R.array.displayLimit));
         displaylimit.setSummary(SettingsManager.getItemsDisplayLimit() + "/" + eventCount);
@@ -256,7 +269,7 @@ public class SettingsFragment extends PreferenceFragment
     private void setClearDbSummary()
     {
         if(clearDb == null)return;
-        long dbSizeBytes = new File(((SQLiteDatabase)MainApp.getInstance().getDaoSession().getDatabase().getRawDatabase()).getPath()).length();
+        long dbSizeBytes = new File(((SQLiteDatabase) App.getInstance().getDaoSession().getDatabase().getRawDatabase()).getPath()).length();
         clearDb.setSummary(getString(R.string.db_size) + " " + Utility.byteToHumanReadableSize(dbSizeBytes));
     }
 
@@ -310,7 +323,7 @@ public class SettingsFragment extends PreferenceFragment
         @Override
         protected Void doInBackground(Void... voids)
         {
-            MainApp.getInstance().getDaoSession().getEventDao().deleteAll();
+            App.getInstance().getDaoSession().getEventDao().deleteAll();
             return null;
         }
 
@@ -321,7 +334,7 @@ public class SettingsFragment extends PreferenceFragment
                 return;
             if (displaylimit != null)
             {
-                final long eventCount = MainApp.getInstance().getDaoSession().getEventDao().queryBuilder().count();
+                final long eventCount = App.getInstance().getDaoSession().getEventDao().queryBuilder().count();
                 final List<String> displayLimit = Arrays.asList(getResources().getStringArray(R.array.displayLimit));
                 displaylimit.setSummary(displayLimit.get(displayLimit.indexOf(SettingsManager.getItemsDisplayLimit())) + "/" + eventCount);
             }

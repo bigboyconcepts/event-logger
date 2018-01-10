@@ -21,12 +21,13 @@ import java.util.Date;
 import java.util.Locale;
 
 import rs.pedjaapps.eventlogger.MainActivity;
-import rs.pedjaapps.eventlogger.MainApp;
+import rs.pedjaapps.eventlogger.App;
 import rs.pedjaapps.eventlogger.R;
 import rs.pedjaapps.eventlogger.constants.Constants;
 import rs.pedjaapps.eventlogger.constants.EventLevel;
 import rs.pedjaapps.eventlogger.constants.EventType;
 import rs.pedjaapps.eventlogger.model.Event;
+import rs.pedjaapps.eventlogger.model.EventDao;
 import rs.pedjaapps.eventlogger.model.Icon;
 import rs.pedjaapps.eventlogger.service.EventService;
 import rs.pedjaapps.eventlogger.utility.Utility;
@@ -41,7 +42,7 @@ public class EventReceiver extends BroadcastReceiver
 	
     public static void sendLocalBroadcast(Event event)
     {
-        sendLocalBroadcast(event, MainApp.getContext());
+        sendLocalBroadcast(event, App.getInstance());
     }
 
     public static void sendLocalBroadcast(Event event, Context context)
@@ -55,6 +56,8 @@ public class EventReceiver extends BroadcastReceiver
     @Override
     public void onReceive(Context context, Intent intent)
     {
+        if(isInitialStickyBroadcast())
+            return;
         if(intent == null || intent.getAction() == null /*|| intent.getExtras() == null*/)
         {
             return;
@@ -83,9 +86,9 @@ public class EventReceiver extends BroadcastReceiver
 			event.setLong_desc(context.getString(R.string.app_started_desc, appName, packageName));
             Icon icon = new Icon();
             icon.setIcon(Utility.getApplicationIcon(context, packageName));
-            long iconId = MainApp.getInstance().getDaoSession().getIconDao().insert(icon);
+            long iconId = App.getInstance().getDaoSession().getIconDao().insert(icon);
 			event.setIcon_id(iconId);
-			EventDao eventDao = MainApp.getInstance().getDaoSession().getEventDao();
+			EventDao eventDao = App.getInstance().getDaoSession().getEventDao();
 			eventDao.insert(event);
 			EventReceiver.sendLocalBroadcast(event);
 		}
@@ -112,7 +115,7 @@ public class EventReceiver extends BroadcastReceiver
                 event.setLong_desc(context.getString(R.string.wifi_disconnected_description));
             }
 
-            EventDao eventDao = MainApp.getInstance().getDaoSession().getEventDao();
+            EventDao eventDao = App.getInstance().getDaoSession().getEventDao();
             eventDao.insert(event);
             sendLocalBroadcast(event);
         }
@@ -137,7 +140,7 @@ public class EventReceiver extends BroadcastReceiver
                     event.setLong_desc(context.getString(R.string.wifi_toggle_description, context.getString(R.string.enabled_lower)));
                     break;
             }
-            EventDao eventDao = MainApp.getInstance().getDaoSession().getEventDao();
+            EventDao eventDao = App.getInstance().getDaoSession().getEventDao();
             eventDao.insert(event);
             sendLocalBroadcast(event);
         }
@@ -167,7 +170,7 @@ public class EventReceiver extends BroadcastReceiver
 
                     break;
             }
-            EventDao eventDao = MainApp.getInstance().getDaoSession().getEventDao();
+            EventDao eventDao = App.getInstance().getDaoSession().getEventDao();
             eventDao.insert(event);
             sendLocalBroadcast(event);
         }
@@ -184,7 +187,7 @@ public class EventReceiver extends BroadcastReceiver
                 event.setLong_desc(context.getString(R.string.bluetooth_connected_description, device.getAddress(), device.getName()));
             }
 
-            EventDao eventDao = MainApp.getInstance().getDaoSession().getEventDao();
+            EventDao eventDao = App.getInstance().getDaoSession().getEventDao();
             eventDao.insert(event);
             sendLocalBroadcast(event);
         }
@@ -201,7 +204,7 @@ public class EventReceiver extends BroadcastReceiver
                 event.setLong_desc(context.getString(R.string.bluetooth_disconnected_description, device.getAddress(), device.getName()));
             }
 
-            EventDao eventDao = MainApp.getInstance().getDaoSession().getEventDao();
+            EventDao eventDao = App.getInstance().getDaoSession().getEventDao();
             eventDao.insert(event);
             sendLocalBroadcast(event);
         }
@@ -229,7 +232,7 @@ public class EventReceiver extends BroadcastReceiver
             }
             String address = messages[0].getOriginatingAddress();
             event.setLong_desc(context.getString(R.string.received_sms_desc, address));
-            EventDao eventDao = MainApp.getInstance().getDaoSession().getEventDao();
+            EventDao eventDao = App.getInstance().getDaoSession().getEventDao();
             eventDao.insert(event);
             sendLocalBroadcast(event);
         }
@@ -241,7 +244,7 @@ public class EventReceiver extends BroadcastReceiver
             event.setType(EventType.getIntForType(EventType.boot));
             event.setShort_desc(context.getString(R.string.boot_completed));
             event.setLong_desc(context.getString(R.string.boot_completed_desc));
-            EventDao eventDao = MainApp.getInstance().getDaoSession().getEventDao();
+            EventDao eventDao = App.getInstance().getDaoSession().getEventDao();
             eventDao.insert(event);
             sendLocalBroadcast(event);
         }
@@ -253,7 +256,7 @@ public class EventReceiver extends BroadcastReceiver
             event.setType(EventType.getIntForType(EventType.time));
             event.setShort_desc(context.getString(R.string.time_changed));
             event.setLong_desc(context.getString(R.string.time_changed_desc));
-            EventDao eventDao = MainApp.getInstance().getDaoSession().getEventDao();
+            EventDao eventDao = App.getInstance().getDaoSession().getEventDao();
             eventDao.insert(event);
             sendLocalBroadcast(event);
         }
@@ -265,7 +268,7 @@ public class EventReceiver extends BroadcastReceiver
             event.setType(EventType.getIntForType(EventType.date));
             event.setShort_desc(context.getString(R.string.date_changed));
             event.setLong_desc(context.getString(R.string.date_changed_desc));
-            EventDao eventDao = MainApp.getInstance().getDaoSession().getEventDao();
+            EventDao eventDao = App.getInstance().getDaoSession().getEventDao();
             eventDao.insert(event);
             sendLocalBroadcast(event);
         }
@@ -277,7 +280,7 @@ public class EventReceiver extends BroadcastReceiver
             event.setType(EventType.getIntForType(EventType.time));
             event.setShort_desc(context.getString(R.string.timezone_changed));
             event.setLong_desc(context.getString(R.string.timezone_changed_desc, extras != null ? extras.getString("time-zone") : "n/a"));
-            EventDao eventDao = MainApp.getInstance().getDaoSession().getEventDao();
+            EventDao eventDao = App.getInstance().getDaoSession().getEventDao();
             eventDao.insert(event);
             sendLocalBroadcast(event);
         }
@@ -290,7 +293,7 @@ public class EventReceiver extends BroadcastReceiver
             event.setType(EventType.getIntForType(EventType.airplane));
             event.setShort_desc(context.getString(R.string.airplane_mode_toggled, isEnabled ? "green" : "red", context.getString(isEnabled ? R.string.enabled_upper : R.string.disabled_upper)));
             event.setLong_desc(context.getString(R.string.airplane_mode_desc, context.getString(isEnabled ? R.string.enabled_lower : R.string.disabled_lower)));
-            EventDao eventDao = MainApp.getInstance().getDaoSession().getEventDao();
+            EventDao eventDao = App.getInstance().getDaoSession().getEventDao();
             eventDao.insert(event);
             sendLocalBroadcast(event);
         }
@@ -302,7 +305,7 @@ public class EventReceiver extends BroadcastReceiver
             event.setType(EventType.getIntForType(EventType.wallpaper));
             event.setShort_desc(context.getString(R.string.wallpaper_changed));
             event.setLong_desc(context.getString(R.string.wallpaper_changed_desc));
-            EventDao eventDao = MainApp.getInstance().getDaoSession().getEventDao();
+            EventDao eventDao = App.getInstance().getDaoSession().getEventDao();
             eventDao.insert(event);
             sendLocalBroadcast(event);
         }
@@ -316,7 +319,7 @@ public class EventReceiver extends BroadcastReceiver
             event.setType(EventType.getIntForType(EventType.gps));
             event.setShort_desc(context.getString(R.string.gps_state_changed, gpsEnabled ? "green" : "red", context.getString(gpsEnabled ? R.string.enabled_upper : R.string.disabled_upper)));
             event.setLong_desc(context.getString(R.string.gps_state_changed_desc, context.getString(gpsEnabled ? R.string.enabled_lower : R.string.disabled_lower)));
-            EventDao eventDao = MainApp.getInstance().getDaoSession().getEventDao();
+            EventDao eventDao = App.getInstance().getDaoSession().getEventDao();
             eventDao.insert(event);
             sendLocalBroadcast(event);
         }
@@ -344,7 +347,7 @@ public class EventReceiver extends BroadcastReceiver
             event.setType(EventType.getIntForType(EventType.volume));
             event.setShort_desc(context.getString(R.string.volume_changed, newVolume));
             event.setLong_desc(context.getString(R.string.volume_changed_desc, type, prevVolume, newVolume));
-            EventDao eventDao = MainApp.getInstance().getDaoSession().getEventDao();
+            EventDao eventDao = App.getInstance().getDaoSession().getEventDao();
             eventDao.insert(event);
             sendLocalBroadcast(event);
         }
@@ -358,7 +361,7 @@ public class EventReceiver extends BroadcastReceiver
             event.setType(EventType.getIntForType(EventType.call));
             event.setShort_desc(context.getString(R.string.outgoing_call, phoneNum));
             event.setLong_desc(context.getString(R.string.outgoing_call_desc, phoneNum));
-            EventDao eventDao = MainApp.getInstance().getDaoSession().getEventDao();
+            EventDao eventDao = App.getInstance().getDaoSession().getEventDao();
             eventDao.insert(event);
             sendLocalBroadcast(event);
         }
@@ -375,7 +378,7 @@ public class EventReceiver extends BroadcastReceiver
             event.setType(EventType.getIntForType(EventType.call));
             event.setShort_desc(context.getString(R.string.incoming_call, phoneNum));
             event.setLong_desc(context.getString(R.string.incoming_call_desc));
-            EventDao eventDao = MainApp.getInstance().getDaoSession().getEventDao();
+            EventDao eventDao = App.getInstance().getDaoSession().getEventDao();
             eventDao.insert(event);
             sendLocalBroadcast(event);
         }
@@ -390,7 +393,7 @@ public class EventReceiver extends BroadcastReceiver
             event.setType(EventType.getIntForType(EventType.orientation));
             event.setShort_desc(context.getString(R.string.orientation_changed, newOrientation.toUpperCase()));
             event.setLong_desc(context.getString(R.string.orientation_changed_desc, oldOrientation, newOrientation));
-            EventDao eventDao = MainApp.getInstance().getDaoSession().getEventDao();
+            EventDao eventDao = App.getInstance().getDaoSession().getEventDao();
             eventDao.insert(event);
             sendLocalBroadcast(event);
         }
@@ -402,7 +405,7 @@ public class EventReceiver extends BroadcastReceiver
             event.setType(EventType.getIntForType(EventType.boot));
             event.setShort_desc(context.getString(R.string.device_reboot));
             event.setLong_desc(context.getString(R.string.reboot_desc));
-            EventDao eventDao = MainApp.getInstance().getDaoSession().getEventDao();
+            EventDao eventDao = App.getInstance().getDaoSession().getEventDao();
             eventDao.insert(event);
             sendLocalBroadcast(event);
         }
@@ -414,7 +417,7 @@ public class EventReceiver extends BroadcastReceiver
             event.setType(EventType.getIntForType(EventType.boot));
             event.setShort_desc(context.getString(R.string.device_shutdown));
             event.setLong_desc(context.getString(R.string.shutdown_desc));
-            EventDao eventDao = MainApp.getInstance().getDaoSession().getEventDao();
+            EventDao eventDao = App.getInstance().getDaoSession().getEventDao();
             eventDao.insert(event);
             sendLocalBroadcast(event);
         }
@@ -426,7 +429,7 @@ public class EventReceiver extends BroadcastReceiver
             event.setType(EventType.getIntForType(EventType.usb));
             event.setShort_desc(context.getString(R.string.power_connected));
             event.setLong_desc(context.getString(R.string.power_connected_desc));
-            EventDao eventDao = MainApp.getInstance().getDaoSession().getEventDao();
+            EventDao eventDao = App.getInstance().getDaoSession().getEventDao();
             eventDao.insert(event);
             sendLocalBroadcast(event);
         }
@@ -438,7 +441,7 @@ public class EventReceiver extends BroadcastReceiver
             event.setType(EventType.getIntForType(EventType.usb));
             event.setShort_desc(context.getString(R.string.power_disconnected));
             event.setLong_desc(context.getString(R.string.power_disconnected_desc));
-            EventDao eventDao = MainApp.getInstance().getDaoSession().getEventDao();
+            EventDao eventDao = App.getInstance().getDaoSession().getEventDao();
             eventDao.insert(event);
             sendLocalBroadcast(event);
         }
@@ -516,7 +519,7 @@ public class EventReceiver extends BroadcastReceiver
                         context.getString(R.string.na).toUpperCase()));
             }
 
-            EventDao eventDao = MainApp.getInstance().getDaoSession().getEventDao();
+            EventDao eventDao = App.getInstance().getDaoSession().getEventDao();
             eventDao.insert(event);
             sendLocalBroadcast(event);
         }
@@ -528,7 +531,7 @@ public class EventReceiver extends BroadcastReceiver
             event.setType(EventType.getIntForType(EventType.battery));
             event.setShort_desc(context.getString(R.string.battery_low));
             event.setLong_desc(context.getString(R.string.battery_low_desc));
-            EventDao eventDao = MainApp.getInstance().getDaoSession().getEventDao();
+            EventDao eventDao = App.getInstance().getDaoSession().getEventDao();
             eventDao.insert(event);
             sendLocalBroadcast(event);
         }
@@ -540,7 +543,7 @@ public class EventReceiver extends BroadcastReceiver
             event.setType(EventType.getIntForType(EventType.battery));
             event.setShort_desc(context.getString(R.string.battery_ok));
             event.setLong_desc(context.getString(R.string.battery_ok_desc));
-            EventDao eventDao = MainApp.getInstance().getDaoSession().getEventDao();
+            EventDao eventDao = App.getInstance().getDaoSession().getEventDao();
             eventDao.insert(event);
             sendLocalBroadcast(event);
         }
@@ -553,7 +556,7 @@ public class EventReceiver extends BroadcastReceiver
             event.setType(EventType.getIntForType(EventType.locale));
             event.setShort_desc(context.getString(R.string.locale_changed, locale));
             event.setLong_desc(context.getString(R.string.locale_changed_desc, locale));
-            EventDao eventDao = MainApp.getInstance().getDaoSession().getEventDao();
+            EventDao eventDao = App.getInstance().getDaoSession().getEventDao();
             eventDao.insert(event);
             sendLocalBroadcast(event);
         }
@@ -565,7 +568,7 @@ public class EventReceiver extends BroadcastReceiver
             event.setType(EventType.getIntForType(EventType.screen));
             event.setShort_desc(context.getString(R.string.screen_off));
             event.setLong_desc(context.getString(R.string.screen_off_desc));
-            EventDao eventDao = MainApp.getInstance().getDaoSession().getEventDao();
+            EventDao eventDao = App.getInstance().getDaoSession().getEventDao();
             eventDao.insert(event);
             sendLocalBroadcast(event);
         }
@@ -577,7 +580,7 @@ public class EventReceiver extends BroadcastReceiver
             event.setType(EventType.getIntForType(EventType.screen));
             event.setShort_desc(context.getString(R.string.screen_on));
             event.setLong_desc(context.getString(R.string.screen_on_desc));
-            EventDao eventDao = MainApp.getInstance().getDaoSession().getEventDao();
+            EventDao eventDao = App.getInstance().getDaoSession().getEventDao();
             eventDao.insert(event);
             sendLocalBroadcast(event);
         }
@@ -589,7 +592,7 @@ public class EventReceiver extends BroadcastReceiver
             event.setType(EventType.getIntForType(EventType.screen));
             event.setShort_desc(context.getString(R.string.screen_unlocked));
             event.setLong_desc(context.getString(R.string.screen_unlocked_desc));
-            EventDao eventDao = MainApp.getInstance().getDaoSession().getEventDao();
+            EventDao eventDao = App.getInstance().getDaoSession().getEventDao();
             eventDao.insert(event);
             sendLocalBroadcast(event);
         }
@@ -627,7 +630,7 @@ public class EventReceiver extends BroadcastReceiver
                 event.setLong_desc(context.getString(R.string.headset_unknown_desc));
             }
 
-            EventDao eventDao = MainApp.getInstance().getDaoSession().getEventDao();
+            EventDao eventDao = App.getInstance().getDaoSession().getEventDao();
             eventDao.insert(event);
             sendLocalBroadcast(event);
         }
@@ -639,7 +642,7 @@ public class EventReceiver extends BroadcastReceiver
             event.setType(EventType.getIntForType(EventType.media));
             event.setShort_desc(context.getString(R.string.scanner_started));
             event.setLong_desc(context.getString(R.string.scanner_started_desc));
-            EventDao eventDao = MainApp.getInstance().getDaoSession().getEventDao();
+            EventDao eventDao = App.getInstance().getDaoSession().getEventDao();
             eventDao.insert(event);
             sendLocalBroadcast(event);
         }
@@ -651,7 +654,7 @@ public class EventReceiver extends BroadcastReceiver
             event.setType(EventType.getIntForType(EventType.media));
             event.setShort_desc(context.getString(R.string.scanner_finished));
             event.setLong_desc(context.getString(R.string.scanner_finished_desc));
-            EventDao eventDao = MainApp.getInstance().getDaoSession().getEventDao();
+            EventDao eventDao = App.getInstance().getDaoSession().getEventDao();
             eventDao.insert(event);
             sendLocalBroadcast(event);
         }
@@ -667,7 +670,7 @@ public class EventReceiver extends BroadcastReceiver
                 event.setType(EventType.getIntForType(EventType.app));
                 event.setShort_desc(context.getString(R.string.app_removed));
                 event.setLong_desc(context.getString(R.string.app_removed_desc, pn));
-                EventDao eventDao = MainApp.getInstance().getDaoSession().getEventDao();
+                EventDao eventDao = App.getInstance().getDaoSession().getEventDao();
                 eventDao.insert(event);
                 sendLocalBroadcast(event);
             }
@@ -687,9 +690,9 @@ public class EventReceiver extends BroadcastReceiver
                 event.setLong_desc(context.getString(R.string.app_installed_desc, appName, pn));
                 Icon icon = new Icon();
                 icon.setIcon(Utility.getApplicationIcon(context, pn));
-                long iconId = MainApp.getInstance().getDaoSession().getIconDao().insert(icon);
+                long iconId = App.getInstance().getDaoSession().getIconDao().insert(icon);
                 event.setIcon_id(iconId);
-                EventDao eventDao = MainApp.getInstance().getDaoSession().getEventDao();
+                EventDao eventDao = App.getInstance().getDaoSession().getEventDao();
                 eventDao.insert(event);
                 sendLocalBroadcast(event);
             }
@@ -706,9 +709,9 @@ public class EventReceiver extends BroadcastReceiver
             event.setLong_desc(context.getString(R.string.app_data_cleared_desc, appName, pn));
             Icon icon = new Icon();
             icon.setIcon(Utility.getApplicationIcon(context, pn));
-            long iconId = MainApp.getInstance().getDaoSession().getIconDao().insert(icon);
+            long iconId = App.getInstance().getDaoSession().getIconDao().insert(icon);
             event.setIcon_id(iconId);
-            EventDao eventDao = MainApp.getInstance().getDaoSession().getEventDao();
+            EventDao eventDao = App.getInstance().getDaoSession().getEventDao();
             eventDao.insert(event);
             sendLocalBroadcast(event);
         }
@@ -724,9 +727,9 @@ public class EventReceiver extends BroadcastReceiver
             event.setLong_desc(context.getString(R.string.app_killed_desc, appName, pn));
             Icon icon = new Icon();
             icon.setIcon(Utility.getApplicationIcon(context, pn));
-            long iconId = MainApp.getInstance().getDaoSession().getIconDao().insert(icon);
+            long iconId = App.getInstance().getDaoSession().getIconDao().insert(icon);
             event.setIcon_id(iconId);
-            EventDao eventDao = MainApp.getInstance().getDaoSession().getEventDao();
+            EventDao eventDao = App.getInstance().getDaoSession().getEventDao();
             eventDao.insert(event);
             sendLocalBroadcast(event);
         }
@@ -742,9 +745,9 @@ public class EventReceiver extends BroadcastReceiver
             event.setLong_desc(context.getString(R.string.app_reinstalled_desc, appName, pn));
             Icon icon = new Icon();
             icon.setIcon(Utility.getApplicationIcon(context, pn));
-            long iconId = MainApp.getInstance().getDaoSession().getIconDao().insert(icon);
+            long iconId = App.getInstance().getDaoSession().getIconDao().insert(icon);
             event.setIcon_id(iconId);
-            EventDao eventDao = MainApp.getInstance().getDaoSession().getEventDao();
+            EventDao eventDao = App.getInstance().getDaoSession().getEventDao();
             eventDao.insert(event);
             sendLocalBroadcast(event);
         }

@@ -5,6 +5,8 @@ import android.database.sqlite.SQLiteDatabase;
 
 import org.greenrobot.greendao.database.Database;
 
+import rs.pedjaapps.eventlogger.model.BroadcastAction;
+import rs.pedjaapps.eventlogger.model.BroadcastActionDao;
 import rs.pedjaapps.eventlogger.model.DaoMaster;
 import rs.pedjaapps.eventlogger.model.EventDao;
 import rs.pedjaapps.eventlogger.model.IconDao;
@@ -24,8 +26,21 @@ public class DatabaseHelper extends DaoMaster.OpenHelper
     {
         if(oldVersion == 3)
         {
-            db.execSQL("ALTER TABLE " + EventDao.TABLENAME + " ADD COLUMN icon_id INTEGER");
-            IconDao.createTable(db, true);
+            upgradeTo4(db);
+            upgradeTo5(db);
         }
+        if(oldVersion == 4)
+        {
+            upgradeTo5(db);
+        }
+    }
+
+    private void upgradeTo5(Database db) {
+        BroadcastActionDao.createTable(db, true);
+    }
+
+    private void upgradeTo4(Database db) {
+        db.execSQL("ALTER TABLE " + EventDao.TABLENAME + " ADD COLUMN icon_id INTEGER");
+        IconDao.createTable(db, true);
     }
 }

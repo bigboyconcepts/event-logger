@@ -5,6 +5,7 @@ import android.app.Service;
 import android.app.usage.UsageStats;
 import android.app.usage.UsageStatsManager;
 import android.bluetooth.BluetoothAdapter;
+import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -18,20 +19,17 @@ import android.support.annotation.RequiresApi;
 import android.telephony.TelephonyManager;
 import android.util.Log;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 import rs.pedjaapps.eventlogger.BuildConfig;
-import rs.pedjaapps.eventlogger.MainApp;
+import rs.pedjaapps.eventlogger.App;
 import rs.pedjaapps.eventlogger.R;
 import rs.pedjaapps.eventlogger.ServiceRestartActivity;
 import rs.pedjaapps.eventlogger.constants.Constants;
@@ -43,28 +41,30 @@ import rs.pedjaapps.eventlogger.model.EventDao;
 import rs.pedjaapps.eventlogger.model.Icon;
 import rs.pedjaapps.eventlogger.receiver.AllReceiver;
 import rs.pedjaapps.eventlogger.receiver.EventReceiver;
+import rs.pedjaapps.eventlogger.utility.BroadcastActionsManager;
 import rs.pedjaapps.eventlogger.utility.SettingsManager;
 import rs.pedjaapps.eventlogger.utility.Utility;
 
 /**
  * Created by pedja on 11.4.14..
  */
-public class EventService extends Service
-{
+public class EventService extends Service {
     public static final long DUMPSYS_CHECK_INTERVAL = 60 * 60 * 1000;
-    private EventReceiver manualRegisterReceiver;
+
+    private static EventReceiver manualRegisterReceiver;
+    private static AllReceiver allReceiver;
+
     private String lastActiveApp = "";
     private Handler handler;
+    private Runnable dumpsysChecker;
 
     @Override
-    public IBinder onBind(Intent intent)
-    {
+    public IBinder onBind(Intent intent) {
         return null;
     }
 
     @Override
-    public void onCreate()
-    {
+    public void onCreate() {
         Log.d(Constants.LOG_TAG, "EventService :: onCreate");
         IntentFilter intentFilter = new IntentFilter();
         //screen
@@ -125,20 +125,17 @@ public class EventService extends Service
 
         intentFilter.addAction(EventReceiver.INTENT_ACTION_APP_LAUNCHED);
 
-        manualRegisterReceiver = new EventReceiver();
+        if (manualRegisterReceiver == null)
+            manualRegisterReceiver = new EventReceiver();
+        unregisterReceiver(manualRegisterReceiver);
         registerReceiver(manualRegisterReceiver, intentFilter);
 
         Runnable appLaunchChecker;
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP)
-        {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
             appLaunchChecker = new AppLaunchCheckerLegacy();
-        }
-        else if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP_MR1)
-        {
+        } else if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP_MR1) {
             appLaunchChecker = new AppLaunchCheckerLP();
-        }
-        else
-        {
+        } else {
             appLaunchChecker = new AppLaunchCheckerN();
         }
 
@@ -147,29 +144,20 @@ public class EventService extends Service
         handler = new Handler(thread.getLooper());
         handler.postDelayed(appLaunchChecker, SettingsManager.getActiveAppCheckInterval());
 
-        Runnable dumpsysChecker = new DumpsysChecker();
-        handler.post(dumpsysChecker);
-
         super.onCreate();
     }
 
-    private class AppLaunchCheckerLegacy implements Runnable
-    {
+    private class AppLaunchCheckerLegacy implements Runnable {
         @Override
-        public void run()
-        {
+        public void run() {
             List<ActivityManager.RunningTaskInfo> tasks = ((ActivityManager) getSystemService(Context.ACTIVITY_SERVICE)).getRunningTasks(1);
-            if (tasks != null && !tasks.isEmpty())
-            {
+            if (tasks != null && !tasks.isEmpty()) {
                 ActivityManager.RunningTaskInfo task = tasks.get(0);
-                if (task != null)
-                {
+                if (task != null) {
                     ComponentName topActivity = task.topActivity;
-                    if (topActivity != null)
-                    {
+                    if (topActivity != null) {
                         String pn = topActivity.getPackageName();
-                        if (pn != null && !lastActiveApp.equals(pn))
-                        {
+                        if (pn != null && !lastActiveApp.equals(pn)) {
                             lastActiveApp = pn;
                             String appName = Utility.getNameForPackage(EventService.this, pn);
 
@@ -181,9 +169,9 @@ public class EventService extends Service
                             event.setLong_desc(getString(R.string.app_started_desc, appName, pn));
                             Icon icon = new Icon();
                             icon.setIcon(Utility.getApplicationIcon(EventService.this, pn));
-                            long iconId = MainApp.getInstance().getDaoSession().getIconDao().insert(icon);
+                            long iconId = App.getInstance().getDaoSession().getIconDao().insert(icon);
                             event.setIcon_id(iconId);
-                            EventDao eventDao = MainApp.getInstance().getDaoSession().getEventDao();
+                            EventDao eventDao = App.getInstance().getDaoSession().getEventDao();
                             eventDao.insert(event);
                             EventReceiver.sendLocalBroadcast(event);
                         }
@@ -194,40 +182,30 @@ public class EventService extends Service
         }
     }
 
-    private class AppLaunchCheckerLP implements Runnable
-    {
+    private class AppLaunchCheckerLP implements Runnable {
         @Override
-        public void run()
-        {
+        public void run() {
             List<ActivityManager.RunningAppProcessInfo> processes = ((ActivityManager) getSystemService(Context.ACTIVITY_SERVICE)).getRunningAppProcesses();
-            if (processes != null)
-            {
+            if (processes != null) {
                 List<String> packages = new ArrayList<>();
-                for (ActivityManager.RunningAppProcessInfo pi : processes)
-                {
+                for (ActivityManager.RunningAppProcessInfo pi : processes) {
                     boolean hasActivities = true;
-                    try
-                    {
+                    try {
                         Field flagsField = pi.getClass().getDeclaredField("flags");
                         int flags = (int) flagsField.get(pi);
                         hasActivities = (flags & 1 << 2) == 1 << 2;
-                    }
-                    catch (Exception e)
-                    {
+                    } catch (Exception e) {
                         if (BuildConfig.DEBUG) e.printStackTrace();
                     }
-                    if (pi.processName.contains("com.android.systemui") || pi.processName.contains("android.process.acore"))
-                    {
+                    if (pi.processName.contains("com.android.systemui") || pi.processName.contains("android.process.acore")) {
                         continue;
                     }
-                    if (hasActivities && pi.importance == ActivityManager.RunningAppProcessInfo.IMPORTANCE_FOREGROUND)
-                    {
+                    if (hasActivities && pi.importance == ActivityManager.RunningAppProcessInfo.IMPORTANCE_FOREGROUND) {
                         packages.add(pi.processName);
                     }
                 }
                 String packageName = packages.isEmpty() ? null : packages.get(0);
-                if (packageName != null && !lastActiveApp.equals(packageName))
-                {
+                if (packageName != null && !lastActiveApp.equals(packageName)) {
                     lastActiveApp = packageName;
                     String appName = Utility.getNameForPackage(EventService.this, packageName);
 
@@ -239,9 +217,9 @@ public class EventService extends Service
                     event.setLong_desc(getString(R.string.app_started_desc, appName, packageName));
                     Icon icon = new Icon();
                     icon.setIcon(Utility.getApplicationIcon(EventService.this, packageName));
-                    long iconId = MainApp.getInstance().getDaoSession().getIconDao().insert(icon);
+                    long iconId = App.getInstance().getDaoSession().getIconDao().insert(icon);
                     event.setIcon_id(iconId);
-                    EventDao eventDao = MainApp.getInstance().getDaoSession().getEventDao();
+                    EventDao eventDao = App.getInstance().getDaoSession().getEventDao();
                     eventDao.insert(event);
                     EventReceiver.sendLocalBroadcast(event);
                 }
@@ -250,31 +228,25 @@ public class EventService extends Service
         }
     }
 
-    private class AppLaunchCheckerN implements Runnable
-    {
+    private class AppLaunchCheckerN implements Runnable {
         @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP_MR1)
         @Override
-        public void run()
-        {
+        public void run() {
             long now = System.currentTimeMillis();
 
             UsageStatsManager usageStatsManager = (UsageStatsManager) EventService.this.getSystemService(Context.USAGE_STATS_SERVICE);
             List<UsageStats> usageStatsList = usageStatsManager.queryUsageStats(UsageStatsManager.INTERVAL_BEST, now - SettingsManager.getActiveAppCheckInterval(), now);
 
-            if (!usageStatsList.isEmpty())
-            {
-                Collections.sort(usageStatsList, new Comparator<UsageStats>()
-                {
+            if (!usageStatsList.isEmpty()) {
+                Collections.sort(usageStatsList, new Comparator<UsageStats>() {
                     @Override
-                    public int compare(UsageStats o1, UsageStats o2)
-                    {
+                    public int compare(UsageStats o1, UsageStats o2) {
                         return Long.compare(o2.getLastTimeUsed(), o1.getLastTimeUsed());
                     }
                 });
 
                 UsageStats stats = usageStatsList.get(0);
-                if (!stats.getPackageName().equals(lastActiveApp))
-                {
+                if (!stats.getPackageName().equals(lastActiveApp)) {
                     lastActiveApp = stats.getPackageName();
 
                     String appName = Utility.getNameForPackage(EventService.this, lastActiveApp);
@@ -287,9 +259,9 @@ public class EventService extends Service
                     event.setLong_desc(getString(R.string.app_started_desc, appName, lastActiveApp));
                     Icon icon = new Icon();
                     icon.setIcon(Utility.getApplicationIcon(EventService.this, lastActiveApp));
-                    long iconId = MainApp.getInstance().getDaoSession().getIconDao().insert(icon);
+                    long iconId = App.getInstance().getDaoSession().getIconDao().insert(icon);
                     event.setIcon_id(iconId);
-                    EventDao eventDao = MainApp.getInstance().getDaoSession().getEventDao();
+                    EventDao eventDao = App.getInstance().getDaoSession().getEventDao();
                     eventDao.insert(event);
                     EventReceiver.sendLocalBroadcast(event);
                 }
@@ -299,77 +271,69 @@ public class EventService extends Service
         }
     }
 
-    private class DumpsysChecker implements Runnable
-    {
+    private class DumpsysChecker implements Runnable {
         @Override
-        public void run()
-        {
-            List<BroadcastAction> actions = MainApp.getInstance().getDaoSession().getBroadcastActionDao().loadAll();
-            if(actions.isEmpty())
-            {
+        public void run() {
+            Set<BroadcastAction> actions = BroadcastActionsManager.getInstance().importDumpsysActions();
 
-            }
-            try
-            {
-                Process p = Runtime.getRuntime().exec("dumpsys activity b");
-                BufferedReader r = new BufferedReader(new InputStreamReader(p.getInputStream()));
+            if (allReceiver == null)
+                allReceiver = new AllReceiver();
 
-                Set<String> actionsDumpsys = new HashSet<>();
+            IntentFilter intentFilter = new IntentFilter();
 
-                String line;
-                while ((line = r.readLine()) != null)
-                {
-                    if (line.startsWith("      Action:"))
-                    {
-                        line = line.substring(15, line.length() - 1);
-                        actionsDumpsys.add(line);
-                    }
-                }
-            }
-            catch (IOException e)
-            {
-                e.printStackTrace();
-            }
+            for (BroadcastAction action : actions)
+                intentFilter.addAction(action.getAction());
 
-            try
-            {
-                String[] actions = Utility.readRawFile(R.raw.broadcast_actions).split("\n");
-                IntentFilter intentFilter = new IntentFilter();
+            unregisterReceiver(allReceiver);
+            registerReceiver(allReceiver, intentFilter);
 
-                for (String action : actions)
-                    intentFilter.addAction(action.trim());
-
-                AllReceiver allReceiver = new AllReceiver();
-                registerReceiver(allReceiver, intentFilter);
-            }
-            catch (IOException e)
-            {
-                e.printStackTrace();
-            }
             handler.postDelayed(this, DUMPSYS_CHECK_INTERVAL);
         }
     }
 
     @Override
-    public void onDestroy()
-    {
+    public void onDestroy() {
         unregisterReceiver(manualRegisterReceiver);
+        unregisterReceiver(allReceiver);
         Log.d(Constants.LOG_TAG, "EventService :: onDestroy");
         super.onDestroy();
     }
 
     @Override
-    public int onStartCommand(Intent intent, int flags, int startId)
-    {
+    public int onStartCommand(Intent intent, int flags, int startId) {
         Log.d(Constants.LOG_TAG, "EventService :: onStartCommand");
+
+        if(SettingsManager.isLogAllBroadcasts())
+        {
+            if(dumpsysChecker == null)
+                dumpsysChecker = new DumpsysChecker();
+            else
+                handler.removeCallbacks(dumpsysChecker);
+            handler.post(dumpsysChecker);
+        }
+        else
+        {
+            if(dumpsysChecker != null)
+                handler.removeCallbacks(dumpsysChecker);
+            unregisterReceiver(allReceiver);
+        }
+
         return Service.START_STICKY;
     }
 
     @Override
-    public void onTaskRemoved(Intent rootIntent)
-    {
+    public void onTaskRemoved(Intent rootIntent) {
         Log.d(Constants.LOG_TAG, "EventService :: onTaskRemoved");
         super.onTaskRemoved(rootIntent);
         startActivity(new Intent(this, ServiceRestartActivity.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS));
+    }
+
+    @Override
+    public void unregisterReceiver(BroadcastReceiver receiver) {
+        try {
+            super.unregisterReceiver(receiver);
+        } catch (Exception e) {
+            Log.w(Constants.LOG_TAG, e.getMessage(), e);
+        }
     }
 }

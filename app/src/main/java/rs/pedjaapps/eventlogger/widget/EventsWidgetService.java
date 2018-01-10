@@ -19,11 +19,12 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
-import rs.pedjaapps.eventlogger.MainApp;
+import rs.pedjaapps.eventlogger.App;
 import rs.pedjaapps.eventlogger.R;
 import rs.pedjaapps.eventlogger.constants.EventLevel;
 import rs.pedjaapps.eventlogger.constants.EventType;
 import rs.pedjaapps.eventlogger.model.Event;
+import rs.pedjaapps.eventlogger.model.EventDao;
 import rs.pedjaapps.eventlogger.utility.SettingsManager;
 import rs.pedjaapps.eventlogger.utility.Utility;
 
@@ -135,7 +136,7 @@ class EventsRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory
         // from the network, etc., it is ok to do it here, synchronously. The widget will remain
         // in its current state while work is being done here, so you don't need to worry about
         // locking up the widget.
-        QueryBuilder<Event> queryBuilder = MainApp.getInstance().getDaoSession().getEventDao().queryBuilder();
+        QueryBuilder<Event> queryBuilder = App.getInstance().getDaoSession().getEventDao().queryBuilder();
         if(SettingsManager.isTimeFilterEnabled())
         {
             queryBuilder.where(EventDao.Properties.Timestamp.between(SettingsManager.getFilterTimeFrom(0), SettingsManager.getFilterTimeTo(new Date().getTime())));

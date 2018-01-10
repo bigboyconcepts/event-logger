@@ -5,8 +5,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 
-import rs.pedjaapps.eventlogger.MainApp;
+import rs.pedjaapps.eventlogger.App;
 import rs.pedjaapps.eventlogger.model.Event;
+import rs.pedjaapps.eventlogger.model.EventDao;
 import rs.pedjaapps.eventlogger.service.EventService;
 
 /**
@@ -29,7 +30,7 @@ public class InsertEventReceiver extends BroadcastReceiver
         if(intent.getAction().equals(ACTION_INSERT_EVENT))
         {
             Event event = extras.getParcelable(EXTRA_EVENT);
-            EventDao eventDao = MainApp.getInstance().getDaoSession().getEventDao();
+            EventDao eventDao = App.getInstance().getDaoSession().getEventDao();
             eventDao.insert(event);
             EventReceiver.sendLocalBroadcast(event, context);
         }
