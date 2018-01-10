@@ -270,5 +270,6 @@
     <string name="intent_extra_template"><![CDATA[<b>Key:</b> \'%s\', <b>Value:</b> \'%s\', <b>Value Class:</b> \'%s\']]></string>
     <string name="log_all_broadcasts">Log all broadcasts</string>
     <string name="log_all_broadcasts_desc">Logs all implicit roadcasts, will probably use more battery</string>
+    <string name="error_unparceling_bundle">Error unparceling bundle: %s</string>
 
 </resources>

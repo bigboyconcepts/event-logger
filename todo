@@ -23,6 +23,7 @@ PACKAGE_CHANGED
 
 indicator that filter is on
 blacklist
+date range, show only logs for today
 
 
 ***6.0 permissions

@@ -26,14 +26,18 @@ public class AllReceiver extends BroadcastReceiver
         if(isInitialStickyBroadcast())
             return;
         StringBuilder builder = new StringBuilder();
-        Bundle bundle = intent.getExtras();
-        if (bundle != null)
-        {
-            for (String key : bundle.keySet())
+        try {
+            Bundle bundle = intent.getExtras();
+            if (bundle != null)
             {
-                Object value = bundle.get(key);
-                builder.append(context.getString(R.string.intent_extra_template, key, value, (value != null ? value.getClass().getName() : null))).append("<br><br>");
+                for (String key : bundle.keySet())
+                {
+                    Object value = bundle.get(key);
+                    builder.append(context.getString(R.string.intent_extra_template, key, value, (value != null ? value.getClass().getName() : null))).append("<br><br>");
+                }
             }
+        } catch (Exception e) {
+            builder.append(context.getString(R.string.error_unparceling_bundle, e.getMessage()));
         }
 
         Event event = new Event();
